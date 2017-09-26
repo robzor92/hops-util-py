@@ -14,14 +14,8 @@ run_id = 0
 
 def launch(spark_session, map_fun, args_dict=None):
 
-    #Temporary crap fix
-    os.environ['CLASSPATH'] = "/srv/hops/hadoop/share/hadoop/hdfs/lib/hops-leader-election-2.8.2.1.jar:" + os.environ['CLASSPATH']
-    os.environ['SPARK_DIST_CLASSPATH'] = "/srv/hops/hadoop/share/hadoop/hdfs/lib/hops-leader-election-2.8.2.1.jar:" + os.environ['SPARK_DIST_CLASSPATH']
-    os.environ['CLASSPATH'] = "/srv/hops/hadoop/share/hadoop/hdfs/lib/hops-leader-election-2.8.2.jar:" + os.environ['CLASSPATH']
-    os.environ['SPARK_DIST_CLASSPATH'] = "/srv/hops/hadoop/share/hadoop/hdfs/lib/hops-leader-election-2.8.2.jar:" + os.environ['SPARK_DIST_CLASSPATH']
-    os.environ['CLASSPATH'] = "/srv/hops-gpu/hadoop/share/hadoop/hdfs/lib/hops-leader-election-2.8.2.1.jar:" + os.environ['CLASSPATH']
-    os.environ['SPARK_DIST_CLASSPATH'] = "/srv/hops-gpu/hadoop/share/hadoop/hdfs/lib/hops-leader-election-2.8.2.1.jar:" + os.environ['SPARK_DIST_CLASSPATH']
-    #os.environ['HADOOP_CLASSPATH'] = "/srv/hops-gpu/hadoop/share/hadoop/hdfs/lib/hops-leader-election-2.8.2.jar:" + os.environ['HADOOP_CLASSPATH']
+    os.environ['CLASSPATH'] = os.environ['HADOOP_HOME'] + "/share/hadoop/hdfs/lib/hops-leader-election-" + os.environ['HADOOP_VERSION'] + ".jar:" + os.environ['CLASSPATH']
+    os.environ['SPARK_DIST_CLASSPATH'] = os.environ['HADOOP_HOME'] + "/share/hadoop/hdfs/lib/hops-leader-election-" + os.environ['HADOOP_VERSION'] + ".jar:" + os.environ['SPARK_DIST_CLASSPATH']
 
     sc = spark_session.sparkContext
     app_id = str(sc.applicationId)
