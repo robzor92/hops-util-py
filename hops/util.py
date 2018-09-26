@@ -16,6 +16,7 @@ import time
 from hops import hdfs
 from hops import version
 from pyspark.sql import SparkSession
+from hops import constants
 
 #! Needed for hops library backwards compatability
 try:
@@ -34,25 +35,24 @@ try:
 except ImportError:
     import httplib as http
 
-def _get_elastic_endpoint():
-    elastic_endpoint = os.environ['ELASTIC_ENDPOINT']
+def get_elastic_endpoint():
+    elastic_endpoint = os.environ[constants.ENV_VARIABLES.ELASTIC_ENDPOINT_ENV_VAR]
     host, port = elastic_endpoint.split(':')
     return host + ':' + port
 
 elastic_endpoint = None
 try:
-    elastic_endpoint = _get_elastic_endpoint()
+    elastic_endpoint = get_elastic_endpoint()
 except:
     pass
 
 
-def _get_hopsworks_rest_endpoint():
-    elastic_endpoint = os.environ['REST_ENDPOINT']
-    return elastic_endpoint
+def get_hopsworks_rest_endpoint():
+    return os.environ[constants.ENV_VARIABLES.REST_ENDPOINT_END_VAR]
 
 hopsworks_endpoint = None
 try:
-    hopsworks_endpoint = _get_hopsworks_rest_endpoint()
+    hopsworks_endpoint = get_hopsworks_rest_endpoint()
 except:
     pass
 
@@ -275,8 +275,4 @@ def convert_to_dict(best_param):
 
 def _find_spark():
     return SparkSession.builder.getOrCreate()
-
-
-
-
 
