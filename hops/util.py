@@ -17,6 +17,8 @@ from hops import hdfs
 from hops import version
 from pyspark.sql import SparkSession
 from hops import constants
+from hops import rest_api
+
 
 #! Needed for hops library backwards compatability
 try:
@@ -46,13 +48,9 @@ try:
 except:
     pass
 
-
-def get_hopsworks_rest_endpoint():
-    return os.environ[constants.ENV_VARIABLES.REST_ENDPOINT_END_VAR]
-
 hopsworks_endpoint = None
 try:
-    hopsworks_endpoint = get_hopsworks_rest_endpoint()
+    hopsworks_endpoint = rest_api.get_hopsworks_rest_endpoint()
 except:
     pass
 
@@ -275,4 +273,3 @@ def convert_to_dict(best_param):
 
 def _find_spark():
     return SparkSession.builder.getOrCreate()
-

@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7d93f73c-b515-4f79-80b8-72babe8a4300" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hops/kafka.py" afterPath="$PROJECT_DIR$/hops/kafka.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hops/util.py" afterPath="$PROJECT_DIR$/hops/util.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -23,21 +25,11 @@
       <file leaf-file-name="kafka.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/hops/kafka.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="386">
-              <caret line="265" column="7" lean-forward="true" selection-start-line="265" selection-start-column="7" selection-end-line="265" selection-end-column="7" />
+            <state relative-caret-position="300">
+              <caret line="72" column="56" lean-forward="true" selection-start-line="72" selection-start-column="56" selection-end-line="72" selection-end-column="56" />
               <folding>
                 <element signature="e#226#235#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ssl.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/anaconda3/envs/hops-util-py/lib/python3.6/ssl.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="308">
-              <caret line="519" column="18" lean-forward="false" selection-start-line="519" selection-start-column="18" selection-end-line="519" selection-end-column="18" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -45,8 +37,8 @@
       <file leaf-file-name="util.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/hops/util.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="98">
-              <caret line="238" column="23" lean-forward="false" selection-start-line="238" selection-start-column="19" selection-end-line="238" selection-end-column="23" />
+            <state relative-caret-position="-3636">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding>
                 <element signature="e#226#235#0" expanded="true" />
               </folding>
@@ -54,33 +46,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="constants.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/hops/constants.py">
+      <file leaf-file-name="tls.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/hops/tls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="31" column="50" lean-forward="true" selection-start-line="31" selection-start-column="50" selection-end-line="31" selection-end-column="50" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="serving.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/hops/serving.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="401">
-              <caret line="76" column="43" lean-forward="true" selection-start-line="76" selection-start-column="43" selection-end-line="76" selection-end-column="43" />
+            <state relative-caret-position="2115">
+              <caret line="141" column="7" lean-forward="true" selection-start-line="141" selection-start-column="7" selection-end-line="141" selection-end-column="7" />
               <folding>
-                <element signature="e#226#247#0" expanded="true" />
+                <element signature="e#226#236#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/anaconda3/envs/hops-util-py/lib/python3.6/json/__init__.py">
+      <file leaf-file-name="rest_api.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/hops/rest_api.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="105">
+              <caret line="7" column="26" lean-forward="true" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -97,16 +79,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>open_file()</find>
-      <find>open_file</find>
-      <find>put</find>
-      <find>open</find>
-      <find>Genera</find>
-      <find>print</find>
-      <find>log</find>
-      <find>key.s</find>
-      <find>allreduce</find>
-      <find>BOOTS</find>
       <find>PROJECT</find>
       <find>get_</find>
       <find>REST</find>
@@ -115,18 +87,28 @@
       <find>headers</find>
       <find>connection</find>
       <find>HTTPS</find>
-      <find>base64</find>
       <find>_cert</find>
       <find>trust_store</find>
       <find>k_c</find>
-      <find>base</find>
       <find>get_key_store</find>
       <find>write_pem</find>
-      <find>get_schema</find>
       <find>get_http_conn</find>
-      <find>unverified</find>
       <find>.loads</find>
       <find>dumps</find>
+      <find>get_http_c</find>
+      <find>prepare</find>
+      <find>material</find>
+      <find>jso</find>
+      <find>unverified</find>
+      <find>rest_</find>
+      <find>get_schema</find>
+      <find>get_key</find>
+      <find>post</find>
+      <find>http</find>
+      <find>connection.</find>
+      <find>base</find>
+      <find>base64</find>
+      <find>rest</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -151,9 +133,13 @@
         <option value="$PROJECT_DIR$/hops/tensorboard.py" />
         <option value="$PROJECT_DIR$/hops/jobs.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/hops/util.py" />
         <option value="$PROJECT_DIR$/hops/serving.py" />
         <option value="$PROJECT_DIR$/hops/constants.py" />
+        <option value="$PROJECT_DIR$/rest_api.py" />
+        <option value="$PROJECT_DIR$/hops/util.py" />
+        <option value="$PROJECT_DIR$/tls.py" />
+        <option value="$PROJECT_DIR$/hops/tls.py" />
+        <option value="$PROJECT_DIR$/hops/rest_api.py" />
         <option value="$PROJECT_DIR$/hops/kafka.py" />
       </list>
     </option>
@@ -166,9 +152,9 @@
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="-2" />
-    <option name="y" value="-18" />
-    <option name="width" value="1924" />
-    <option name="height" value="1100" />
+    <option name="y" value="2" />
+    <option name="width" value="1370" />
+    <option name="height" value="767" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -230,6 +216,11 @@
     <property name="nodejs_interpreter_path" value="/usr/bin/node" />
     <property name="js.eslint.eslintPackage" value="" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/hops" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -506,10 +497,10 @@
     <option name="totallyTimeSpent" value="12100000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-2" y="-18" width="1924" height="1100" extended-state="0" />
+    <frame x="-2" y="2" width="1370" height="767" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.106496274" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22280967" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
@@ -564,15 +555,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="26" column="23" lean-forward="false" selection-start-line="26" selection-start-column="23" selection-end-line="26" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hopsutil/tensorboard.py" />
-    <entry file="file://$PROJECT_DIR$/hopsutil/__init__.py" />
     <entry file="file://$PROJECT_DIR$/hopsutil/tensorboard.py" />
     <entry file="file://$PROJECT_DIR$/hopsutil/hdfs.py" />
     <entry file="file://$PROJECT_DIR$/README.rst">
@@ -751,36 +733,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hops/constants.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="31" column="50" lean-forward="true" selection-start-line="31" selection-start-column="50" selection-end-line="31" selection-end-column="50" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hops/util.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="98">
-          <caret line="238" column="23" lean-forward="false" selection-start-line="238" selection-start-column="19" selection-end-line="238" selection-end-column="23" />
-          <folding>
-            <element signature="e#226#235#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/envs/hops-util-py/lib/python3.6/json/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/envs/hops-util-py/lib/python3.6/ssl.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="308">
-          <caret line="519" column="18" lean-forward="false" selection-start-line="519" selection-start-column="18" selection-end-line="519" selection-end-column="18" />
           <folding />
         </state>
       </provider>
@@ -790,15 +746,67 @@
         <state relative-caret-position="401">
           <caret line="76" column="43" lean-forward="true" selection-start-line="76" selection-start-column="43" selection-end-line="76" selection-end-column="43" />
           <folding>
-            <element signature="e#226#247#0" expanded="true" />
+            <element signature="e#226#247#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/hops-util-py/lib/python3.6/base64.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="758">
+          <caret line="254" column="32" lean-forward="false" selection-start-line="254" selection-start-column="32" selection-end-line="254" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hops/constants.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1020">
+          <caret line="68" column="0" lean-forward="true" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/hops-util-py/lib/python3.6/ssl.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hops/rest_api.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="26" lean-forward="true" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hops/tls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2115">
+          <caret line="141" column="7" lean-forward="true" selection-start-line="141" selection-start-column="7" selection-end-line="141" selection-end-column="7" />
+          <folding>
+            <element signature="e#226#236#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hops/util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3636">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#226#235#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/hops/kafka.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="386">
-          <caret line="265" column="7" lean-forward="true" selection-start-line="265" selection-start-column="7" selection-end-line="265" selection-end-column="7" />
+        <state relative-caret-position="300">
+          <caret line="72" column="56" lean-forward="true" selection-start-line="72" selection-start-column="56" selection-end-line="72" selection-end-column="56" />
           <folding>
             <element signature="e#226#235#0" expanded="true" />
           </folding>
