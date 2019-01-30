@@ -162,7 +162,7 @@ def num_executors():
         Number of configured executors for Jupyter
     """
     sc = _find_spark().sparkContext
-    return int(sc._conf.get("spark.executor.instances"))
+    return int(sc._conf.get("spark.dynamicAllocation.maxExecutors"))
 
 def num_param_servers():
     """
