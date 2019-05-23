@@ -166,7 +166,7 @@ def _kill_logger():
             pass
 
 
-def _create_directories(app_id, run_id, param_string, sub_type=None):
+def _create_directories(app_id, run_id, param_string, type, sub_type=None):
     """
     Creates directories for an experiment, if Experiments folder exists it will create directories
     below it, otherwise it will create them in the Logs directory.
@@ -184,28 +184,20 @@ def _create_directories(app_id, run_id, param_string, sub_type=None):
 
     pyhdfs_handle = get()
 
+    hdfs_events_parent_dir = project_path() + "Experiments"
 
-    experiments_dir = project_path() + "Experiments"
-
-    # user may have accidently deleted Experiments dataset
-    if not exists(experiments_dir):
-        mkdir(experiments_dir)
-        try:
-            st = hdfs.stat(experiments_dir)
-            if not bool(st.st_mode & local_stat.S_IWGRP):  # if not group writable make it so
-                hdfs.chmod(experiments_dir, "g+w")
-        except IOError:
-            pass
-
-    experiment_run_dir = experiments_dir + "/" + app_id + "_" + str(run_id)
+    #hdfs_appid_logdir = hdfs_events_parent_dir + "/" + app_id
+    hdfs_experiment_dir = hdfs_events_parent_dir + "/" + app_id + "_" + str(run_id)
+    # if not pyhdfs_handle.exists(hdfs_appid_logdir):
+    # pyhdfs_handle.create_directory(hdfs_appid_logdir)
 
     # determine directory structure based on arguments
     if sub_type:
-        hdfs_exec_logdir = experiment_run_dir + "/" + str(sub_type) + '/' + str(param_string)
+        hdfs_exec_logdir = hdfs_experiment_dir + "/" + str(sub_type) + '/' + str(param_string)
     elif not param_string and not sub_type:
-        hdfs_exec_logdir = experiment_run_dir + '/'
+        hdfs_exec_logdir = hdfs_experiment_dir + '/'
     else:
-        hdfs_exec_logdir = experiment_run_dir + '/' + str(param_string)
+        hdfs_exec_logdir = hdfs_experiment_dir + '/' + str(param_string)
 
     # Need to remove directory if it exists (might be a task retry)
     if pyhdfs_handle.exists(hdfs_exec_logdir):
@@ -218,7 +210,7 @@ def _create_directories(app_id, run_id, param_string, sub_type=None):
     logfile = hdfs_exec_logdir + '/' + 'logfile'
     os.environ['EXEC_LOGFILE'] = logfile
 
-    return experiment_run_dir
+    return hdfs_exec_logdir, hdfs_experiment_dir
 
 
 def copy_to_hdfs(local_path, relative_hdfs_path, overwrite=False, project=None):
