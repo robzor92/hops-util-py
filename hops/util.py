@@ -12,17 +12,22 @@ import socket
 import json
 from datetime import datetime
 import time
+import requests
+import ssl
+import jks
+from pathlib import Path
+from six import string_types
+
 from hops import hdfs
 from hops import version
 from hops import constants
-import ssl
+from hops import tls
 
-#! Needed for hops library backwards compatability
-try:
-    import requests
-except:
-    pass
+import requests
+
 import pydoop.hdfs
+
+fd = None
 
 try:
     import tensorflow
@@ -40,6 +45,49 @@ try:
 except:
     pass
 
+def _convert_jks_to_pem():
+    ca = jks.KeyStore.load("domain_ca_truststore", "adminpw", try_decrypt_keys=True)
+    ca_certs = ""
+    for alias, c in ca.certs.items():
+        ca_certs = ca_certs + tls._bytes_to_pem_str(c.cert, "CERTIFICATE")
+    ca_cert_path = Path("catrust.pem")
+    with ca_cert_path.open("w") as f:
+        f.write(ca_certs)
+
+def send_request_with_session(method, resource, data=None, headers=None):
+    """
+    Sends a request to Hopsworks over HTTPS. In case of Unauthorized response, submit the request once more as jwt
+    might not have been read properly from local container.
+
+    Args:
+        method: request method
+        url: Hopsworks request url
+        data: request data payload
+        headers: request headers
+
+    Returns:
+        HTTPS response
+    """
+
+    if not os.path.exists("catrust.pem"):
+        _convert_jks_to_pem()
+
+    if headers is None:
+        headers = {}
+    headers[constants.HTTP_CONFIG.HTTP_AUTHORIZATION] = "Bearer " + get_jwt()
+    session = requests.session()
+    host_port_pair = _get_host_port_pair()
+    url = "https://" + host_port_pair[0] + ":" + host_port_pair[1] + resource
+    req = requests.Request(method, url, data=data, headers=headers)
+    prepped = session.prepare_request(req)
+    response = session.send(prepped, verify="catrust.pem")
+
+    if response.status_code == constants.HTTP_CONFIG.HTTP_UNAUTHORIZED:
+        req.headers[constants.HTTP_CONFIG.HTTP_AUTHORIZATION] = "Bearer " + get_jwt()
+        prepped = session.prepare_request(req)
+        response = session.send(prepped)
+    return response
+
 def _get_elastic_endpoint():
     """
 
@@ -51,13 +99,6 @@ def _get_elastic_endpoint():
     host, port = elastic_endpoint.split(':')
     return host + ':' + port
 
-elastic_endpoint = None
-try:
-    elastic_endpoint = _get_elastic_endpoint()
-except:
-    pass
-
-
 def _get_hopsworks_rest_endpoint():
     """
 
@@ -66,12 +107,6 @@ def _get_hopsworks_rest_endpoint():
 
     """
     return os.environ[constants.ENV_VARIABLES.REST_ENDPOINT_END_VAR]
-
-hopsworks_endpoint = None
-try:
-    hopsworks_endpoint = _get_hopsworks_rest_endpoint()
-except:
-    pass
 
 def _find_in_path(path, file):
     """
@@ -280,7 +315,7 @@ def _time_diff(task_start, task_end):
     else:
         return 'unknown time'
 
-def _put_elastic(project, appid, elastic_id, json_data):
+def _publish_experiment(appid, elastic_id, json_data):
     """
     Utility method for putting JSON data into elastic search
 
@@ -294,27 +329,16 @@ def _put_elastic(project, appid, elastic_id, json_data):
         None
 
     """
-    if not elastic_endpoint:
-        return
     headers = {'Content-type': 'application/json'}
-    session = requests.Session()
+    resource_url = constants.DELIMITERS.SLASH_DELIMITER + \
+                   constants.REST_CONFIG.HOPSWORKS_REST_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
+                   constants.REST_CONFIG.HOPSWORKS_PROJECT_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
+                   hdfs.project_id() + constants.DELIMITERS.SLASH_DELIMITER + \
+                   constants.REST_CONFIG.HOPSWORKS_EXPERIMENTS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
+                   appid + "_" + str(elastic_id) + constants.DELIMITERS.SLASH_DELIMITER + \
+                   constants.REST_CONFIG.HOPSWORKS_SCHEMA_RESOURCE
 
-    retries = 3
-    resp=None
-    while retries > 0:
-        resp = session.put("http://" + elastic_endpoint + "/" +  project.lower() + "_experiments/experiments/" + appid + "_" + str(elastic_id), data=json_data, headers=headers, verify=False)
-        if resp.status_code == 200:
-            return
-        else:
-            time.sleep(5)
-            retries = retries - 1
-
-    if resp != None:
-        raise RuntimeError("Failed to publish experiment json file to Elastic. Response: " + str(resp) +
-                           ". It is possible Elastic is experiencing problems. Please contact an administrator.")
-    else:
-        raise RuntimeError("Failed to publish experiment json file to Elastic." +
-                           " It is possible Elastic is experiencing problems. Please contact an administrator.")
+    send_request_with_session('POST', resource_url, data=json_data, headers=headers)
 
 
 
@@ -496,3 +520,98 @@ def get_jwt():
     """
     with open(constants.REST_CONFIG.JWT_TOKEN, "r") as jwt:
         return jwt.read()
+
+def _get_experiments_dir():
+    """
+    Gets the root folder where the experiments are writing their results
+
+    Returns:
+        the folder where the experiments are writing results
+    """
+    pyhdfs_handle = hdfs.get()
+    assert pyhdfs_handle.exists(hdfs.project_path() + "Experiments"), "Your project is missing an Experiments dataset, please create one."
+    return hdfs.project_path() + "Experiments"
+
+def _create_experiment_subdirectories(app_id, run_id, param_string, type, sub_type=None):
+    """
+    Creates directories for an experiment, if Experiments folder exists it will create directories
+    below it, otherwise it will create them in the Logs directory.
+
+    Args:
+        :app_id: YARN application ID of the experiment
+        :run_id: Experiment ID
+        :param_string: name of the new directory created under parent directories
+        :type: type of the new directory parent, e.g differential_evolution
+        :sub_type: type of sub directory to parent, e.g generation
+
+    Returns:
+        The new directories for the yarn-application and for the execution (hdfs_exec_logdir, hdfs_appid_logdir)
+    """
+
+    pyhdfs_handle = hdfs.get()
+
+    hdfs_events_parent_dir = hdfs.project_path() + "Experiments"
+
+    hdfs_experiment_dir = hdfs_events_parent_dir + "/" + app_id + "_" + str(run_id)
+
+    # determine directory structure based on arguments
+    if sub_type:
+        hdfs_exec_logdir = hdfs_experiment_dir + "/" + str(sub_type) + '/' + str(param_string)
+    elif not param_string and not sub_type:
+        hdfs_exec_logdir = hdfs_experiment_dir + '/'
+    else:
+        hdfs_exec_logdir = hdfs_experiment_dir + '/' + str(param_string)
+
+    # Need to remove directory if it exists (might be a task retry)
+    if pyhdfs_handle.exists(hdfs_exec_logdir):
+        hdfs.delete(hdfs_exec_logdir, recursive=True)
+
+    # create the new directory
+    pyhdfs_handle.create_directory(hdfs_exec_logdir)
+
+    # update logfile
+    logfile = hdfs_exec_logdir + '/' + 'logfile'
+    os.environ['EXEC_LOGFILE'] = logfile
+
+    return hdfs_exec_logdir, hdfs_experiment_dir
+
+def _init_logger():
+    """
+    Initialize the logger by opening the log file and pointing the global fd to the open file
+    """
+    logfile = os.environ['EXEC_LOGFILE']
+    fs_handle = hdfs.get_fs()
+    global fd
+    try:
+        fd = fs_handle.open_file(logfile, mode='w')
+    except:
+        fd = fs_handle.open_file(logfile, flags='w')
+
+
+def log(string):
+    """
+    Logs a string to the log file
+
+    Args:
+        :string: string to log
+    """
+    global fd
+    if fd:
+        if isinstance(string, string_types):
+            fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(), string) + '\n').encode())
+        else:
+            fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(),
+                                        'ERROR! Attempting to write a non-string object to logfile') + '\n').encode())
+
+
+def _kill_logger():
+    """
+    Closes the logfile
+    """
+    global fd
+    if fd:
+        try:
+            fd.flush()
+            fd.close()
+        except:
+            pass

@@ -75,7 +75,7 @@ def _launch(sc, map_fun, args_dict, samples, direction='max', local_logdir=False
 
     arg_count = six.get_function_code(map_fun).co_argcount
     arg_names = six.get_function_code(map_fun).co_varnames
-    hdfs_appid_dir = hopshdfs._get_experiments_dir() + '/' + app_id
+    hdfs_appid_dir = util._get_experiments_dir() + '/' + app_id
     hdfs_runid_dir = _get_logdir(app_id)
 
     max_val, max_hp, min_val, min_hp, avg = _get_best(random_dict, new_samples, arg_names, arg_count, hdfs_appid_dir, run_id)
@@ -150,7 +150,7 @@ def _get_logdir(app_id):
 
     """
     global run_id
-    return hopshdfs._get_experiments_dir() + '/' + app_id + '/random_search/run.' +  str(run_id)
+    return util._get_experiments_dir() + '/' + app_id + '_' +  str(run_id)
 
 
 #Helper to put Spark required parameter iter in function signature
@@ -206,7 +206,7 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                     argcount -= 1
                     argIndex += 1
                 param_string = param_string[:-1]
-                hdfs_exec_logdir, hdfs_appid_logdir = hopshdfs._create_directories(app_id, run_id, param_string, 'random_search')
+                hdfs_exec_logdir, hdfs_appid_logdir = util._create_experiment_subdirectories(app_id, run_id, param_string, 'random_search')
                 pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
                 hopshdfs._init_logger()
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)

@@ -33,12 +33,11 @@ import pydoop.hdfs
 import os
 import subprocess
 
-elastic_id = 1
+run_id = 1
 app_id = None
 experiment_json = None
 running = False
 driver_tensorboard_hdfs_path = None
-run_id = 0
 
 def _get_logdir(app_id):
     """
@@ -50,7 +49,7 @@ def _get_logdir(app_id):
 
     """
     global run_id
-    return hopshdfs._get_experiments_dir() + '/' + app_id + '/begin/run.' +  str(run_id)
+    return util._get_experiments_dir() + '/' + app_id + '_' +  str(run_id)
 
 def begin(name='no-name', local_logdir=False, versioned_resources=None, description=None):
     """
@@ -84,7 +83,6 @@ def begin(name='no-name', local_logdir=False, versioned_resources=None, descript
     try:
         global app_id
         global experiment_json
-        global elastic_id
         global run_id
         global driver_tensorboard_hdfs_path
 
@@ -93,17 +91,15 @@ def begin(name='no-name', local_logdir=False, versioned_resources=None, descript
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        run_id = run_id + 1
-
         versioned_path = util._version_resources(versioned_resources, _get_logdir(app_id))
 
         experiment_json = None
 
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'begin', _get_logdir(app_id), None, versioned_path, description)
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
 
-        hdfs_exec_logdir, hdfs_appid_logdir = hopshdfs._create_directories(app_id, run_id, None, 'begin')
+        hdfs_exec_logdir, hdfs_appid_logdir = util._create_experiment_subdirectories(app_id, run_id, None, 'begin')
 
         pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
 
@@ -126,7 +122,7 @@ def end(metric=None):
     """
     global running
     global experiment_json
-    global elastic_id
+    global run_id
     global driver_tensorboard_hdfs_path
     global app_id
     if not running:
@@ -134,15 +130,15 @@ def end(metric=None):
     try:
         if metric:
             experiment_json = util._finalize_experiment(experiment_json, None, str(metric))
-            util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+            util._publish_experiment(app_id, run_id, experiment_json)
         else:
             experiment_json = util._finalize_experiment(experiment_json, None, None)
-            util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+            util._publish_experiment(app_id, run_id, experiment_json)
     except:
         _exception_handler()
         raise
     finally:
-        elastic_id +=1
+        run_id +=1
         running = False
         handle = hopshdfs.get()
 
@@ -202,13 +198,13 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
     try:
         global app_id
         global experiment_json
-        global elastic_id
+        global run_id
         running = True
 
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        launcher.run_id = launcher.run_id + 1
+        launcher.run_id = run_id
 
         versioned_path = util._version_resources(versioned_resources, launcher._get_logdir(app_id))
 
@@ -220,25 +216,25 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
         util._version_resources(versioned_resources, launcher._get_logdir(app_id))
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
 
         retval, tensorboard_logdir, hp = launcher._launch(sc, map_fun, args_dict, local_logdir)
 
         if retval:
             experiment_json = util._finalize_experiment(experiment_json, hp, retval)
-            util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+            util._publish_experiment(app_id, run_id, experiment_json)
             return tensorboard_logdir
 
         experiment_json = util._finalize_experiment(experiment_json, hp, None)
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
 
     except:
         _exception_handler()
         raise
     finally:
         #cleanup spark jobs
-        elastic_id +=1
+        run_id +=1
         running = False
         sc.setJobGroup("", "")
     return tensorboard_logdir
@@ -289,13 +285,13 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
     try:
         global app_id
         global experiment_json
-        global elastic_id
+        global run_id
         running = True
 
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        r_search.run_id = r_search.run_id + 1
+        r_search.run_id = run_id
 
         versioned_path = util._version_resources(versioned_resources, r_search._get_logdir(app_id))
 
@@ -305,13 +301,13 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         util._version_resources(versioned_resources, r_search._get_logdir(app_id))
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
 
         tensorboard_logdir, param, metric = r_search._launch(sc, map_fun, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
 
         experiment_json = util._finalize_experiment(experiment_json, param, metric)
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
 
         return tensorboard_logdir
 
@@ -320,7 +316,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         raise
     finally:
         #cleanup spark jobs
-        elastic_id +=1
+        run_id +=1
         running = False
         sc.setJobGroup("", "")
     return tensorboard_logdir
@@ -374,26 +370,26 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
     try:
         global app_id
         global experiment_json
-        global elastic_id
+        global run_id
         running = True
         spark = util._find_spark()
         sc = spark.sparkContext
         app_id = str(sc.applicationId)
 
-        diff_evo.run_id = diff_evo.run_id + 1
+        diff_evo.run_id = run_id
 
         versioned_path = util._version_resources(versioned_resources, diff_evo._get_logdir(app_id))
 
         experiment_json = None
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'differential_evolution', diff_evo._get_logdir(app_id), json.dumps(boundary_dict), versioned_path, description)
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
 
         tensorboard_logdir, best_param, best_metric = diff_evo._search(spark, objective_function, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
 
         experiment_json = util._finalize_experiment(experiment_json, best_param, best_metric)
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
 
         best_param_dict = util._convert_to_dict(best_param)
 
@@ -402,7 +398,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         raise
     finally:
         #cleanup spark jobs
-        elastic_id +=1
+        run_id +=1
         running = False
         sc.setJobGroup("", "")
 
@@ -458,13 +454,13 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
     try:
         global app_id
         global experiment_json
-        global elastic_id
+        global run_id
         running = True
 
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        gs.run_id = gs.run_id + 1
+        gs.run_id = run_id
 
         versioned_path = util._version_resources(versioned_resources, gs._get_logdir(app_id))
 
@@ -472,7 +468,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         util._version_resources(versioned_resources, gs._get_logdir(app_id))
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
 
         grid_params = util.grid_params(args_dict)
 
@@ -480,13 +476,13 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         experiment_json = util._finalize_experiment(experiment_json, param, metric)
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
     except:
         _exception_handler()
         raise
     finally:
         #cleanup spark jobs
-        elastic_id +=1
+        run_id +=1
         running = False
         sc.setJobGroup("", "")
 
@@ -536,13 +532,13 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
     try:
         global app_id
         global experiment_json
-        global elastic_id
+        global run_id
         running = True
 
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        tf_allreduce.run_id = tf_allreduce.run_id + 1
+        tf_allreduce.run_id = run_id
 
         versioned_path = util._version_resources(versioned_resources, tf_allreduce._get_logdir(app_id))
 
@@ -550,19 +546,19 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
         util._version_resources(versioned_resources, tf_allreduce._get_logdir(app_id))
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
 
         retval, logdir = tf_allreduce._launch(sc, map_fun, local_logdir=local_logdir, name=name)
 
         experiment_json = util._finalize_experiment(experiment_json, None, retval)
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
     except:
         _exception_handler()
         raise
     finally:
         #cleanup spark jobs
-        elastic_id +=1
+        run_id +=1
         running = False
         sc.setJobGroup("", "")
 
@@ -611,13 +607,13 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
     try:
         global app_id
         global experiment_json
-        global elastic_id
+        global run_id
         running = True
 
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        ps.run_id = ps.run_id + 1
+        ps.run_id = run_id
 
         versioned_path = util._version_resources(versioned_resources, ps._get_logdir(app_id))
 
@@ -625,19 +621,19 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
         util._version_resources(versioned_resources, ps._get_logdir(app_id))
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
 
         retval, logdir = ps._launch(sc, map_fun, local_logdir=local_logdir, name=name)
 
         experiment_json = util._finalize_experiment(experiment_json, None, retval)
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
     except:
         _exception_handler()
         raise
     finally:
         #cleanup spark jobs
-        elastic_id +=1
+        run_id +=1
         running = False
         sc.setJobGroup("", "")
 
@@ -680,13 +676,13 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
     try:
         global app_id
         global experiment_json
-        global elastic_id
+        global run_id
         running = True
 
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        mirrored_impl.run_id = mirrored_impl.run_id + 1
+        mirrored_impl.run_id = run_id
 
         versioned_path = util._version_resources(versioned_resources, mirrored_impl._get_logdir(app_id))
 
@@ -694,19 +690,19 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         util._version_resources(versioned_resources, mirrored_impl._get_logdir(app_id))
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
 
         retval, logdir = mirrored_impl._launch(sc, map_fun, local_logdir=local_logdir, name=name)
 
         experiment_json = util._finalize_experiment(experiment_json, None, retval)
 
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
     except:
         _exception_handler()
         raise
     finally:
         #cleanup spark jobs
-        elastic_id +=1
+        run_id +=1
         running = False
         sc.setJobGroup("", "")
 
@@ -725,7 +721,7 @@ def _exception_handler():
         experiment_json['status'] = "FAILED"
         experiment_json['finished'] = datetime.now().isoformat()
         experiment_json = json.dumps(experiment_json)
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
 
 def _exit_handler():
     """
@@ -740,6 +736,6 @@ def _exit_handler():
         experiment_json['status'] = "KILLED"
         experiment_json['finished'] = datetime.now().isoformat()
         experiment_json = json.dumps(experiment_json)
-        util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json)
 
 atexit.register(_exit_handler)
