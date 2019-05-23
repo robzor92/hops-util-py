@@ -166,7 +166,7 @@ def _kill_logger():
             pass
 
 
-def _create_directories(app_id, run_id, param_string, type, sub_type=None):
+def _create_directories(app_id, run_id, param_string, sub_type=None):
     """
     Creates directories for an experiment, if Experiments folder exists it will create directories
     below it, otherwise it will create them in the Logs directory.
@@ -184,31 +184,28 @@ def _create_directories(app_id, run_id, param_string, type, sub_type=None):
 
     pyhdfs_handle = get()
 
-    if pyhdfs_handle.exists(project_path() + "Experiments"):
-        hdfs_events_parent_dir = project_path() + "Experiments"
-    elif pyhdfs_handle.exists(project_path() + "Logs"):
-        hdfs_events_parent_dir = project_path() + "Logs/TensorFlow"
+
+    experiments_dir = project_path() + "Experiments"
+
+    # user may have accidently deleted Experiments dataset
+    if not hdfs.exists(experiments_dir):
+        hdfs.mkdir(experiments_dir)
         try:
-            st = hdfs.stat(hdfs_events_parent_dir)
+            st = hdfs.stat(experiments_dir)
             if not bool(st.st_mode & local_stat.S_IWGRP):  # if not group writable make it so
-                hdfs.chmod(hdfs_events_parent_dir, "g+w")
+                hdfs.chmod(experiments_dir, "g+w")
         except IOError:
-            # If this happens then the permission is set correct already since the creator of the /Logs/TensorFlow already set group writable
             pass
 
-    hdfs_appid_logdir = hdfs_events_parent_dir + "/" + app_id
-    # if not pyhdfs_handle.exists(hdfs_appid_logdir):
-    # pyhdfs_handle.create_directory(hdfs_appid_logdir)
-
-    hdfs_run_id_logdir = hdfs_appid_logdir + "/" + type + "/run." + str(run_id)
+    experiment_run_dir = experiments_dir + "/" + app_id + "_" + str(run_id)
 
     # determine directory structure based on arguments
     if sub_type:
-        hdfs_exec_logdir = hdfs_run_id_logdir + "/" + str(sub_type) + '/' + str(param_string)
+        hdfs_exec_logdir = experiment_run_dir + "/" + str(sub_type) + '/' + str(param_string)
     elif not param_string and not sub_type:
-        hdfs_exec_logdir = hdfs_run_id_logdir + '/'
+        hdfs_exec_logdir = experiment_run_dir + '/'
     else:
-        hdfs_exec_logdir = hdfs_run_id_logdir + '/' + str(param_string)
+        hdfs_exec_logdir = experiment_run_dir + '/' + str(param_string)
 
     # Need to remove directory if it exists (might be a task retry)
     if pyhdfs_handle.exists(hdfs_exec_logdir):
@@ -221,7 +218,7 @@ def _create_directories(app_id, run_id, param_string, type, sub_type=None):
     logfile = hdfs_exec_logdir + '/' + 'logfile'
     os.environ['EXEC_LOGFILE'] = logfile
 
-    return hdfs_exec_logdir, hdfs_appid_logdir
+    return experiment_run_dir
 
 
 def copy_to_hdfs(local_path, relative_hdfs_path, overwrite=False, project=None):
