@@ -150,7 +150,7 @@ def _get_logdir(app_id):
 
     """
     global run_id
-    return hopshdfs._get_experiments_dir() + '/' + app_id + '/random_search/run.' +  str(run_id)
+    return hopshdfs._get_experiments_dir() + '/' + app_id + '_' +  str(run_id)
 
 
 #Helper to put Spark required parameter iter in function signature

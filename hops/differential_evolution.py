@@ -789,7 +789,7 @@ def _get_metric(param_string, app_id, generation_id, run_id):
     project_path = hopshdfs.project_path()
     handle = hopshdfs.get()
     for i in range(generation_id):
-        possible_result_path = hopshdfs._get_experiments_dir() + '/' + app_id + '/differential_evolution/run.' \
+        possible_result_path = hopshdfs._get_experiments_dir() + '/' + app_id + '_' \
                                + str(run_id) + '/generation.' + str(i) + '/' + param_string + '/metric'
         if handle.exists(possible_result_path):
             with pydoop.hdfs.open(possible_result_path, "r") as fi:

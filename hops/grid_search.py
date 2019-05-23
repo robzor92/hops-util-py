@@ -103,7 +103,7 @@ def _get_logdir(app_id):
 
     """
     global run_id
-    return hopshdfs._get_experiments_dir() + '/' + app_id + '/grid_search/run.' + str(run_id)
+    return hopshdfs._get_experiments_dir() + '/' + app_id + '_' + str(run_id)
 
 
 
@@ -262,7 +262,7 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
 
         param_string = param_string[:-1]
 
-        path_to_metric = hdfs_appid_dir + '/grid_search/run.' + str(run_id) + '/' + param_string + '/metric'
+        path_to_metric = hdfs_appid_dir + '_' + str(run_id) + '/' + param_string + '/metric'
 
         metric = None
 
