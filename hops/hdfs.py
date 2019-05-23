@@ -188,8 +188,8 @@ def _create_directories(app_id, run_id, param_string, sub_type=None):
     experiments_dir = project_path() + "Experiments"
 
     # user may have accidently deleted Experiments dataset
-    if not hdfs.exists(experiments_dir):
-        hdfs.mkdir(experiments_dir)
+    if not exists(experiments_dir):
+        mkdir(experiments_dir)
         try:
             st = hdfs.stat(experiments_dir)
             if not bool(st.st_mode & local_stat.S_IWGRP):  # if not group writable make it so
