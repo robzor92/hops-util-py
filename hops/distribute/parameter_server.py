@@ -74,7 +74,7 @@ def _get_logdir(app_id):
 
     """
     global run_id
-    return hopshdfs._get_experiments_dir() + '/' + app_id + '/parameter_server/run.' + str(run_id)
+    return util._get_experiments_dir() + '/' + app_id + '_' + str(run_id)
 
 def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps):
     """
@@ -148,7 +148,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps):
             os.environ["TF_CONFIG"] = json.dumps(cluster_spec)
 
             if role == "chief":
-                hdfs_exec_logdir, hdfs_appid_logdir = hopshdfs._create_directories(app_id, run_id, None, 'parameter_server')
+                hdfs_exec_logdir, hdfs_appid_logdir = util._create_experiment_subdirectories(app_id, run_id, None, 'parameter_server')
                 pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
                 hopshdfs._init_logger()
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)
