@@ -72,7 +72,7 @@ def _get_logdir(app_id):
 
     """
     global run_id
-    return hopshdfs._get_experiments_dir() + '/' + app_id + '/collective_all_reduce/run.' + str(run_id)
+    return hopshdfs._get_experiments_dir() + '/' + app_id + '_' + str(run_id)
 
 def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
     """
