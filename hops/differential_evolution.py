@@ -604,7 +604,7 @@ def _search(spark, function, search_dict, direction = 'max', generations=10, pop
                                      mutation=mutation,
                                      name=name)
 
-    root_dir = hopshdfs._get_experiments_dir() + "/" + str(app_id) + "/differential_evolution/run." + str(run_id)
+    root_dir = hopshdfs._get_experiments_dir() + "/" + str(app_id) + "_" + str(run_id)
 
     best_param, best_metric = diff_evo._solve(root_dir)
 
@@ -622,7 +622,7 @@ def _get_logdir(app_id):
 
     """
     global run_id
-    return hopshdfs._get_experiments_dir() + "/" + app_id + "/differential_evolution/run." + str(run_id)
+    return hopshdfs._get_experiments_dir() + "/" + app_id + "_" + str(run_id)
 
 
 def _evolutionary_launch(spark_session, map_fun, args_dict, name="no-name"):
