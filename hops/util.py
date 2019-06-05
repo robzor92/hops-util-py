@@ -337,8 +337,6 @@ def _publish_experiment(appid, elastic_id, json_data):
                    constants.REST_CONFIG.HOPSWORKS_EXPERIMENTS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    appid + "_" + str(elastic_id)
 
-    raise Exception(resource_url)
-
     send_request_with_session('POST', resource_url, data=json_data, headers=headers)
 
 
