@@ -10,7 +10,7 @@ from ctypes import cdll
 import itertools
 import socket
 import json
-from datetime import datetime
+import datetime
 import time
 import requests
 import ssl
@@ -367,7 +367,7 @@ def _populate_experiment(sc, model_name, module, function, logdir, hyperparamete
                        'function': function,
                        'status':'RUNNING',
                        'app_id': sc.applicationId,
-                       'start': datetime.now().isoformat(),
+                       'start': datetime.datetime.now().isoformat(),
                        'memory_per_executor': str(sc._conf.get("spark.executor.memory")),
                        'gpus_per_executor': str(sc._conf.get("spark.executor.gpus")),
                        'executors': str(num_executors()),
@@ -389,7 +389,7 @@ def _finalize_experiment(experiment_json, hyperparameter, metric):
     experiment_json = json.loads(experiment_json)
     experiment_json['metric'] = metric
     experiment_json['hyperparameter'] = hyperparameter
-    experiment_json['finished'] = datetime.now().isoformat()
+    experiment_json['finished'] = datetime.datetime.now().isoformat()
     experiment_json['status'] = "SUCCEEDED"
     experiment_json = _add_version(experiment_json)
 
