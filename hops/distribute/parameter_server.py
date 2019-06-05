@@ -150,16 +150,16 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps):
             if role == "chief":
                 hdfs_exec_logdir, hdfs_appid_logdir = util._create_experiment_subdirectories(app_id, run_id, None, 'parameter_server')
                 pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
-                hopshdfs._init_logger()
+                util._init_logger()
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
             if role == "chief":
-                hopshdfs.log(gpu_str)
+                util.log(gpu_str)
             print(gpu_str)
             print('-------------------------------------------------------')
             print('Started running task \n')
             if role == "chief":
-                hopshdfs.log('Started running task')
+                util.log('Started running task')
             task_start = datetime.datetime.now()
 
             retval=None
@@ -181,7 +181,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps):
             print('\n' + time_str)
             print('-------------------------------------------------------')
             if role == "chief":
-                hopshdfs.log(time_str)
+                util.log(time_str)
         except:
             raise
         finally:
@@ -213,7 +213,7 @@ def _cleanup(tb_hdfs_path):
     handle = hopshdfs.get()
     if not tb_hdfs_path == None and not tb_hdfs_path == '' and handle.exists(tb_hdfs_path):
         handle.delete(tb_hdfs_path)
-    hopshdfs._kill_logger()
+    util._kill_logger()
 
 def _find_task_and_index(host_port, cluster_spec):
     """

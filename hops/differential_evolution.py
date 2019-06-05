@@ -717,23 +717,23 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id):
                 val = _get_metric(param_string, app_id, generation_id, run_id)
                 hdfs_exec_logdir, hdfs_appid_logdir = util._create_experiment_subdirectories(app_id, run_id, param_string, 'differential_evolution', sub_type='generation.' + str(generation_id))
                 pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
-                hopshdfs._init_logger()
+                util._init_logger()
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir_bool)
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
-                hopshdfs.log(gpu_str)
+                util.log(gpu_str)
                 print(gpu_str)
                 print('-------------------------------------------------------')
                 print('Started running task ' + param_string + '\n')
                 if val:
                     print('Reading returned metric from previous run: ' + str(val))
-                hopshdfs.log('Started running task ' + param_string)
+                util.log('Started running task ' + param_string)
                 task_start = datetime.datetime.now()
                 if not val:
                     val = map_fun(*args)
                 task_end = datetime.datetime.now()
                 time_str = 'Finished task ' + param_string + ' - took ' + util._time_diff(task_start, task_end)
                 print('\n' + time_str)
-                hopshdfs.log(time_str)
+                util.log(time_str)
                 try:
                     castval = int(val)
                 except:
@@ -765,7 +765,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id):
                 local_tb = tensorboard.local_logdir_path
                 util._store_local_tensorboard(local_tb, hdfs_exec_logdir)
 
-        hopshdfs.log('Finished running')
+        util.log('Finished running')
         if tb_hdfs_path:
             _cleanup(tb_hdfs_path)
         if devices.get_num_gpus() > 0:
@@ -811,4 +811,4 @@ def _cleanup(tb_hdfs_path):
     handle = hopshdfs.get()
     if not tb_hdfs_path == None and not tb_hdfs_path == '' and handle.exists(tb_hdfs_path):
         handle.delete(tb_hdfs_path)
-    hopshdfs._kill_logger()
+    util._kill_logger()
