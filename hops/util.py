@@ -361,21 +361,9 @@ def _populate_experiment(sc, model_name, module, function, logdir, hyperparamete
     user = None
     if constants.ENV_VARIABLES.HOPSWORKS_USER_ENV_VAR in os.environ:
         user = os.environ[constants.ENV_VARIABLES.HOPSWORKS_USER_ENV_VAR]
-    return json.dumps({'project': hdfs.project_name(),
-                       'user': user,
+    return json.dumps({'user': user,
                        'name': model_name,
-                       'module': module,
-                       'function': function,
-                       'status':'RUNNING',
-                       'app_id': sc.applicationId,
-                       'start': datetime.datetime.now().isoformat(),
-                       'memory_per_executor': str(sc._conf.get("spark.executor.memory")),
-                       'gpus_per_executor': str(sc._conf.get("spark.executor.gpus")),
-                       'executors': str(num_executors()),
-                       'logdir': logdir,
-                       'hyperparameter_space': hyperparameter_space,
-                       'versioned_resources': versioned_resources,
-                       'description': description})
+                       'start': datetime.datetime.now().isoformat(})
 
 def _finalize_experiment(experiment_json, hyperparameter, metric):
     """
