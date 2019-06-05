@@ -223,9 +223,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
             util._publish_experiment(app_id, run_id, experiment_json)
             return tensorboard_logdir
 
-        experiment_json = util._finalize_experiment(experiment_json, hp, None)
-
-        util._publish_experiment(app_id, run_id, experiment_json)
+        _finalize_experiment(experiment_json, hp, app_id, run_id)
 
     except:
         _exception_handler()
@@ -746,3 +744,8 @@ def _setup_experiment(versioned_resources, logdir, app_id, run_id):
     hopshdfs.mkdir(hopshdfs.get_plain_path(util._get_experiments_dir()) + "/" + app_id + "_" + str(run_id))
 
     return versioned_path
+
+def _finalize_experiment(experiment_json, hp, app_id,_run_id):
+    experiment_json = util._finalize_experiment(experiment_json, hp, None)
+
+    util._publish_experiment(app_id, run_id, experiment_json)
