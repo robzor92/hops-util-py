@@ -206,7 +206,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
         launcher.run_id = run_id
 
-        versioned_path = _setup_experiment(versioned_resources)
+        versioned_path = _setup_experiment(versioned_resources, launcher._get_logdir(app_id), app_id, run_id)
 
         experiment_json = None
         if args_dict:
@@ -738,10 +738,10 @@ def _exit_handler():
 
 atexit.register(_exit_handler)
 
-def _setup_experiment(versioned_resources):
-    versioned_path = util._version_resources(versioned_resources, launcher._get_logdir(app_id))
+def _setup_experiment(versioned_resources, logdir, app_id, run_id):
+    versioned_path = util._version_resources(versioned_resources, logdir)
 
-    util._version_resources(versioned_resources, launcher._get_logdir(app_id))
+    util._version_resources(versioned_resources, logdir)
 
     hopshdfs.mkdir(hopshdfs.get_plain_path(util._get_experiments_dir()) + "/" + app_id + "_" + str(run_id))
 
