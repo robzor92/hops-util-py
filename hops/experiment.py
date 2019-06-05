@@ -216,6 +216,12 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
         util._version_resources(versioned_resources, launcher._get_logdir(app_id))
 
+        hopshdfs.mkdir()
+
+        hopshdfs.get_plain_path(util._get_experiments_dir())
+
+        hopshdfs.mkdir(hopshdfs.get_plain_path(util._get_experiments_dir()) + "/" + app_id + "_" + str(run_id))
+
         util._publish_experiment(app_id, run_id, experiment_json)
 
         retval, tensorboard_logdir, hp = launcher._launch(sc, map_fun, args_dict, local_logdir)
