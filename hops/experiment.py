@@ -91,7 +91,7 @@ def begin(name='no-name', local_logdir=False, versioned_resources=None, descript
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = util._version_resources(versioned_resources, _get_logdir(app_id))
+        versioned_path = _setup_experiment(versioned_resources, _get_logdir(app_id), app_id, run_id)
 
         experiment_json = None
 
