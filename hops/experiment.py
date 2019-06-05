@@ -103,7 +103,7 @@ def begin(name='no-name', local_logdir=False, versioned_resources=None, descript
 
         pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
 
-        hopshdfs._init_logger()
+        util._init_logger()
 
         driver_tensorboard_hdfs_path,_ = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, 0, local_logdir=local_logdir)
     except:
@@ -152,7 +152,7 @@ def end(metric=None):
         if not tensorboard.endpoint == None and not tensorboard.endpoint == '' \
                 and handle.exists(tensorboard.endpoint):
             handle.delete(tensorboard.endpoint)
-        hopshdfs._kill_logger()
+        util._kill_logger()
 
 
 def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versioned_resources=None, description=None):
