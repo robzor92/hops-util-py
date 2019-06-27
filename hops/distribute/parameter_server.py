@@ -143,8 +143,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps):
             cluster_spec["cluster"] = cluster
             cluster_spec["task"] = {"type": role, "index": index}
 
-            print(cluster_spec)
-
+            print('TF_CONFIG: {} '.format(cluster))
             os.environ["TF_CONFIG"] = json.dumps(cluster_spec)
 
             if role == "chief":
