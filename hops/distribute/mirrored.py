@@ -131,8 +131,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
             else:
                 cluster["task"] = {"type": "worker", "index": task_index}
 
-            print(cluster)
-
+            print('TF_CONFIG: {} '.format(cluster))
             os.environ["TF_CONFIG"] = json.dumps(cluster)
 
             if task_index == -1:
