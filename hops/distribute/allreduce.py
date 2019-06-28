@@ -126,9 +126,11 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, eval_node)
 
             if eval_node:
                 evaluator = cluster["cluster"]["worker"].pop(len(cluster["cluster"]["worker"]) -1)
+                cluster["cluster"]["evaluator"] = [evaluator]
                 if evaluator == host_port:
                     cluster["task"] = {"type": "evaluator", "index": 0}
-                    cluster["cluster"]["evaluator"] = [evaluator]
+
+            task_index = _find_index(host_port, cluster)
 
             if evaluator != None:
                 chief = cluster["cluster"]["worker"].pop(len(cluster["cluster"]["worker"]) -1)
