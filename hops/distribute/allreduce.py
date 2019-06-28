@@ -132,13 +132,12 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, eval_node)
 
             task_index = _find_index(host_port, cluster)
 
-            if evaluator == None:
-                chief = cluster["cluster"]["worker"].pop(len(cluster["cluster"]["worker"]) -1)
-                cluster["cluster"]["chief"] = [chief]
-                if task_index == -1:
-                    cluster["task"] = {"type": "chief", "index": 0}
-                else:
-                    cluster["task"] = {"type": "worker", "index": task_index}
+            chief = cluster["cluster"]["worker"].pop(len(cluster["cluster"]["worker"]) -1)
+            cluster["cluster"]["chief"] = [chief]
+            if chief == host_port:
+                cluster["task"] = {"type": "chief", "index": 0}
+            else:
+                cluster["task"] = {"type": "worker", "index": task_index}
 
             print(cluster)
 
