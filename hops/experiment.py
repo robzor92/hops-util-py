@@ -492,7 +492,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
     return tensorboard_logdir
 
-def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None):
+def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
     """
     *Distributed Training*
 
@@ -552,7 +552,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
         util._put_elastic(hopshdfs.project_name(), app_id, elastic_id, experiment_json)
 
-        retval, logdir = tf_allreduce._launch(sc, map_fun, local_logdir=local_logdir, name=name)
+        retval, logdir = tf_allreduce._launch(sc, map_fun, local_logdir=local_logdir, name=name, eval_node=evaluator)
 
         experiment_json = util._finalize_experiment(experiment_json, None, retval)
 
