@@ -20,7 +20,7 @@ from . import allreduce_reservation
 
 run_id = 0
 
-def _launch(sc, map_fun, local_logdir=False, name="no-name"):
+def _launch(sc, map_fun, local_logdir=False, name="no-name", eval_node=False):
     """
 
     Args:
@@ -47,7 +47,7 @@ def _launch(sc, map_fun, local_logdir=False, name="no-name"):
     server_addr = server.start()
 
     #Force execution on executor, since GPU is located on executor
-    nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr))
+    nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, eval_node))
 
     logdir = _get_logdir(app_id)
 
@@ -74,7 +74,7 @@ def _get_logdir(app_id):
     global run_id
     return hopshdfs._get_experiments_dir() + '/' + app_id + '/collective_all_reduce/run.' + str(run_id)
 
-def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
+def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, eval_node):
     """
 
     Args:
@@ -125,11 +125,17 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
             client.close()
 
             task_index = _find_index(host_port, cluster)
-            
+
+            evaluator = None
             if task_index == -1:
                 cluster["task"] = {"type": "chief", "index": 0}
             else:
-                cluster["task"] = {"type": "worker", "index": task_index}
+                if eval_node and task_index == len(["cluster"]["worker"]) -1:
+                    evaluator = ["cluster"]["worker"].pop(len(["cluster"]["worker"]) -1)
+                    cluster["task"] = {"type": "evaluator", "index": 0}
+                    cluster["cluster"]["evaluator"] = [evaluator]
+                else:
+                    cluster["task"] = {"type": "worker", "index": task_index}
 
             print(cluster)
 
@@ -140,6 +146,10 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
                 pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
                 hopshdfs._init_logger()
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)
+            elif eval_node:
+                tensorboard.events_logdir = hopshdfs._get_experiments_dir() + '/' + app_id + '/collective_all_reduce/run.' + str(run_id)
+                tensorboard.local_logdir_bool = False
+
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
             if task_index == -1:
                 hopshdfs.log(gpu_str)
