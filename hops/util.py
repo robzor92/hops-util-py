@@ -360,12 +360,7 @@ def _populate_experiment(sc, model_name, module, function, logdir, hyperparamete
     Returns:
 
     """
-    user = None
-    if constants.ENV_VARIABLES.HOPSWORKS_USER_ENV_VAR in os.environ:
-        user = os.environ[constants.ENV_VARIABLES.HOPSWORKS_USER_ENV_VAR]
-    return json.dumps({'user': user,
-                       'name': model_name,
-                       'start': datetime.datetime.now().isoformat()})
+    return json.dumps({'name': model_name})
 
 def _finalize_experiment(experiment_json, hyperparameter, metric):
     """
