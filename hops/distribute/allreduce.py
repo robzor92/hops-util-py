@@ -124,19 +124,17 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, eval_node)
             tmp_socket.close()
             client.close()
 
-            task_index = _find_index(host_port, cluster)
-
             if eval_node:
                 evaluator = cluster["cluster"]["worker"].pop(len(cluster["cluster"]["worker"]) -1)
-                if eval_node == host:
+                if evaluator == host_port:
                     cluster["task"] = {"type": "evaluator", "index": 0}
                     cluster["cluster"]["evaluator"] = [evaluator]
 
             chief = cluster["cluster"]["worker"].pop(len(cluster["cluster"]["worker"]) -1)
-            cluster["task"] = {"type": "chief", "index": 0}
             cluster["cluster"]["chief"] = [chief]
-
             if task_index != -1:
+                cluster["task"] = {"type": "chief", "index": 0}
+            else:
                 cluster["task"] = {"type": "worker", "index": task_index}
 
             print(cluster)
