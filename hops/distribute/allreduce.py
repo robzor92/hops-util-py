@@ -134,7 +134,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, eval_node)
 
             chief = cluster["cluster"]["worker"].pop(len(cluster["cluster"]["worker"]) -1)
             cluster["cluster"]["chief"] = [chief]
-            if evaluator == None:
+            if "task" not in cluster:
                 if chief == host_port:
                     cluster["task"] = {"type": "chief", "index": 0}
                 else:
