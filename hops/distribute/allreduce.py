@@ -130,7 +130,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, eval_node)
                 cluster["task"] = {"type": "chief", "index": 0}
             else:
                 if eval_node and task_index == len(cluster["cluster"]["worker"]) -1:
-                    evaluator = cluster["cluster"]["worker"].pop(len(["cluster"]["worker"]) -1)
+                    evaluator = cluster["cluster"]["worker"].pop(len(cluster["cluster"]["worker"]) -1)
                     cluster["task"] = {"type": "evaluator", "index": 0}
                     cluster["cluster"]["evaluator"] = [evaluator]
                 else:
