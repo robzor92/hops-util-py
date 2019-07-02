@@ -89,7 +89,7 @@ def _grid_launch(sc, map_fun, run_id, args_dict, direction='max', local_logdir=F
 
     return hdfs_dir, param_combination, best_val
 
-def _get_logdir(app_id):
+def _get_logdir(app_id, run_id):
     """
 
     Args:
@@ -98,7 +98,6 @@ def _get_logdir(app_id):
     Returns:
 
     """
-    global run_id
     return util._get_experiments_dir() + '/' + app_id + '_' + str(run_id)
 
 
