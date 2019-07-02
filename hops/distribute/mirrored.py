@@ -18,9 +18,8 @@ import json
 
 from . import allreduce_reservation
 
-run_id = 0
 
-def _launch(sc, map_fun, local_logdir=False, name="no-name"):
+def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name"):
     """
 
     Args:
@@ -32,7 +31,6 @@ def _launch(sc, map_fun, local_logdir=False, name="no-name"):
     Returns:
 
     """
-    global run_id
     app_id = str(sc.applicationId)
 
     num_executions = util.num_executors()
@@ -49,7 +47,7 @@ def _launch(sc, map_fun, local_logdir=False, name="no-name"):
     #Force execution on executor, since GPU is located on executor
     nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr))
 
-    logdir = _get_logdir(app_id)
+    logdir = _get_logdir(app_id, run_id)
 
     path_to_metric = logdir + '/metric'
     if pydoop.hdfs.path.exists(path_to_metric):
@@ -62,7 +60,7 @@ def _launch(sc, map_fun, local_logdir=False, name="no-name"):
 
     return None, logdir
 
-def _get_logdir(app_id):
+def _get_logdir(app_id, run_id):
     """
 
     Args:
@@ -71,7 +69,6 @@ def _get_logdir(app_id):
     Returns:
 
     """
-    global run_id
     return util._get_experiments_dir() + '/' + app_id + '_' + str(run_id)
 
 def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
@@ -100,14 +97,9 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
         for i in iter:
             executor_num = i
 
-        tb_hdfs_path = ''
-        hdfs_exec_logdir = ''
-
         t = threading.Thread(target=devices._print_periodic_gpu_utilization)
         if devices.get_num_gpus() > 0:
             t.start()
-
-        task_index = None
 
         try:
             host = util._get_ip_address()
@@ -132,41 +124,37 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
                 cluster["task"] = {"type": "worker", "index": task_index}
 
             print('TF_CONFIG: {} '.format(cluster))
-            os.environ["TF_CONFIG"] = json.dumps(cluster)
 
-            if task_index == -1:
-                hdfs_exec_logdir, hdfs_appid_logdir = util._create_experiment_subdirectories(app_id, run_id, None, 'mirrored')
-                pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
-                util._init_logger()
-                tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)
+            if util.num_executors() > 1:
+                os.environ["TF_CONFIG"] = json.dumps(cluster)
+
+            is_chief = task_index == -1 or util.num_executors() == 1
+
+            if is_chief:
+                logdir = _get_logdir(app_id, run_id)
+                tb_hdfs_path, tb_pid = tensorboard._register(logdir, logdir, executor_num, local_logdir=local_logdir)
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
 
-            if task_index == -1:
-                util.log(gpu_str)
             print(gpu_str)
             print('-------------------------------------------------------')
             print('Started running task \n')
-            if task_index == -1:
-                util.log('Started running task')
             task_start = datetime.datetime.now()
 
             retval = map_fun()
-            if task_index == -1:
+            if is_chief:
                 if retval:
-                    _handle_return(retval, hdfs_exec_logdir)
+                    _handle_return(retval, logdir)
             task_end = datetime.datetime.now()
             time_str = 'Finished task - took ' + util._time_diff(task_start, task_end)
             print('\n' + time_str)
             print('-------------------------------------------------------')
-            if task_index == -1:
-                util.log(time_str)
         except:
             raise
         finally:
-            if task_index == -1:
+            if is_chief:
                 if local_logdir:
                     local_tb = tensorboard.local_logdir_path
-                    util._store_local_tensorboard(local_tb, hdfs_exec_logdir)
+                    util._store_local_tensorboard(local_tb, logdir)
 
             if devices.get_num_gpus() > 0:
                 t.do_run = False
@@ -188,7 +176,6 @@ def _cleanup(tb_hdfs_path):
     handle = hopshdfs.get()
     if not tb_hdfs_path == None and not tb_hdfs_path == '' and handle.exists(tb_hdfs_path):
         handle.delete(tb_hdfs_path)
-    util._kill_logger()
 
 def _handle_return(val, hdfs_exec_logdir):
     """
