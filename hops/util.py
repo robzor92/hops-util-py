@@ -373,11 +373,8 @@ def _finalize_experiment(experiment_json, hyperparameter, metric):
 
     """
     experiment_json = json.loads(experiment_json)
-    #experiment_json['metric'] = metric
+    experiment_json['metric'] = metric
     #experiment_json['hyperparameter'] = hyperparameter
-    #experiment_json['finished'] = datetime.datetime.now().isoformat()
-    #experiment_json['status'] = "SUCCEEDED"
-    #experiment_json = _add_version(experiment_json)
 
     return json.dumps(experiment_json)
 
