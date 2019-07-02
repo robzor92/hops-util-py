@@ -128,9 +128,13 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
                 cluster["task"] = {"type": "worker", "index": task_index}
 
             print('TF_CONFIG: {} '.format(cluster))
-            os.environ["TF_CONFIG"] = json.dumps(cluster)
 
-            if task_index == -1:
+            if util.num_executors() > 1:
+                os.environ["TF_CONFIG"] = json.dumps(cluster)
+
+            is_chief = task_index == -1 or util.num_executors() == 1
+
+            if is_chief:
                 logdir = _get_logdir(app_id, run_id)
                 tb_hdfs_path, tb_pid = tensorboard._register(logdir, logdir, executor_num, local_logdir=local_logdir)
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
@@ -140,7 +144,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
             task_start = datetime.datetime.now()
 
             retval = map_fun()
-            if task_index == -1:
+            if is_chief:
                 if retval:
                     _handle_return(retval, hdfs_exec_logdir)
             task_end = datetime.datetime.now()
@@ -150,7 +154,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
         except:
             raise
         finally:
-            if task_index == -1:
+            if is_chief:
                 if local_logdir:
                     local_tb = tensorboard.local_logdir_path
                     util._store_local_tensorboard(local_tb, hdfs_exec_logdir)

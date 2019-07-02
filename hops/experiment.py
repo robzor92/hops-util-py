@@ -596,19 +596,17 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        ps.run_id = run_id
+        versioned_path = _setup_experiment(versioned_resources, ps._get_logdir(app_id, run_id), app_id, run_id)
 
-        versioned_path = _setup_experiment(versioned_resources, ps._get_logdir(app_id), app_id, run_id)
+        experiment_json = util._populate_experiment(sc, name, 'experiment', 'parameter_server', ps._get_logdir(app_id, run_id), None, versioned_path, description)
 
-        experiment_json = util._populate_experiment(sc, name, 'experiment', 'parameter_server', ps._get_logdir(app_id), None, versioned_path, description)
+        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        util._publish_experiment(app_id, run_id, experiment_json)
-
-        retval, logdir = ps._launch(sc, map_fun, local_logdir=local_logdir, name=name)
+        retval, logdir = ps._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name)
 
         experiment_json = util._finalize_experiment(experiment_json, None, retval)
 
-        util._publish_experiment(app_id, run_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except:
         _exception_handler()
         raise
@@ -671,7 +669,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         util._publish_experiment(app_id, run_id, experiment_json)
 
-        retval, logdir = mirrored_impl._launch(sc, map_fun, local_logdir=local_logdir, name=name)
+        retval, logdir = mirrored_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name)
 
         experiment_json = util._finalize_experiment(experiment_json, None, retval)
 
