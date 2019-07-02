@@ -525,19 +525,17 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        tf_allreduce.run_id = run_id
+        versioned_path = _setup_experiment(versioned_resources, tf_allreduce._get_logdir(app_id, run_id), app_id, run_id)
 
-        versioned_path = _setup_experiment(versioned_resources, tf_allreduce._get_logdir(app_id), app_id, run_id)
+        experiment_json = util._populate_experiment(sc, name, 'experiment', 'collective_all_reduce', tf_allreduce._get_logdir(app_id, run_id), None, versioned_path, description)
 
-        experiment_json = util._populate_experiment(sc, name, 'experiment', 'collective_all_reduce', tf_allreduce._get_logdir(app_id), None, versioned_path, description)
+        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        util._publish_experiment(app_id, run_id, experiment_json)
-
-        retval, logdir = tf_allreduce._launch(sc, map_fun, local_logdir=local_logdir, name=name)
+        retval, logdir = tf_allreduce._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name)
 
         experiment_json = util._finalize_experiment(experiment_json, None, retval)
 
-        util._publish_experiment(app_id, run_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except:
         _exception_handler()
         raise
