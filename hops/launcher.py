@@ -124,7 +124,6 @@ def _prepare_func(app_id, map_fun, args_dict, local_logdir):
         for i in iter:
             executor_num = i
 
-        tb_pid = 0
         tb_hdfs_path = ''
         hdfs_exec_logdir = _get_logdir(app_id)
         hdfs_appid_logdir = _get_logdir(app_id)
