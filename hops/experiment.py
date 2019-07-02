@@ -451,13 +451,11 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        gs.run_id = run_id
+        versioned_path = _setup_experiment(versioned_resources, gs._get_logdir(app_id, run_id), app_id, run_id)
 
-        versioned_path = _setup_experiment(versioned_resources, gs._get_logdir(app_id), app_id, run_id)
+        experiment_json = util._populate_experiment(sc, name, 'experiment', 'grid_search', gs._get_logdir(app_id, run_id), json.dumps(args_dict), versioned_path, description)
 
-        experiment_json = util._populate_experiment(sc, name, 'experiment', 'grid_search', gs._get_logdir(app_id), json.dumps(args_dict), versioned_path, description)
-
-        util._publish_experiment(app_id, run_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
         grid_params = util.grid_params(args_dict)
 
@@ -465,7 +463,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         experiment_json = util._finalize_experiment(experiment_json, param, metric)
 
-        util._publish_experiment(app_id, run_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except:
         _exception_handler()
         raise
