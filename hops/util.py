@@ -317,7 +317,7 @@ def _time_diff(task_start, task_end):
     else:
         return 'unknown time'
 
-def _publish_experiment(appid, elastic_id, json_data):
+def _publish_experiment(appid, elastic_id, json_data, xattr):
     """
     Utility method for putting JSON data into elastic search
 
@@ -337,7 +337,7 @@ def _publish_experiment(appid, elastic_id, json_data):
                    constants.REST_CONFIG.HOPSWORKS_PROJECT_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    hdfs.project_id() + constants.DELIMITERS.SLASH_DELIMITER + \
                    constants.REST_CONFIG.HOPSWORKS_EXPERIMENTS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
-                   appid + "_" + str(elastic_id)
+                   appid + "_" + str(elastic_id) + "?xattr=" + xattr
 
     resp = send_request_with_session('POST', resource_url, data=json_data, headers=headers)
     print(resp)

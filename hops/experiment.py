@@ -214,17 +214,14 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         else:
             experiment_json = util._populate_experiment(sc, name, 'experiment', 'launcher', launcher._get_logdir(app_id), None, versioned_path, description)
 
-        util._publish_experiment(app_id, run_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
         retval, tensorboard_logdir, hp = launcher._launch(sc, map_fun, args_dict, local_logdir)
 
         if retval:
             experiment_json = util._finalize_experiment(experiment_json, hp, retval)
-            util._publish_experiment(app_id, run_id, experiment_json)
+            util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
             return tensorboard_logdir
-
-        _finalize_experiment(experiment_json, hp, app_id, run_id)
-
     except:
         _exception_handler()
         raise
