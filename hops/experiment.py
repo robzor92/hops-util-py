@@ -459,7 +459,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         grid_params = util.grid_params(args_dict)
 
-        tensorboard_logdir, param, metric = gs._grid_launch(sc, map_fun, grid_params, direction=direction, local_logdir=local_logdir, name=name)
+        tensorboard_logdir, param, metric = gs._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name)
 
         experiment_json = util._finalize_experiment(experiment_json, param, metric)
 
