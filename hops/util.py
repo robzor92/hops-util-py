@@ -547,7 +547,6 @@ def _create_experiment_subdirectories(app_id, run_id, param_string, type, sub_ty
 
     # Need to remove directory if it exists (might be a task retry)
     if pyhdfs_handle.exists(hdfs_exec_logdir):
-        raise Exception('woops')
         hdfs.delete(hdfs_exec_logdir, recursive=True)
 
     # create the new directory
