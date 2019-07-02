@@ -29,131 +29,12 @@ from hops import util
 from datetime import datetime
 import atexit
 import json
-import pydoop.hdfs
-import os
-import subprocess
 
 run_id = 1
 app_id = None
 experiment_json = None
 running = False
 driver_tensorboard_hdfs_path = None
-
-def _get_logdir(app_id):
-    """
-
-    Args:
-        app_id:
-
-    Returns:
-
-    """
-    global run_id
-    return util._get_experiments_dir() + '/' + app_id + '_' +  str(run_id)
-
-def begin(name='no-name', local_logdir=False, versioned_resources=None, description=None):
-    """
-    Start a custom Experiment, at the end of the experiment call *end(metric)*.
-
-    *IMPORTANT* - This call should not be combined with other functions in the experiment module, other than *end*.
-    Other experiment functions such as *grid_search* manages the *begin* and *end* functions internally
-
-    Example usage:
-
-    >>> from hops import experiment
-    >>> experiment.begin(name='calculate pi')
-    >>> # Code to calculate pi
-    >>> pi = calc_pi()
-    >>> experiment.end(pi)
-
-    Args:
-        :name: name of the experiment
-        :local_logdir: True if *tensorboard.logdir()* should be in the local filesystem, otherwise it is in HDFS
-        :versioned_resources: A list of HDFS paths of resources to version with this experiment
-        :description: A longer description for the experiment
-
-    Returns:
-        HDFS path in your project where the experiment is stored
-
-    """
-    global running
-    if running:
-        raise RuntimeError("An experiment is currently running. Please call experiment.stop() to stop it.")
-
-    try:
-        global app_id
-        global experiment_json
-        global run_id
-        global driver_tensorboard_hdfs_path
-
-        running = True
-
-        sc = util._find_spark().sparkContext
-        app_id = str(sc.applicationId)
-
-        versioned_path = _setup_experiment(versioned_resources, _get_logdir(app_id), app_id, run_id)
-
-        experiment_json = None
-
-        experiment_json = util._populate_experiment(sc, name, 'experiment', 'begin', _get_logdir(app_id), None, versioned_path, description)
-
-        util._publish_experiment(app_id, run_id, experiment_json)
-
-        hdfs_exec_logdir, hdfs_appid_logdir = util._create_experiment_subdirectories(app_id, run_id, None, 'begin')
-
-        pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
-
-        util._init_logger()
-
-        driver_tensorboard_hdfs_path,_ = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, 0, local_logdir=local_logdir)
-    except:
-        _exception_handler()
-        raise
-
-    return driver_tensorboard_hdfs_path
-
-def end(metric=None):
-    """
-    End a custom Experiment previously registered with *begin* and register a metric to associate with it.
-
-    Args:
-        :metric: The metric to associate with the Experiment
-
-    """
-    global running
-    global experiment_json
-    global run_id
-    global driver_tensorboard_hdfs_path
-    global app_id
-    if not running:
-        raise RuntimeError("An experiment is not running. Did you forget to call experiment.end()?")
-    try:
-        if metric:
-            experiment_json = util._finalize_experiment(experiment_json, None, str(metric))
-            util._publish_experiment(app_id, run_id, experiment_json)
-        else:
-            experiment_json = util._finalize_experiment(experiment_json, None, None)
-            util._publish_experiment(app_id, run_id, experiment_json)
-    except:
-        _exception_handler()
-        raise
-    finally:
-        run_id +=1
-        running = False
-        handle = hopshdfs.get()
-
-        if tensorboard.tb_pid != 0:
-            subprocess.Popen(["kill", str(tensorboard.tb_pid)])
-
-        if tensorboard.local_logdir_bool:
-            local_tb = tensorboard.local_logdir_path
-            util._store_local_tensorboard(local_tb, tensorboard.events_logdir)
-
-        if not tensorboard.endpoint == None and not tensorboard.endpoint == '' \
-                and handle.exists(tensorboard.endpoint):
-            handle.delete(tensorboard.endpoint)
-        util._kill_logger()
-
 
 def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versioned_resources=None, description=None):
     """
@@ -284,13 +165,13 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         r_search.run_id = run_id
 
-        versioned_path = _setup_experiment(versioned_resources, r_search._get_logdir(app_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, r_search._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = None
 
-        experiment_json = util._populate_experiment(sc, name, 'experiment', 'random_search', r_search._get_logdir(app_id), json.dumps(boundary_dict), versioned_path, description)
+        experiment_json = util._populate_experiment(sc, name, 'experiment', 'random_search', r_search._get_logdir(app_id, run_id), json.dumps(boundary_dict), versioned_path, description)
 
-        util._version_resources(versioned_resources, r_search._get_logdir(app_id))
+        util._version_resources(versioned_resources, r_search._get_logdir(app_id, run_id))
 
         util._publish_experiment(app_id, run_id, experiment_json)
 
@@ -369,10 +250,10 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
         diff_evo.run_id = run_id
 
-        versioned_path = _setup_experiment(versioned_resources, diff_evo._get_logdir(app_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, diff_evo._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = None
-        experiment_json = util._populate_experiment(sc, name, 'experiment', 'differential_evolution', diff_evo._get_logdir(app_id), json.dumps(boundary_dict), versioned_path, description)
+        experiment_json = util._populate_experiment(sc, name, 'experiment', 'differential_evolution', diff_evo._get_logdir(app_id, run_id), json.dumps(boundary_dict), versioned_path, description)
 
         util._publish_experiment(app_id, run_id, experiment_json)
 
@@ -663,9 +544,9 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         mirrored_impl.run_id = run_id
 
-        versioned_path = _setup_experiment(versioned_resources, mirrored_impl._get_logdir(app_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, mirrored_impl._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = util._populate_experiment(sc, name, 'experiment', 'mirrored', mirrored_impl._get_logdir(app_id), None, versioned_path, description)
+        experiment_json = util._populate_experiment(sc, name, 'experiment', 'mirrored', mirrored_impl._get_logdir(app_id, run_id), None, versioned_path, description)
 
         util._publish_experiment(app_id, run_id, experiment_json)
 
