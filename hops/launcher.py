@@ -11,7 +11,6 @@ import pydoop.hdfs
 import threading
 import six
 import datetime
-import os
 
 
 def _launch(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-name"):

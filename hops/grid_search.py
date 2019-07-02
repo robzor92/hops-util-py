@@ -13,9 +13,7 @@ import threading
 import six
 import datetime
 
-run_id = 0
-
-def _grid_launch(sc, map_fun, args_dict, direction='max', local_logdir=False, name="no-name"):
+def _grid_launch(sc, map_fun, run_id, args_dict, direction='max', local_logdir=False, name="no-name"):
     """
     Run the wrapper function with each hyperparameter combination as specified by the dictionary
 
@@ -30,7 +28,6 @@ def _grid_launch(sc, map_fun, args_dict, direction='max', local_logdir=False, na
     Returns:
 
     """
-    global run_id
     app_id = str(sc.applicationId)
     num_executions = 1
 
@@ -59,10 +56,9 @@ def _grid_launch(sc, map_fun, args_dict, direction='max', local_logdir=False, na
 
     arg_count = six.get_function_code(map_fun).co_argcount
     arg_names = six.get_function_code(map_fun).co_varnames
-    hdfs_appid_dir = util._get_experiments_dir() + '/' + app_id
-    hdfs_runid_dir = _get_logdir(app_id)
+    hdfs_dir = _get_logdir(app_id, run_id)
 
-    max_val, max_hp, min_val, min_hp, avg = _get_best(args_dict, num_executions, arg_names, arg_count, hdfs_appid_dir, run_id)
+    max_val, max_hp, min_val, min_hp, avg = _get_best(args_dict, num_executions, arg_names, arg_count, hdfs_dir, run_id)
 
     param_combination = ""
     best_val = ""
@@ -75,7 +71,7 @@ def _grid_launch(sc, map_fun, args_dict, direction='max', local_logdir=False, na
           'WORST combination ' + min_hp + ' -- metric ' + str(min_val) + '\n' \
           'AVERAGE metric -- ' + str(avg) + '\n' \
           'Total job time ' + job_time_str + '\n'
-        _write_result(hdfs_runid_dir, results)
+        _write_result(hdfs_dir, results)
         print(results)
     elif direction == 'min':
         param_combination = min_hp
@@ -85,13 +81,13 @@ def _grid_launch(sc, map_fun, args_dict, direction='max', local_logdir=False, na
         'WORST combination ' + max_hp + ' -- metric ' + str(max_val) + '\n' \
         'AVERAGE metric -- ' + str(avg) + '\n' \
         'Total job time ' + job_time_str + '\n'
-        _write_result(hdfs_runid_dir, results)
+        _write_result(hdfs_dir, results)
         print(results)
 
 
     print('Finished Experiment \n')
 
-    return hdfs_runid_dir, param_combination, best_val
+    return hdfs_dir, param_combination, best_val
 
 def _get_logdir(app_id):
     """
@@ -180,12 +176,9 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                     argIndex += 1
                 param_string = param_string[:-1]
                 hdfs_exec_logdir, hdfs_appid_logdir = util._create_experiment_subdirectories(app_id, run_id, param_string, 'grid_search')
-                pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
-                util._init_logger()
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)
 
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
-                util.log(gpu_str)
                 print(gpu_str)
                 print('-------------------------------------------------------')
                 print('Started running task ' + param_string + '\n')
@@ -198,7 +191,6 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 print('\n' + time_str)
                 print('Returning metric ' + str(retval))
                 print('-------------------------------------------------------')
-                util.log(time_str)
         except:
             #Always do cleanup
             _cleanup(tb_hdfs_path)
@@ -264,8 +256,6 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
 
         path_to_metric = hdfs_appid_dir + '_' + str(run_id) + '/' + param_string + '/metric'
 
-        metric = None
-
         with pydoop.hdfs.open(path_to_metric, "r") as fi:
             metric = float(fi.read())
             fi.close()
@@ -329,4 +319,3 @@ def _cleanup(tb_hdfs_path):
     handle = hopshdfs.get()
     if not tb_hdfs_path == None and not tb_hdfs_path == '' and handle.exists(tb_hdfs_path):
         handle.delete(tb_hdfs_path)
-    util._kill_logger()
