@@ -204,13 +204,13 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, launcher._get_logdir(app_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, launcher._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = None
         if args_dict:
-            experiment_json = util._populate_experiment(sc, name, 'experiment', 'launcher', launcher._get_logdir(app_id), json.dumps(args_dict), versioned_path, description)
+            experiment_json = util._populate_experiment(sc, name, 'experiment', 'launcher', launcher._get_logdir(app_id, run_id), json.dumps(args_dict), versioned_path, description)
         else:
-            experiment_json = util._populate_experiment(sc, name, 'experiment', 'launcher', launcher._get_logdir(app_id), None, versioned_path, description)
+            experiment_json = util._populate_experiment(sc, name, 'experiment', 'launcher', launcher._get_logdir(app_id, run_id), None, versioned_path, description)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
