@@ -173,13 +173,13 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         util._version_resources(versioned_resources, r_search._get_logdir(app_id, run_id))
 
-        util._publish_experiment(app_id, run_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        tensorboard_logdir, param, metric = r_search._launch(sc, map_fun, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
+        tensorboard_logdir, param, metric = r_search._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
 
         experiment_json = util._finalize_experiment(experiment_json, param, metric)
 
-        util._publish_experiment(app_id, run_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
 
         return tensorboard_logdir
 
@@ -255,13 +255,13 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         experiment_json = None
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'differential_evolution', diff_evo._get_logdir(app_id, run_id), json.dumps(boundary_dict), versioned_path, description)
 
-        util._publish_experiment(app_id, run_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
         tensorboard_logdir, best_param, best_metric = diff_evo._search(spark, objective_function, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
 
         experiment_json = util._finalize_experiment(experiment_json, best_param, best_metric)
 
-        util._publish_experiment(app_id, run_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
 
         best_param_dict = util._convert_to_dict(best_param)
 
@@ -548,13 +548,13 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'mirrored', mirrored_impl._get_logdir(app_id, run_id), None, versioned_path, description)
 
-        util._publish_experiment(app_id, run_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
         retval, logdir = mirrored_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name)
 
         experiment_json = util._finalize_experiment(experiment_json, None, retval)
 
-        util._publish_experiment(app_id, run_id, experiment_json)
+        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except:
         _exception_handler()
         raise
