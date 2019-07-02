@@ -204,8 +204,6 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        launcher.run_id = run_id
-
         versioned_path = _setup_experiment(versioned_resources, launcher._get_logdir(app_id), app_id, run_id)
 
         experiment_json = None
@@ -216,7 +214,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        retval, tensorboard_logdir, hp = launcher._launch(sc, map_fun, args_dict, local_logdir)
+        retval, tensorboard_logdir, hp = launcher._launch(sc, map_fun, run_id, args_dict, local_logdir)
 
         if retval:
             experiment_json = util._finalize_experiment(experiment_json, hp, retval)

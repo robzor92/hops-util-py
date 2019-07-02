@@ -13,10 +13,8 @@ import six
 import datetime
 import os
 
-run_id = 0
 
-
-def _launch(sc, map_fun, args_dict=None, local_logdir=False, name="no-name"):
+def _launch(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-name"):
     """
 
     Args:
@@ -29,7 +27,6 @@ def _launch(sc, map_fun, args_dict=None, local_logdir=False, name="no-name"):
     Returns:
 
     """
-    global run_id
 
     app_id = str(sc.applicationId)
 
@@ -48,7 +45,7 @@ def _launch(sc, map_fun, args_dict=None, local_logdir=False, name="no-name"):
     #Each TF task should be run on 1 executor
     nodeRDD = sc.parallelize(range(num_executions), num_executions)
 
-    #Force execution on executor, since GPU is located on executor    global run_id
+    #Force execution on executor, since GPU is located on executor
     nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, args_dict, local_logdir))
 
     print('Finished Experiment \n')
@@ -84,7 +81,7 @@ def _launch(sc, map_fun, args_dict=None, local_logdir=False, name="no-name"):
 
     return None, _get_logdir(app_id), None
 
-def _get_logdir(app_id):
+def _get_logdir(app_id, run_id):
     """
 
     Args:
@@ -93,12 +90,11 @@ def _get_logdir(app_id):
     Returns:
 
     """
-    global run_id
     return util._get_experiments_dir() + '/' + app_id + '_' +  str(run_id)
 
 
 #Helper to put Spark required parameter iter in function signature
-def _prepare_func(app_id, map_fun, args_dict, local_logdir):
+def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
     """
 
     Args:
@@ -125,8 +121,8 @@ def _prepare_func(app_id, map_fun, args_dict, local_logdir):
             executor_num = i
 
         tb_hdfs_path = ''
+
         hdfs_exec_logdir = _get_logdir(app_id)
-        hdfs_appid_logdir = _get_logdir(app_id)
 
         t = threading.Thread(target=devices._print_periodic_gpu_utilization)
         if devices.get_num_gpus() > 0:
@@ -152,7 +148,7 @@ def _prepare_func(app_id, map_fun, args_dict, local_logdir):
                 param_string = param_string[:-1]
                 pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
                 util._init_logger()
-                tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)
+                tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_exec_logdir, executor_num, local_logdir=local_logdir)
 
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
                 util.log(gpu_str)
@@ -172,7 +168,7 @@ def _prepare_func(app_id, map_fun, args_dict, local_logdir):
             else:
                 pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
                 util._init_logger()
-                tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)
+                tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_exec_logdir, executor_num, local_logdir=local_logdir)
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
                 util.log(gpu_str)
                 print(gpu_str)
