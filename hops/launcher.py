@@ -146,12 +146,9 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                     argcount -= 1
                     argIndex += 1
                 param_string = param_string[:-1]
-                pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
-                util._init_logger()
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_exec_logdir, executor_num, local_logdir=local_logdir)
 
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
-                util.log(gpu_str)
                 print(gpu_str)
                 print('-------------------------------------------------------')
                 print('Started running task ' + param_string + '\n')
@@ -164,17 +161,12 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 time_str = 'Finished task ' + param_string + ' - took ' + util._time_diff(task_start, task_end)
                 print('\n' + time_str)
                 print('-------------------------------------------------------')
-                util.log(time_str)
             else:
-                pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
-                util._init_logger()
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_exec_logdir, executor_num, local_logdir=local_logdir)
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
-                util.log(gpu_str)
                 print(gpu_str)
                 print('-------------------------------------------------------')
                 print('Started running task\n')
-                util.log('Started running task')
                 task_start = datetime.datetime.now()
                 retval = map_fun()
                 task_end = datetime.datetime.now()
@@ -183,7 +175,6 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 time_str = 'Finished task - took ' + util._time_diff(task_start, task_end)
                 print('\n' + time_str)
                 print('-------------------------------------------------------')
-                util.log(time_str)
         except:
             #Always do cleanup
             _cleanup(tb_hdfs_path)
@@ -219,7 +210,6 @@ def _cleanup(tb_hdfs_path):
     handle = hopshdfs.get()
     if not tb_hdfs_path == None and not tb_hdfs_path == '' and handle.exists(tb_hdfs_path):
         handle.delete(tb_hdfs_path)
-    util._kill_logger()
 
 def _handle_return(val, hdfs_exec_logdir):
     """
