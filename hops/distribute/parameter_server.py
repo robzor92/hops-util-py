@@ -30,7 +30,6 @@ def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name"):
     Returns:
 
     """
-    global run_id
     app_id = str(sc.applicationId)
 
     num_executions = util.num_executors()
