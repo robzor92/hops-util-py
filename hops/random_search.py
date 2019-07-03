@@ -145,7 +145,6 @@ def _get_logdir(app_id, run_id):
     Returns:
 
     """
-    global run_id
     return util._get_experiments_dir() + '/' + app_id + '_' +  str(run_id)
 
 
