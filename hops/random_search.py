@@ -14,10 +14,7 @@ import datetime
 import os
 import random
 
-run_id = 0
-
-
-def _launch(sc, map_fun, args_dict, samples, direction='max', local_logdir=False, name="no-name"):
+def _launch(sc, map_fun, run_id, args_dict, samples, direction='max', local_logdir=False, name="no-name"):
     """
 
     Args:
@@ -30,7 +27,6 @@ def _launch(sc, map_fun, args_dict, samples, direction='max', local_logdir=False
     Returns:
 
     """
-    global run_id
 
     app_id = str(sc.applicationId)
 
@@ -76,7 +72,7 @@ def _launch(sc, map_fun, args_dict, samples, direction='max', local_logdir=False
     arg_count = six.get_function_code(map_fun).co_argcount
     arg_names = six.get_function_code(map_fun).co_varnames
     hdfs_appid_dir = util._get_experiments_dir() + '/' + app_id
-    hdfs_runid_dir = _get_logdir(app_id)
+    hdfs_runid_dir = _get_logdir(app_id, run_id)
 
     max_val, max_hp, min_val, min_hp, avg = _get_best(random_dict, new_samples, arg_names, arg_count, hdfs_appid_dir, run_id)
 
@@ -140,7 +136,7 @@ def _remove_duplicates(random_dict, samples):
     return random_dict, samples - len(indices_to_skip)
 
 
-def _get_logdir(app_id):
+def _get_logdir(app_id, run_id):
     """
 
     Args:
@@ -207,16 +203,12 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                     argIndex += 1
                 param_string = param_string[:-1]
                 hdfs_exec_logdir, hdfs_appid_logdir = util._create_experiment_subdirectories(app_id, run_id, param_string, 'random_search')
-                pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
-                util._init_logger()
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)
 
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
-                util.log(gpu_str)
                 print(gpu_str)
                 print('-------------------------------------------------------')
                 print('Started running task ' + param_string + '\n')
-                util.log('Started running task ' + param_string)
                 task_start = datetime.datetime.now()
                 retval = map_fun(*args)
                 task_end = datetime.datetime.now()
@@ -225,7 +217,6 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 print('\n' + time_str)
                 print('Returning metric ' + str(retval))
                 print('-------------------------------------------------------')
-                util.log(time_str)
         except:
             #Always do cleanup
             _cleanup(tb_hdfs_path)
@@ -261,7 +252,6 @@ def _cleanup(tb_hdfs_path):
     handle = hopshdfs.get()
     if not tb_hdfs_path == None and not tb_hdfs_path == '' and handle.exists(tb_hdfs_path):
         handle.delete(tb_hdfs_path)
-    util._kill_logger()
 
 def _handle_return(val, hdfs_exec_logdir):
     """
@@ -332,8 +322,6 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
         param_string = param_string[:-1]
 
         path_to_metric = hdfs_appid_dir + '/random_search/run.' + str(run_id) + '/' + param_string + '/metric'
-
-        metric = None
 
         with pydoop.hdfs.open(path_to_metric, "r") as fi:
             metric = float(fi.read())
