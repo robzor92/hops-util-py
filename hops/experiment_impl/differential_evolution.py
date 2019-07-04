@@ -612,19 +612,6 @@ def _search(spark, function, search_dict, direction = 'max', generations=10, pop
 
     return str(root_dir), best_param, best_metric
 
-def _get_logdir(app_id):
-    """
-
-    Args:
-        :app_id:
-
-    Returns:
-
-    """
-    global run_id
-    return util._get_experiments_dir() + "/" + app_id + "_" + str(run_id)
-
-
 def _evolutionary_launch(spark_session, map_fun, args_dict, name="no-name"):
     """ Run the wrapper function with each hyperparameter combination as specified by the dictionary
 

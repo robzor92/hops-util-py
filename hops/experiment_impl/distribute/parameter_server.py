@@ -48,7 +48,7 @@ def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=F
     #Force execution on executor, since GPU is located on executor
     nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, evaluator))
 
-    logdir = _get_logdir(app_id, run_id)
+    logdir = util._get_logdir(app_id, run_id)
 
     path_to_metric = logdir + '/metric'
     if pydoop.hdfs.path.exists(path_to_metric):
@@ -60,17 +60,6 @@ def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=F
     print('Finished Experiment \n')
 
     return None, logdir
-
-def _get_logdir(app_id, run_id):
-    """
-
-    Args:
-        app_id:
-
-    Returns:
-
-    """
-    return util._get_experiments_dir() + '/' + app_id + '_' + str(run_id)
 
 def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, evaluator):
     """
@@ -149,10 +138,10 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
             os.environ["TF_CONFIG"] = json.dumps(cluster_spec)
 
             if role == "chief":
-                logdir = _get_logdir(app_id, run_id)
+                logdir = util._get_logdir(app_id, run_id)
                 tb_hdfs_path, tb_pid = tensorboard._register(logdir, logdir, executor_num, local_logdir=local_logdir)
             elif role == "evaluator":
-                logdir = _get_logdir(app_id, run_id)
+                logdir = util._get_logdir(app_id, run_id)
                 tensorboard.events_logdir = logdir
                 
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()

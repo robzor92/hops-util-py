@@ -70,7 +70,7 @@ def _launch(sc, map_fun, run_id, args_dict, samples, direction='max', local_logd
 
     arg_count = six.get_function_code(map_fun).co_argcount
     arg_names = six.get_function_code(map_fun).co_varnames
-    exp_dir = _get_logdir(app_id, run_id)
+    exp_dir = util._get_logdir(app_id, run_id)
 
     max_val, max_hp, min_val, min_hp, avg = _get_best(random_dict, new_samples, arg_names, arg_count, exp_dir)
 
@@ -130,19 +130,6 @@ def _remove_duplicates(random_dict, samples):
         random_dict[hp] = pruned_duplicates_arr
 
     return random_dict, samples - len(indices_to_skip)
-
-
-def _get_logdir(app_id, run_id):
-    """
-
-    Args:
-        app_id:
-
-    Returns:
-
-    """
-    return util._get_experiments_dir() + '/' + app_id + '_' +  str(run_id)
-
 
 #Helper to put Spark required parameter iter in function signature
 def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):

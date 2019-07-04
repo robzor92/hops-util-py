@@ -50,12 +50,12 @@ def _launch(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-na
     print('Finished Experiment \n')
 
     if args_dict == None:
-        path_to_metric = _get_logdir(app_id, run_id) + '/metric'
+        path_to_metric = util._get_logdir(app_id, run_id) + '/metric'
         if pydoop.hdfs.path.exists(path_to_metric):
             with pydoop.hdfs.open(path_to_metric, "r") as fi:
                 metric = float(fi.read())
                 fi.close()
-                return metric, _get_logdir(app_id, run_id), None
+                return metric, util._get_logdir(app_id, run_id), None
     elif num_executions == 1 and not args_dict == None:
         arg_count = six.get_function_code(map_fun).co_argcount
         arg_names = six.get_function_code(map_fun).co_varnames
@@ -68,29 +68,17 @@ def _launch(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-na
             arg_count -= 1
             argIndex += 1
         param_string = param_string[:-1]
-        path_to_metric = _get_logdir(app_id, run_id) + '/' + param_string + '/metric'
+        path_to_metric = util._get_logdir(app_id, run_id) + '/' + param_string + '/metric'
         if pydoop.hdfs.path.exists(path_to_metric):
             with pydoop.hdfs.open(path_to_metric, "r") as fi:
                 metric = float(fi.read())
                 fi.close()
-                return metric, _get_logdir(app_id, run_id), param_string
+                return metric, util._get_logdir(app_id, run_id), param_string
         else:
-            return None, _get_logdir(app_id, run_id), param_string
+            return None, util._get_logdir(app_id, run_id), param_string
 
 
-    return None, _get_logdir(app_id, run_id), None
-
-def _get_logdir(app_id, run_id):
-    """
-
-    Args:
-        app_id:
-
-    Returns:
-
-    """
-    return util._get_experiments_dir() + '/' + app_id + '_' +  str(run_id)
-
+    return None, util._get_logdir(app_id, run_id), None
 
 #Helper to put Spark required parameter iter in function signature
 def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
@@ -121,7 +109,7 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
 
         tb_hdfs_path = ''
 
-        hdfs_exec_logdir = _get_logdir(app_id, run_id)
+        hdfs_exec_logdir = util._get_logdir(app_id, run_id)
 
         t = threading.Thread(target=devices._print_periodic_gpu_utilization)
         if devices.get_num_gpus() > 0:
