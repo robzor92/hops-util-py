@@ -175,15 +175,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
                 client.register_worker_finished()
             client.close()
             if role == "chief":
-                if local_logdir:
-                    local_tb = tensorboard.local_logdir_path
-                    util._store_local_tensorboard(local_tb, logdir)
-
-            if devices.get_num_gpus() > 0:
-                t.do_run = False
-                t.join(20)
-
-            _cleanup(tb_hdfs_path)
+                util.cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, logdir, t, tb_hdfs_path)
 
     return _wrapper_fun
 
@@ -199,7 +191,6 @@ def _cleanup(tb_hdfs_path):
     handle = hopshdfs.get()
     if not tb_hdfs_path == None and not tb_hdfs_path == '' and handle.exists(tb_hdfs_path):
         handle.delete(tb_hdfs_path)
-    util._kill_logger()
 
 def _find_task_and_index(host_port, cluster_spec):
     """

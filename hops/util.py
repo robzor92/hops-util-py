@@ -18,6 +18,7 @@ from hops import hdfs
 from hops import version
 from hops import constants
 from hops import tls
+from hops import devices
 
 #! Needed for hops library backwards compatability
 try:
@@ -564,3 +565,24 @@ def _create_experiment_subdirectories(app_id, run_id, param_string, type, sub_ty
     os.environ['EXEC_LOGFILE'] = logfile
 
     return hdfs_exec_logdir, hdfs_experiment_dir
+
+
+def _cleanup(local_logdir_bool, local_tb_path, hdfs_exec_logdir, gpu_thread, tb_hdfs_file):
+    try:
+        if local_logdir_bool:
+            _store_local_tensorboard(local_tb_path, hdfs_exec_logdir)
+    except Exception as err:
+        print('Exception occurred while uploading local logdir to hdfs: {}'.format(err))
+    finally:
+        if devices.get_num_gpus() > 0 and gpu_thread.isAlive():
+            gpu_thread.do_run = False
+            gpu_thread.join(20)
+
+        handle = hdfs.get()
+        try:
+            if tb_hdfs_file and handle.exists(tb_hdfs_file):
+                handle.delete(tb_hdfs_file)
+        except:
+            pass
+
+
