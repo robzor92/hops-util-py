@@ -10,7 +10,7 @@ from hops import devices
 import pydoop.hdfs
 import threading
 import six
-import datetime
+import time
 
 
 def _launch(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-name"):
@@ -152,9 +152,9 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 print('-------------------------------------------------------')
                 print('Started running task ' + param_string + '\n')
                 util.log('Started running task ' + param_string)
-                task_start = datetime.datetime.now()
+                task_start = time.time()
                 retval = map_fun(*args)
-                task_end = datetime.datetime.now()
+                task_end = time.time()
                 if retval:
                     _handle_return(retval, hdfs_exec_logdir)
                 time_str = 'Finished task ' + param_string + ' - took ' + util._time_diff(task_start, task_end)
@@ -166,9 +166,9 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 print(gpu_str)
                 print('-------------------------------------------------------')
                 print('Started running task\n')
-                task_start = datetime.datetime.now()
+                task_start = time.time()
                 retval = map_fun()
-                task_end = datetime.datetime.now()
+                task_end = time.time()
                 if retval:
                     _handle_return(retval, hdfs_exec_logdir)
                 time_str = 'Finished task - took ' + util._time_diff(task_start, task_end)

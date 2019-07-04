@@ -12,7 +12,7 @@ from hops import util
 
 import pydoop.hdfs
 import threading
-import datetime
+import time
 import socket
 import json
 
@@ -148,13 +148,13 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator)
             print(gpu_str)
             print('-------------------------------------------------------')
             print('Started running task \n')
-            task_start = datetime.datetime.now()
+            task_start = time.time()
 
             retval = map_fun()
             if is_chief:
                 if retval:
                     _handle_return(retval, logdir)
-            task_end = datetime.datetime.now()
+            task_end = time.time()
             time_str = 'Finished task - took ' + util._time_diff(task_start, task_end)
             print('\n' + time_str)
             print('-------------------------------------------------------')

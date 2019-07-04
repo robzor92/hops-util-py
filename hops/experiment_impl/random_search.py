@@ -10,8 +10,7 @@ from hops import devices
 import pydoop.hdfs
 import threading
 import six
-import datetime
-import os
+import time
 import random
 
 def _launch(sc, map_fun, run_id, args_dict, samples, direction='max', local_logdir=False, name="no-name"):
@@ -63,18 +62,17 @@ def _launch(sc, map_fun, run_id, args_dict, samples, direction='max', local_logd
     #Each TF task should be run on 1 executor
     nodeRDD = sc.parallelize(range(new_samples), new_samples)
 
-    job_start = datetime.datetime.now()
+    job_start = time.time()
     nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, random_dict, local_logdir))
-    job_end = datetime.datetime.now()
+    job_end = time.time()
 
     job_time_str = util._time_diff(job_start, job_end)
 
     arg_count = six.get_function_code(map_fun).co_argcount
     arg_names = six.get_function_code(map_fun).co_varnames
-    hdfs_appid_dir = util._get_experiments_dir() + '/' + app_id
-    hdfs_runid_dir = _get_logdir(app_id, run_id)
+    exp_dir = _get_logdir(app_id, run_id)
 
-    max_val, max_hp, min_val, min_hp, avg = _get_best(random_dict, new_samples, arg_names, arg_count, hdfs_appid_dir, run_id)
+    max_val, max_hp, min_val, min_hp, avg = _get_best(random_dict, new_samples, arg_names, arg_count, exp_dir)
 
     param_combination = ""
     best_val = ""
@@ -87,7 +85,6 @@ def _launch(sc, map_fun, run_id, args_dict, samples, direction='max', local_logd
         'WORST combination ' + min_hp + ' -- metric ' + str(min_val) + '\n' \
         'AVERAGE metric -- ' + str(avg) + '\n' \
         'Total job time ' + job_time_str + '\n'
-        _write_result(hdfs_runid_dir, results)
         print(results)
     elif direction == 'min':
         param_combination = min_hp
@@ -97,12 +94,11 @@ def _launch(sc, map_fun, run_id, args_dict, samples, direction='max', local_logd
         'WORST combination ' + max_hp + ' -- metric ' + str(max_val) + '\n' \
         'AVERAGE metric -- ' + str(avg) + '\n' \
         'Total job time ' + job_time_str + '\n'
-        _write_result(hdfs_runid_dir, results)
         print(results)
 
     print('Finished Experiment \n')
 
-    return hdfs_runid_dir, param_combination, best_val
+    return exp_dir, param_combination, best_val
 
 def _remove_duplicates(random_dict, samples):
     hp_names = random_dict.keys()
@@ -208,9 +204,9 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 print(gpu_str)
                 print('-------------------------------------------------------')
                 print('Started running task ' + param_string + '\n')
-                task_start = datetime.datetime.now()
+                task_start = time.time()
                 retval = map_fun(*args)
-                task_end = datetime.datetime.now()
+                task_end = time.time()
                 _handle_return(retval, hdfs_exec_logdir)
                 time_str = 'Finished task ' + param_string + ' - took ' + util._time_diff(task_start, task_end)
                 print('\n' + time_str)
@@ -278,7 +274,7 @@ def _handle_return(val, hdfs_exec_logdir):
     fd.close()
 
 
-def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir, run_id):
+def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir):
     """
 
     Args:
@@ -346,24 +342,3 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
     avg = sum(results)/float(len(results))
 
     return max_val, max_hp, min_val, min_hp, avg
-
-def _write_result(runid_dir, string):
-    """
-
-    Args:
-        runid_dir:
-        string:
-
-    Returns:
-
-    """
-    metric_file = runid_dir + '/summary'
-    fs_handle = hopshdfs.get_fs()
-    try:
-        fd = fs_handle.open_file(metric_file, mode='w')
-    except:
-        fd = fs_handle.open_file(metric_file, flags='w')
-    fd.write(string.encode())
-    fd.flush()
-    fd.close()
-

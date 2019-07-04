@@ -14,19 +14,14 @@ Whenever a function to run an experiment is invoked it is also registered in the
 
 from hops import hdfs as hopshdfs
 
-from hops import differential_evolution as diff_evo
-from hops import grid_search as gs
-from hops import launcher as launcher
-from hops import random_search as r_search
-from hops.distribute import allreduce as tf_allreduce
-from hops.distribute import parameter_server as ps
-from hops.distribute import mirrored as mirrored_impl
+from hops.experiment_impl import differential_evolution as diff_evo_impl, grid_search as grid_search_impl, random_search as r_search_impl, launcher as launcher
+from hops.experiment_impl.distribute import allreduce as allreduce_impl, parameter_server as ps_impl, mirrored as mirrored_impl
 
 from hops import tensorboard
 
 from hops import util
 
-from datetime import datetime
+from time import time
 import atexit
 import json
 
@@ -163,19 +158,19 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        r_search.run_id = run_id
+        r_search_impl.run_id = run_id
 
-        versioned_path = _setup_experiment(versioned_resources, r_search._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, r_search_impl._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = None
 
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'random_search', json.dumps(boundary_dict), versioned_path, description)
 
-        util._version_resources(versioned_resources, r_search._get_logdir(app_id, run_id))
+        util._version_resources(versioned_resources, r_search_impl._get_logdir(app_id, run_id))
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        tensorboard_logdir, param, metric = r_search._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
+        tensorboard_logdir, param, metric = r_search_impl._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
 
         experiment_json = util._finalize_experiment(experiment_json, param, metric)
 
@@ -248,16 +243,16 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         sc = spark.sparkContext
         app_id = str(sc.applicationId)
 
-        diff_evo.run_id = run_id
+        diff_evo_impl.run_id = run_id
 
-        versioned_path = _setup_experiment(versioned_resources, diff_evo._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, diff_evo_impl._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = None
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'differential_evolution', json.dumps(boundary_dict), versioned_path, description)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        tensorboard_logdir, best_param, best_metric = diff_evo._search(spark, objective_function, run_id, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
+        tensorboard_logdir, best_param, best_metric = diff_evo_impl._search(spark, objective_function, run_id, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
 
         experiment_json = util._finalize_experiment(experiment_json, best_param, best_metric)
 
@@ -332,7 +327,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, gs._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, grid_search_impl._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'grid_search', json.dumps(args_dict), versioned_path, description)
 
@@ -340,7 +335,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         grid_params = util.grid_params(args_dict)
 
-        tensorboard_logdir, param, metric = gs._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name)
+        tensorboard_logdir, param, metric = grid_search_impl._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name)
 
         experiment_json = util._finalize_experiment(experiment_json, param, metric)
 
@@ -408,13 +403,13 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, tf_allreduce._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, allreduce_impl._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'collective_all_reduce', None, versioned_path, description)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        retval, logdir = tf_allreduce._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
+        retval, logdir = allreduce_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
 
         experiment_json = util._finalize_experiment(experiment_json, None, retval)
 
@@ -481,13 +476,13 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, ps._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, ps_impl._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'parameter_server', None, versioned_path, description)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        retval, logdir = ps._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
+        retval, logdir = ps_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
 
         experiment_json = util._finalize_experiment(experiment_json, None, retval)
 
@@ -585,7 +580,7 @@ def _exception_handler():
     if running and experiment_json != None:
         experiment_json = json.loads(experiment_json)
         experiment_json['status'] = "FAILED"
-        experiment_json['finished'] = datetime.now().isoformat()
+        experiment_json['finished'] = time.time()
         experiment_json = json.dumps(experiment_json)
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
 
@@ -600,7 +595,7 @@ def _exit_handler():
     if running and experiment_json != None:
         experiment_json = json.loads(experiment_json)
         experiment_json['status'] = "KILLED"
-        experiment_json['finished'] = datetime.now().isoformat()
+        experiment_json['finished'] = time.time()
         experiment_json = json.dumps(experiment_json)
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
 
