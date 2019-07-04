@@ -136,6 +136,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
             cluster_spec["cluster"] = cluster
             cluster_spec["task"] = {"type": role, "index": index}
 
+            evaluator_node = None
             if evaluator:
                 evaluator_node = cluster["cluster"]["worker"][0]
                 cluster["cluster"]["evaluator"] = [evaluator_node]
@@ -149,6 +150,10 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
             if role == "chief":
                 logdir = _get_logdir(app_id, run_id)
                 tb_hdfs_path, tb_pid = tensorboard._register(logdir, logdir, executor_num, local_logdir=local_logdir)
+            elif evaluator_node == host_port:
+                logdir = _get_logdir(app_id, run_id)
+                tensorboard.events_logdir = logdir
+                
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
             print(gpu_str)
             print('-------------------------------------------------------')
