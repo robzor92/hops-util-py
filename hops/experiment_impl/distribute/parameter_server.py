@@ -12,7 +12,7 @@ from hops import util
 
 import pydoop.hdfs
 import threading
-import datetime
+import time
 import socket
 import json
 
@@ -142,6 +142,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
                 cluster_spec["cluster"]["evaluator"] = [evaluator_node]
                 del cluster_spec["cluster"]["worker"][0]
                 if evaluator_node == host_port:
+                    role = "evaluator"
                     cluster_spec["task"] = {"type": "evaluator", "index": 0}
 
             print('TF_CONFIG: {} '.format(cluster))
@@ -150,7 +151,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
             if role == "chief":
                 logdir = _get_logdir(app_id, run_id)
                 tb_hdfs_path, tb_pid = tensorboard._register(logdir, logdir, executor_num, local_logdir=local_logdir)
-            elif evaluator_node == host_port:
+            elif role == "evaluator":
                 logdir = _get_logdir(app_id, run_id)
                 tensorboard.events_logdir = logdir
                 
@@ -158,7 +159,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
             print(gpu_str)
             print('-------------------------------------------------------')
             print('Started running task \n')
-            task_start = datetime.datetime.now()
+            task_start = time.time()
 
             retval=None
             if role == "ps":
@@ -174,7 +175,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
                 if retval:
                     _handle_return(retval, logdir)
 
-            task_end = datetime.datetime.now()
+            task_end = time.time()
             time_str = 'Finished task - took ' + util._time_diff(task_start, task_end)
             print('\n' + time_str)
             print('-------------------------------------------------------')

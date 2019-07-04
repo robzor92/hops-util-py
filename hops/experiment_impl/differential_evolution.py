@@ -15,7 +15,7 @@ from hops import util
 import pydoop.hdfs
 import threading
 import six
-import datetime
+import time
 import copy
 
 objective_function=None
@@ -727,10 +727,10 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id):
                 if val:
                     print('Reading returned metric from previous run: ' + str(val))
                 util.log('Started running task ' + param_string)
-                task_start = datetime.datetime.now()
+                task_start = time.time()
                 if not val:
                     val = map_fun(*args)
-                task_end = datetime.datetime.now()
+                task_end = time.time()
                 time_str = 'Finished task ' + param_string + ' - took ' + util._time_diff(task_start, task_end)
                 print('\n' + time_str)
                 util.log(time_str)
