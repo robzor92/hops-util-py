@@ -81,7 +81,7 @@ def _get_rocm_gpu_util():
     """
     gpu_str = ''
     try:
-        gpu_info = subprocess.check_output(["/opt/rocm/bin/rocm-smi", "--showuse"]).decode("utf-8")
+        gpu_info = subprocess.check_output(["/opt/rocm/bin/rocm-smi", "--showuse"], shell=True).decode("utf-8")
     except Exception as err:
         print(err)
         return gpu_str
@@ -127,14 +127,20 @@ def _count_rocm_gpus():
         Number of GPUs available in the environment
     """
     try:
-        gpu_info = subprocess.check_output(["/opt/rocm/bin/rocm-smi -i | grep GPU"]).decode("utf-8")
+        gpu_info = subprocess.check_output(["/opt/rocm/bin/rocm-smi -i | grep GPU"], shell=True).decode("utf-8")
         gpu_info = gpu_info.split('\n')
     except Exception as err:
         return 0
 
     count = 0
     for line in gpu_info:
-        if len(line) > 0:
+        if 'warning' in line.lower():
+            continue
+        elif 'error' in line.lower():
+            continue
+        elif 'critical' in line.lower():
+            continue
+        elif len(line) > 0:
             count += 1
     return count
 
