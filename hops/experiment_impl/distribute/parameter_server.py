@@ -154,9 +154,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
             if role == "ps":
                 ps_thread = threading.Thread(target=lambda: map_fun())
                 ps_thread.start()
-                print("waiting for workers")
                 client.await_all_workers_finished()
-                print("waiting finished")
             else:
                 retval = map_fun()
 
@@ -178,19 +176,6 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
                 util.cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, logdir, t, tb_hdfs_path)
 
     return _wrapper_fun
-
-def _cleanup(tb_hdfs_path):
-    """
-
-    Args:
-        tb_hdfs_path:
-
-    Returns:
-
-    """
-    handle = hopshdfs.get()
-    if not tb_hdfs_path == None and not tb_hdfs_path == '' and handle.exists(tb_hdfs_path):
-        handle.delete(tb_hdfs_path)
 
 def _find_task_and_index(host_port, cluster_spec):
     """
