@@ -138,11 +138,11 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
 
             evaluator_node = None
             if evaluator:
-                evaluator_node = cluster["cluster"]["worker"][0]
-                cluster["cluster"]["evaluator"] = [evaluator_node]
-                del cluster["cluster"]["worker"][0]
+                evaluator_node = cluster_spec["cluster"]["worker"][0]
+                cluster_spec["cluster"]["evaluator"] = [evaluator_node]
+                del cluster_spec["cluster"]["worker"][0]
                 if evaluator_node == host_port:
-                    cluster["task"] = {"type": "evaluator", "index": 0}
+                    cluster_spec["task"] = {"type": "evaluator", "index": 0}
 
             print('TF_CONFIG: {} '.format(cluster))
             os.environ["TF_CONFIG"] = json.dumps(cluster_spec)
