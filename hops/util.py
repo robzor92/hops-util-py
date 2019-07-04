@@ -10,24 +10,22 @@ from ctypes import cdll
 import itertools
 import socket
 import json
-import datetime
-import time
-import requests
 import ssl
 import jks
 from pathlib import Path
-from six import string_types
 
 from hops import hdfs
 from hops import version
 from hops import constants
 from hops import tls
 
-import requests
+#! Needed for hops library backwards compatability
+try:
+    import requests
+except:
+    pass
 
 import pydoop.hdfs
-
-fd = None
 
 try:
     import tensorflow
