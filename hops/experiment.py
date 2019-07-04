@@ -392,6 +392,8 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
     assert num_ps == 0, "number of parameter servers should be 0"
     assert num_executors > 1, "number of workers (executors) should be greater than 1"
+    if evaluator:
+        assert num_executors > 2, "number of workers must be atleast 3 if evaluator role is required"
 
     global running
     if running:
@@ -428,7 +430,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
     return logdir
 
-def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None):
+def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
     """
     *Distributed Training*
 
@@ -463,6 +465,8 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
     assert num_ps > 0, "number of parameter servers should be greater than 0"
     assert num_ps < num_executors, "num_ps cannot be greater than num_executors (i.e. num_executors == num_ps + num_workers)"
+    if evaluator:
+        assert num_executors - num_ps > 2, "number of workers must be atleast 3 if evaluator role is required"
 
     global running
     if running:
@@ -483,7 +487,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        retval, logdir = ps._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name)
+        retval, logdir = ps._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
 
         experiment_json = util._finalize_experiment(experiment_json, None, retval)
 

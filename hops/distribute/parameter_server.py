@@ -18,7 +18,7 @@ import json
 
 from . import parameter_server_reservation
 
-def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name"):
+def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=False):
     """
 
     Args:
@@ -46,7 +46,7 @@ def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name"):
     num_ps = util.num_param_servers()
 
     #Force execution on executor, since GPU is located on executor
-    nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps))
+    nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, evaluator))
 
     logdir = _get_logdir(app_id, run_id)
 
@@ -72,7 +72,7 @@ def _get_logdir(app_id, run_id):
     """
     return util._get_experiments_dir() + '/' + app_id + '_' + str(run_id)
 
-def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps):
+def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, evaluator):
     """
 
     Args:
@@ -135,6 +135,13 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps):
             cluster_spec = {}
             cluster_spec["cluster"] = cluster
             cluster_spec["task"] = {"type": role, "index": index}
+
+            if evaluator:
+                evaluator_node = cluster["cluster"]["worker"][0]
+                cluster["cluster"]["evaluator"] = [evaluator_node]
+                del cluster["cluster"]["worker"][0]
+                if evaluator_node == host_port:
+                    cluster["task"] = {"type": "evaluator", "index": 0}
 
             print('TF_CONFIG: {} '.format(cluster))
             os.environ["TF_CONFIG"] = json.dumps(cluster_spec)
