@@ -190,19 +190,8 @@ class DifferentialEvolution:
         fs_handle = hopshdfs.get_fs()
         global run_id
 
-        contents = ''
-        generation_summary = ''
         new_gen_best_param = None
         new_gen_best = None
-        global summary_file
-        summary_file = root_dir + "/summary"
-
-        global fd
-        try:
-            fd = fs_handle.open_file(summary_file, mode='w')
-        except:
-            fd = fs_handle.open_file(summary_file, flags='w')
-        fd.write(("Differential evolution summary\n\n").encode())
 
         for _ in range(self.generations):
 
@@ -227,42 +216,11 @@ class DifferentialEvolution:
                 new_gen_best_param[index] = name + "=" + str(new_gen_best_param[index])
                 index += 1
 
-            contents = ''
-            try:
-                with pydoop.hdfs.open(summary_file, encoding='utf-8') as f:
-                    for line in f:
-                        contents += line.decode('utf-8')
-            except:
-                with pydoop.hdfs.open(summary_file) as f:
-                    for line in f:
-                        contents += line.decode('utf-8')
-
-            generation_summary = "Generation " + str(self._generation) + " || " + "average metric: " + str(new_gen_avg) \
-                             + ", best metric: " + str(new_gen_best) + ", best parameter combination: " + str(new_gen_best_param) + "\n"
-            print(generation_summary)
-
-            try:
-                fd = fs_handle.open_file(summary_file, mode='w')
-            except:
-                fd = fs_handle.open_file(summary_file, flags='w')
-
-            fd.write((contents + generation_summary + "\n").encode())
-
-            fd.flush()
-            fd.close()
+            print("Generation " + str(self._generation) + " || " + "average metric: " + str(new_gen_avg) \
+                  + ", best metric: " + str(new_gen_best) + ", best parameter combination: " + str(new_gen_best_param) + "\n")
 
             if cleanup:
                 pydoop.hdfs.rmr(root_dir + '/generation.' + str(self._generation-1))
-
-        try:
-            fd = fs_handle.open_file(summary_file, mode='w')
-        except:
-            fd = fs_handle.open_file(summary_file, flags='w')
-
-        fd.write((contents + generation_summary + "\n\nBest parameter combination found " + str(new_gen_best_param) + " with metric " + str(new_gen_best)).encode())
-
-        fd.flush()
-        fd.close()
 
         parsed_back_population = []
         for indiv in population:
