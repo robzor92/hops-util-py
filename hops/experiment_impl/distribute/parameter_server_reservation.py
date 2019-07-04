@@ -367,7 +367,6 @@ class Client(MessageSocket):
       Returns:
 
       """
-      print('Registering executor {} '.format(reservation))
       resp = self._request('REG', reservation)
       return resp
 
