@@ -499,7 +499,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
     return logdir
 
-def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None):
+def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
     """
     *Distributed Training*
 
@@ -533,6 +533,10 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
     if running:
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
+    num_workers = util.num_executors()
+    if evaluator:
+        assert num_workers > 2, "number of workers must be atleast 3 if evaluator role is required"
+
     try:
         global app_id
         global experiment_json
@@ -550,7 +554,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        retval, logdir = mirrored_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name)
+        retval, logdir = mirrored_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
 
         experiment_json = util._finalize_experiment(experiment_json, None, retval)
 
