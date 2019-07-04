@@ -291,31 +291,27 @@ def _get_ip_address():
 
 def _time_diff(task_start, task_end):
     """
-    Utility method for computing and pretty-printing the time difference between two timestamps
-
     Args:
-        :task_start: the starting timestamp
-        :tast_end: the ending timestamp
+        :task_start: time in
+        :tast_end:
 
     Returns:
-        The time difference in a pretty-printed format
 
     """
-    time_diff = task_end - task_start
 
-    seconds = time_diff.seconds
+    task_start = int(round(task_start * 1000))
+    task_end = int(round(task_end * 1000))
 
-    if seconds < 60:
-        return str(int(seconds)) + ' seconds'
-    elif seconds == 60 or seconds <= 3600:
-        minutes = float(seconds) / 60.0
-        return str(int(minutes)) + ' minutes, ' + str((int(seconds) % 60)) + ' seconds'
-    elif seconds > 3600:
-        hours = float(seconds) / 3600.0
-        minutes = (hours % 1) * 60
-        return str(int(hours)) + ' hours, ' + str(int(minutes)) + ' minutes'
-    else:
-        return 'unknown time'
+    millis = task_end - task_start
+
+    millis = int(millis)
+    seconds=(millis/1000)%60
+    seconds = int(seconds)
+    minutes=(millis/(1000*60))%60
+    minutes = int(minutes)
+    hours=(millis/(1000*60*60))%24
+
+    return "%d hours, %d, minutes, %d seconds" % (hours, minutes, seconds)
 
 def _publish_experiment(appid, elastic_id, json_data, xattr):
     """
