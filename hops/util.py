@@ -292,8 +292,8 @@ def _get_ip_address():
 def _time_diff(task_start, task_end):
     """
     Args:
-        :task_start: time in
-        :tast_end:
+        :task_start: time in microseconds
+        :tast_end: time in microseconds
 
     Returns:
 
@@ -341,7 +341,7 @@ def _publish_experiment(appid, elastic_id, json_data, xattr):
 
 
 
-def _populate_experiment(sc, model_name, module, function, logdir, hyperparameter_space, versioned_resources, description):
+def _populate_experiment(sc, model_name, module, function, hyperparameter_space, versioned_resources, description):
     """
     Args:
          :sc:
@@ -356,7 +356,7 @@ def _populate_experiment(sc, model_name, module, function, logdir, hyperparamete
     Returns:
 
     """
-    return json.dumps({'name': model_name})
+    return json.dumps({'name': model_name, 'description': description})
 
 def _finalize_experiment(experiment_json, hyperparameter, metric):
     """
