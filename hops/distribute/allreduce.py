@@ -18,7 +18,7 @@ import json
 
 from . import allreduce_reservation
 
-def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name"):
+def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=False):
     """
 
     Args:
@@ -44,7 +44,7 @@ def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name"):
     server_addr = server.start()
 
     #Force execution on executor, since GPU is located on executor
-    nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr))
+    nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator))
 
     logdir = _get_logdir(app_id, run_id)
 
@@ -70,7 +70,7 @@ def _get_logdir(app_id, run_id):
     """
     return util._get_experiments_dir() + '/' + app_id + '_' + str(run_id)
 
-def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
+def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator):
     """
 
     Args:
@@ -96,14 +96,9 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
         for i in iter:
             executor_num = i
 
-        tb_hdfs_path = ''
-        hdfs_exec_logdir = ''
-
         t = threading.Thread(target=devices._print_periodic_gpu_utilization)
         if devices.get_num_gpus() > 0:
             t.start()
-
-        task_index = None
 
         try:
             host = util._get_ip_address()
@@ -121,23 +116,35 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
             client.close()
 
             task_index = _find_index(host_port, cluster)
-            
+
             if task_index == -1:
                 cluster["task"] = {"type": "chief", "index": 0}
             else:
                 cluster["task"] = {"type": "worker", "index": task_index}
+
+            if evaluator:
+                evaluator_node = cluster["cluster"]["worker"][0]
+                cluster["cluster"]["evaluator"] = [evaluator_node]
+                del cluster["cluster"]["worker"][0]
+                if evaluator_node == host_port:
+                    cluster["task"] = {"type": "evaluator", "index": 0}
 
             print('TF_CONFIG: {} '.format(cluster))
 
             if util.num_executors() > 1:
                 os.environ["TF_CONFIG"] = json.dumps(cluster)
 
-            is_chief = task_index == -1 or util.num_executors() == 1
+            is_chief = (task_index == -1 or util.num_executors() == 1) and not evaluator_node == host_port
+            is_evaluator = evaluator_node == host_port
 
             if is_chief:
                 logdir = _get_logdir(app_id, run_id)
                 tb_hdfs_path, tb_pid = tensorboard._register(logdir, logdir, executor_num, local_logdir=local_logdir)
+            elif is_evaluator:
+                logdir = _get_logdir(app_id, run_id)
+                tensorboard.events_logdir = logdir
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
+
             print(gpu_str)
             print('-------------------------------------------------------')
             print('Started running task \n')
@@ -146,7 +153,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
             retval = map_fun()
             if is_chief:
                 if retval:
-                    _handle_return(retval, hdfs_exec_logdir)
+                    _handle_return(retval, logdir)
             task_end = datetime.datetime.now()
             time_str = 'Finished task - took ' + util._time_diff(task_start, task_end)
             print('\n' + time_str)
@@ -157,7 +164,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr):
             if is_chief:
                 if local_logdir:
                     local_tb = tensorboard.local_logdir_path
-                    util._store_local_tensorboard(local_tb, hdfs_exec_logdir)
+                    util._store_local_tensorboard(local_tb, logdir)
 
             if devices.get_num_gpus() > 0:
                 t.do_run = False

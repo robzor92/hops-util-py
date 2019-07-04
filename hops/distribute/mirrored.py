@@ -135,11 +135,15 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator)
             if util.num_executors() > 1:
                 os.environ["TF_CONFIG"] = json.dumps(cluster)
 
-            is_chief = task_index == -1 or util.num_executors() == 1
+            is_chief = (task_index == -1 or util.num_executors() == 1) and not evaluator_node == host_port
+            is_evaluator = evaluator_node == host_port
 
             if is_chief:
                 logdir = _get_logdir(app_id, run_id)
                 tb_hdfs_path, tb_pid = tensorboard._register(logdir, logdir, executor_num, local_logdir=local_logdir)
+            elif is_evaluator:
+                logdir = _get_logdir(app_id, run_id)
+                tensorboard.events_logdir = logdir
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
 
             print(gpu_str)
