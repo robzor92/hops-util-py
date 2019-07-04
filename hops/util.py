@@ -505,11 +505,24 @@ def _get_experiments_dir():
     Gets the root folder where the experiments are writing their results
 
     Returns:
-        the folder where the experiments are writing results
+        The folder where the experiments are writing results
     """
     pyhdfs_handle = hdfs.get()
     assert pyhdfs_handle.exists(hdfs.project_path() + "Experiments"), "Your project is missing an Experiments dataset, please create one."
     return hdfs.project_path() + "Experiments"
+
+def _get_logdir(app_id, run_id):
+    """
+
+    Args:
+        app_id: app_id for experiment
+        run_id: run_id for experiment
+
+    Returns:
+        The folder where a particular experiment is writing results
+
+    """
+    return _get_experiments_dir() + '/' + str(app_id) + '_' + str(run_id)
 
 def _create_experiment_subdirectories(app_id, run_id, param_string, type, sub_type=None):
     """
@@ -553,44 +566,3 @@ def _create_experiment_subdirectories(app_id, run_id, param_string, type, sub_ty
     os.environ['EXEC_LOGFILE'] = logfile
 
     return hdfs_exec_logdir, hdfs_experiment_dir
-
-def _init_logger():
-    """
-    Initialize the logger by opening the log file and pointing the global fd to the open file
-    """
-    logfile = os.environ['EXEC_LOGFILE']
-    fs_handle = hdfs.get_fs()
-    global fd
-    try:
-        fd = fs_handle.open_file(logfile, mode='w')
-    except:
-        fd = fs_handle.open_file(logfile, flags='w')
-
-
-def log(string):
-    """
-    Logs a string to the log file
-
-    Args:
-        :string: string to log
-    """
-    global fd
-    if fd:
-        if isinstance(string, string_types):
-            fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(), string) + '\n').encode())
-        else:
-            fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(),
-                                        'ERROR! Attempting to write a non-string object to logfile') + '\n').encode())
-
-
-def _kill_logger():
-    """
-    Closes the logfile
-    """
-    global fd
-    if fd:
-        try:
-            fd.flush()
-            fd.close()
-        except:
-            pass

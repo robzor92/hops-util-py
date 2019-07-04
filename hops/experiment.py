@@ -80,7 +80,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, launcher._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = None
         if args_dict:
@@ -160,13 +160,13 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         r_search_impl.run_id = run_id
 
-        versioned_path = _setup_experiment(versioned_resources, r_search_impl._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = None
 
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'random_search', json.dumps(boundary_dict), versioned_path, description)
 
-        util._version_resources(versioned_resources, r_search_impl._get_logdir(app_id, run_id))
+        util._version_resources(versioned_resources, util._get_logdir(app_id, run_id))
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
@@ -245,7 +245,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
         diff_evo_impl.run_id = run_id
 
-        versioned_path = _setup_experiment(versioned_resources, diff_evo_impl._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = None
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'differential_evolution', json.dumps(boundary_dict), versioned_path, description)
@@ -327,7 +327,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, grid_search_impl._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'grid_search', json.dumps(args_dict), versioned_path, description)
 
@@ -403,7 +403,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, allreduce_impl._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'collective_all_reduce', None, versioned_path, description)
 
@@ -476,7 +476,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, ps_impl._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'parameter_server', None, versioned_path, description)
 
@@ -547,7 +547,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         mirrored_impl.run_id = run_id
 
-        versioned_path = _setup_experiment(versioned_resources, mirrored_impl._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'mirrored', None, versioned_path, description)
 

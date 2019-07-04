@@ -56,7 +56,7 @@ def _grid_launch(sc, map_fun, run_id, args_dict, direction='max', local_logdir=F
 
     arg_count = six.get_function_code(map_fun).co_argcount
     arg_names = six.get_function_code(map_fun).co_varnames
-    hdfs_dir = _get_logdir(app_id, run_id)
+    hdfs_dir = util._get_logdir(app_id, run_id)
 
     max_val, max_hp, min_val, min_hp, avg = _get_best(args_dict, num_executions, arg_names, arg_count, hdfs_dir, run_id)
 
@@ -88,19 +88,6 @@ def _grid_launch(sc, map_fun, run_id, args_dict, direction='max', local_logdir=F
     print('Finished Experiment \n')
 
     return hdfs_dir, param_combination, best_val
-
-def _get_logdir(app_id, run_id):
-    """
-
-    Args:
-        app_id:
-
-    Returns:
-
-    """
-    return util._get_experiments_dir() + '/' + app_id + '_' + str(run_id)
-
-
 
 def _write_result(runid_dir, string):
     """
