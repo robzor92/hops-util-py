@@ -161,8 +161,6 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = None
-
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'random_search', json.dumps(boundary_dict), versioned_path, description)
 
         util._version_resources(versioned_resources, util._get_logdir(app_id, run_id))
@@ -248,7 +246,6 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
         versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = None
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'differential_evolution', json.dumps(boundary_dict), versioned_path, description)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
