@@ -95,7 +95,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         retval, tensorboard_logdir, hp = launcher._launch(sc, map_fun, run_id, args_dict, local_logdir)
         duration = time.time() - start
 
-        experiment_json = util._finalize_experiment(experiment_json, hp, retval, duration)
+        experiment_json = util._finalize_experiment(experiment_json, hp, retval, duration, 'FINISHED')
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
         return tensorboard_logdir
     except:
@@ -606,6 +606,6 @@ def _setup_experiment(versioned_resources, logdir, app_id, run_id):
     hopshdfs.mkdir(hopshdfs.get_plain_path(util._get_experiments_dir()) + "/" + app_id + "_" + str(run_id))
     return versioned_path
 
-def _finalize_experiment(experiment_json, hp, app_id,_run_id, duration):
+def _finalize_experiment(experiment_json, hp, app_id, duration):
     experiment_json = util._finalize_experiment(experiment_json, hp, None, 'FINISHED', duration)
     util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
