@@ -298,8 +298,8 @@ def _time_diff(task_start, task_end):
 
     """
 
-    task_start = _millis_to_microseconds(task_start)
-    task_end = _millis_to_microseconds(task_end)
+    task_start = _microseconds_to_millis(task_start)
+    task_end = _microseconds_to_millis(task_end)
 
     millis = task_end - task_start
 
@@ -312,7 +312,7 @@ def _time_diff(task_start, task_end):
 
     return "%d hours, %d minutes, %d seconds" % (hours, minutes, seconds)
 
-def _millis_to_microseconds(time):
+def _microseconds_to_millis(time):
     return int(round(time * 1000))
 
 def _publish_experiment(appid, elastic_id, json_data, xattr):
