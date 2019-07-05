@@ -169,9 +169,11 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
+        start = time.time()
         tensorboard_logdir, param, metric = r_search_impl._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
+        duration = util._millis_to_microseconds(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, param, metric)
+        experiment_json = util._finalize_experiment(experiment_json, param, metric, duration)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
 
@@ -251,9 +253,11 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
+        start = time.time()
         tensorboard_logdir, best_param, best_metric = diff_evo_impl._search(spark, objective_function, run_id, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
+        duration = util._millis_to_microseconds(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, best_param, best_metric)
+        experiment_json = util._finalize_experiment(experiment_json, best_param, best_metric, duration)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
 
@@ -334,7 +338,9 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         grid_params = util.grid_params(args_dict)
 
+        start = time.time()
         tensorboard_logdir, param, metric = grid_search_impl._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name)
+        duration = util._millis_to_microseconds(time.time() - start)
 
         experiment_json = util._finalize_experiment(experiment_json, param, metric)
 
@@ -408,9 +414,11 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
+        start = time.time()
         retval, logdir = allreduce_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
+        duration = util._millis_to_microseconds(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, None, retval)
+        experiment_json = util._finalize_experiment(experiment_json, None, retval, duration)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except:
@@ -481,9 +489,11 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
+        start = time.time()
         retval, logdir = ps_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
+        duration = util._millis_to_microseconds(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, None, retval)
+        experiment_json = util._finalize_experiment(experiment_json, None, retval, duration)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except:
@@ -552,9 +562,11 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
+        start = time.time()
         retval, logdir = mirrored_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
+        duration = util._millis_to_microseconds(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, None, retval)
+        experiment_json = util._finalize_experiment(experiment_json, None, retval, duration)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except:
