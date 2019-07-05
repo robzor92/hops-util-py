@@ -84,12 +84,11 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
         experiment_json = None
         if args_dict:
-            experiment_json = util._populate_experiment(sc, name, 'experiment', 'launcher', json.dumps(args_dict), versioned_path, description, 'RUNNING')
+            experiment_json = util._populate_experiment(sc, name, 'experiment', 'launcher', json.dumps(args_dict), versioned_path, description)
         else:
-            experiment_json = util._populate_experiment(sc, name, 'experiment', 'launcher', None, versioned_path, description, 'RUNNING')
+            experiment_json = util._populate_experiment(sc, name, 'experiment', 'launcher', None, versioned_path, description)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
-
 
         start = time.time()
         retval, tensorboard_logdir, hp = launcher._launch(sc, map_fun, run_id, args_dict, local_logdir)

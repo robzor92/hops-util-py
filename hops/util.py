@@ -343,7 +343,7 @@ def _publish_experiment(appid, elastic_id, json_data, xattr):
 
 
 
-def _populate_experiment(sc, model_name, module, function, hyperparameter_space, versioned_resources, description, state):
+def _populate_experiment(sc, model_name, module, function, hyperparameter_space, versioned_resources, description):
     """
     Args:
          :sc:
@@ -358,7 +358,7 @@ def _populate_experiment(sc, model_name, module, function, hyperparameter_space,
     Returns:
 
     """
-    return json.dumps({'name': model_name, 'description': description, 'state': state})
+    return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING'})
 
 def _finalize_experiment(experiment_json, hyperparameter, metric, state, duration):
     """
