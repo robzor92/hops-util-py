@@ -665,20 +665,17 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id):
                 util._init_logger()
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir_bool)
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
-                util.log(gpu_str)
                 print(gpu_str)
                 print('-------------------------------------------------------')
                 print('Started running task ' + param_string + '\n')
                 if val:
                     print('Reading returned metric from previous run: ' + str(val))
-                util.log('Started running task ' + param_string)
                 task_start = time.time()
                 if not val:
                     val = map_fun(*args)
                 task_end = time.time()
                 time_str = 'Finished task ' + param_string + ' - took ' + util._time_diff(task_start, task_end)
                 print('\n' + time_str)
-                util.log(time_str)
                 try:
                     castval = int(val)
                 except:
