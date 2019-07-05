@@ -152,7 +152,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator)
             raise
         finally:
             if is_chief:
-                util.cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, logdir, t, tb_hdfs_path)
+                util._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, logdir, t, tb_hdfs_path)
 
     return _wrapper_fun
 
