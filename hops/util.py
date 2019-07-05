@@ -340,7 +340,7 @@ def _publish_experiment(appid, elastic_id, json_data, xattr):
 
 
 
-def _populate_experiment(sc, model_name, module, function, hyperparameter_space, versioned_resources, description):
+def _populate_experiment(sc, model_name, module, function, hyperparameter_space, versioned_resources, description, state):
     """
     Args:
          :sc:
@@ -355,9 +355,9 @@ def _populate_experiment(sc, model_name, module, function, hyperparameter_space,
     Returns:
 
     """
-    return json.dumps({'name': model_name, 'description': description})
+    return json.dumps({'name': model_name, 'description': description, 'state': state})
 
-def _finalize_experiment(experiment_json, hyperparameter, metric):
+def _finalize_experiment(experiment_json, hyperparameter, metric, state, duration):
     """
     Args:
         :experiment_json:
@@ -369,24 +369,12 @@ def _finalize_experiment(experiment_json, hyperparameter, metric):
     """
     experiment_json = json.loads(experiment_json)
     experiment_json['metric'] = metric
+    experiment_json['state'] = state
+    experiment_json['duration'] = duration
+
     #experiment_json['hyperparameter'] = hyperparameter
 
     return json.dumps(experiment_json)
-
-def _add_version(experiment_json):
-    experiment_json['spark'] = os.environ['SPARK_VERSION']
-
-    try:
-        experiment_json['tensorflow'] = tensorflow.__version__
-    except:
-        experiment_json['tensorflow'] = os.environ[constants.ENV_VARIABLES.TENSORFLOW_VERSION_ENV_VAR]
-
-    experiment_json['hops_py'] = version.__version__
-    experiment_json['hops'] = os.environ[constants.ENV_VARIABLES.HADOOP_VERSION_ENV_VAR]
-    experiment_json['hopsworks'] = os.environ[constants.ENV_VARIABLES.HOPSWORKS_VERSION_ENV_VAR]
-    experiment_json['cuda'] = os.environ[constants.ENV_VARIABLES.CUDA_VERSION_ENV_VAR]
-    experiment_json['kafka'] = os.environ[constants.ENV_VARIABLES.KAFKA_VERSION_ENV_VAR]
-    return experiment_json
 
 def _store_local_tensorboard(local_tb, hdfs_exec_logdir):
     """
