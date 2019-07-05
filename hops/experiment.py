@@ -93,9 +93,9 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
         start = time.time()
         retval, tensorboard_logdir, hp = launcher._launch(sc, map_fun, run_id, args_dict, local_logdir)
-        duration = time.time() - start
+        duration = util._millis_to_microseconds(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, hp, retval, duration, 'FINISHED')
+        experiment_json = util._finalize_experiment(experiment_json, hp, retval, 'FINISHED', duration)
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
         return tensorboard_logdir
     except:
