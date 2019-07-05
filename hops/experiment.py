@@ -21,7 +21,7 @@ from hops import tensorboard
 
 from hops import util
 
-from time import time
+import time
 import atexit
 import json
 
