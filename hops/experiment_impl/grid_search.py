@@ -168,7 +168,6 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 print(gpu_str)
                 print('-------------------------------------------------------')
                 print('Started running task ' + param_string + '\n')
-                util.log('Started running task ' + param_string)
                 task_start = time.time()
                 retval = map_fun(*args)
                 task_end = time.time()

@@ -342,7 +342,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         tensorboard_logdir, param, metric = grid_search_impl._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name)
         duration = util._millis_to_microseconds(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, param, metric)
+        experiment_json = util._finalize_experiment(experiment_json, param, metric, duration)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except:
