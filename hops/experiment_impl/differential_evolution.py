@@ -22,7 +22,6 @@ objective_function=None
 spark_session=None
 diff_evo=None
 cleanup=None
-summary_file=None
 fs_handle=None
 local_logdir_bool=False
 
@@ -391,26 +390,6 @@ class DifferentialEvolution:
             for name in self._param_names:
                 new_gen_best_param[index] = name + "=" + str(new_gen_best_param[index])
                 index += 1
-
-            contents = ''
-            try:
-                with pydoop.hdfs.open(summary_file, encoding='utf-8') as f:
-                    for line in f:
-                        contents += line.decode('utf-8')
-            except:
-                with pydoop.hdfs.open(summary_file) as f:
-                    for line in f:
-                        contents += line.decode('utf-8')
-
-            generation_summary = "Generation " + str(self._generation) + " || " + "average metric: " + str(new_gen_avg) \
-                                 + ", best metric: " + str(new_gen_best) + ", best parameter combination: " + str(new_gen_best_param) + "\n"
-
-            print(generation_summary)
-
-            fd.write((contents + generation_summary + "\n").encode())
-
-            fd.flush()
-            fd.close()
 
         parsed_trial_population = []
         for index, trial_vec in enumerate(trial_population):
