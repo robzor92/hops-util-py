@@ -254,7 +254,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
         start = time.time()
-        tensorboard_logdir, best_param, best_metric = diff_evo_impl._search(spark, objective_function, run_id, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
+        tensorboard_logdir, best_param, best_metric = diff_evo_impl._search(spark, objective_function, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
         duration = util._microseconds_to_millis(time.time() - start)
 
         experiment_json = util._finalize_experiment(experiment_json, best_param, best_metric, 'FINISHED', duration)
