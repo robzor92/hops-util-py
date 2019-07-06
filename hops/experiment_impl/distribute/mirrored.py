@@ -113,6 +113,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
             else:
                 cluster["task"] = {"type": "worker", "index": task_index}
 
+            evaluator_node = None
             if evaluator:
                 evaluator_node = cluster["cluster"]["worker"][0]
                 cluster["cluster"]["evaluator"] = [evaluator_node]
