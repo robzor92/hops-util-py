@@ -551,8 +551,6 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        mirrored_impl.run_id = run_id
-
         versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = util._populate_experiment(sc, name, 'experiment', 'mirrored', None, versioned_path, description)
@@ -611,7 +609,8 @@ atexit.register(_exit_handler)
 
 def _setup_experiment(versioned_resources, logdir, app_id, run_id):
     versioned_path = util._version_resources(versioned_resources, logdir)
-    hopshdfs.mkdir(hopshdfs.get_plain_path(util._get_experiments_dir()) + "/" + app_id + "_" + str(run_id))
+    hopshdfs.mkdir(util._get_logdir(app_id, run_id))
+    #hopshdfs.mkdir(hopshdfs.get_plain_path(util._get_experiments_dir()) + "/" + app_id + "_" + str(run_id))
     return versioned_path
 
 def _finalize_experiment(experiment_json, hp, app_id, duration):
