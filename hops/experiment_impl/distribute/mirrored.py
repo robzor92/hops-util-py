@@ -90,6 +90,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator)
         if devices.get_num_gpus() > 0:
             t.start()
 
+        is_chief = False
         try:
             host = util._get_ip_address()
 
