@@ -44,7 +44,7 @@ def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=F
     server_addr = server.start()
 
     #Force execution on executor, since GPU is located on executor
-    nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator))
+    nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator, util.num_executors()))
 
     logdir = util._get_logdir(app_id, run_id)
 
@@ -59,7 +59,7 @@ def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=F
 
     return None, logdir
 
-def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator):
+def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator, num_executors):
     """
 
     Args:
@@ -121,7 +121,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator)
 
             print('TF_CONFIG: {} '.format(cluster))
 
-            if util.num_executors() > 1:
+            if num_executors > 1:
                 os.environ["TF_CONFIG"] = json.dumps(cluster)
 
             is_chief = (task_index == -1 or util.num_executors() == 1) and not evaluator_node == host_port
