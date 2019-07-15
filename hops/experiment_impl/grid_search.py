@@ -2,7 +2,6 @@
 Gridsearch implementation
 """
 
-import os
 from hops import hdfs as hopshdfs
 from hops import tensorboard
 from hops import devices
@@ -48,17 +47,13 @@ def _grid_launch(sc, map_fun, run_id, args_dict, direction='max', local_logdir=F
     sc.setJobGroup("Grid Search", "{} | Hyperparameter Optimization".format(name))
 
     #Force execution on executor, since GPU is located on executor
-    job_start = time.time()
     nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, args_dict, local_logdir))
-    job_end = time.time()
-
-    job_time_str = util._time_diff(job_start, job_end)
 
     arg_count = six.get_function_code(map_fun).co_argcount
     arg_names = six.get_function_code(map_fun).co_varnames
     hdfs_dir = util._get_logdir(app_id, run_id)
 
-    max_val, max_hp, min_val, min_hp, avg = _get_best(args_dict, num_executions, arg_names, arg_count, hdfs_dir, run_id)
+    max_val, max_hp, min_val, min_hp, avg = _get_best(args_dict, num_executions, arg_names, arg_count, hdfs_dir)
 
     param_combination = ""
     best_val = ""
@@ -66,23 +61,9 @@ def _grid_launch(sc, map_fun, run_id, args_dict, direction='max', local_logdir=F
     if direction == 'max':
         param_combination = max_hp
         best_val = str(max_val)
-        results = '\n------ Grid Search results ------ direction(' + direction + ') \n' \
-          'BEST combination ' + max_hp + ' -- metric ' + str(max_val) + '\n' \
-          'WORST combination ' + min_hp + ' -- metric ' + str(min_val) + '\n' \
-          'AVERAGE metric -- ' + str(avg) + '\n' \
-          'Total job time ' + job_time_str + '\n'
-        _write_result(hdfs_dir, results)
-        print(results)
     elif direction == 'min':
         param_combination = min_hp
         best_val = str(min_val)
-        results = '\n------ Grid Search results ------ direction(' + direction + ') \n' \
-        'BEST combination ' + min_hp + ' -- metric ' + str(min_val) + '\n' \
-        'WORST combination ' + max_hp + ' -- metric ' + str(max_val) + '\n' \
-        'AVERAGE metric -- ' + str(avg) + '\n' \
-        'Total job time ' + job_time_str + '\n'
-        _write_result(hdfs_dir, results)
-        print(results)
 
 
     print('Finished Experiment \n')
@@ -184,7 +165,7 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
     return _wrapper_fun
 
 
-def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir, run_id):
+def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir):
     """
 
     Args:
