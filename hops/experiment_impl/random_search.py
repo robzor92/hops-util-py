@@ -62,11 +62,7 @@ def _launch(sc, map_fun, run_id, args_dict, samples, direction='max', local_logd
     #Each TF task should be run on 1 executor
     nodeRDD = sc.parallelize(range(new_samples), new_samples)
 
-    job_start = time.time()
     nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, random_dict, local_logdir))
-    job_end = time.time()
-
-    job_time_str = util._time_diff(job_start, job_end)
 
     arg_count = six.get_function_code(map_fun).co_argcount
     arg_names = six.get_function_code(map_fun).co_varnames
@@ -146,7 +142,6 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
         for i in iter:
             executor_num = i
 
-        tb_pid = 0
         tb_hdfs_path = ''
         hdfs_exec_logdir = ''
 
