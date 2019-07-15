@@ -507,7 +507,7 @@ def _search(spark, function, search_dict, direction = 'max', generations=4, pops
                              'or [category1, category2] in the case of strings')
 
     assert popsize > 3, 'population should be greater than 3'
-    assert generations > 2, 'generations should be greater than 2'
+    assert generations > 1, 'generations should be greater than 1'
 
     argIndex = 0
     while argcount != 0:
