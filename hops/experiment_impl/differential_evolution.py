@@ -375,8 +375,6 @@ class DifferentialEvolution:
             parsed_population = self._parse_to_dict(parsed_population)
             self._scores = self.objective_function(parsed_population, name=self.name)
 
-            new_gen_avg = sum(self._scores)/self.n
-
             if self.direction == 'max':
                 new_gen_best = max(self._scores)
             elif self.direction == 'min':
