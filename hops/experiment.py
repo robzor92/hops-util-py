@@ -91,12 +91,12 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        retval, tensorboard_logdir, hp = launcher._launch(sc, map_fun, run_id, args_dict, local_logdir)
+        logdir, hp, metric = launcher._launch(sc, map_fun, run_id, args_dict, local_logdir)
         duration = util._microseconds_to_millis(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, hp, retval, 'FINISHED', duration)
+        experiment_json = util._finalize_experiment(experiment_json, hp, metric, 'FINISHED', duration)
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
-        return tensorboard_logdir
+        return logdir
     except:
         _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
@@ -168,15 +168,14 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        tensorboard_logdir, param, metric = r_search_impl._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
+        logdir, param, metric = r_search_impl._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
         duration = util._microseconds_to_millis(time.time() - start)
 
         experiment_json = util._finalize_experiment(experiment_json, param, metric, 'FINISHED', duration)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
 
-        return tensorboard_logdir
-
+        return logdir
     except:
         _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
@@ -185,8 +184,6 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         run_id +=1
         running = False
         sc.setJobGroup("", "")
-    return tensorboard_logdir
-
 
 def differential_evolution(objective_function, boundary_dict, direction = 'max', generations=10, population=10, mutation=0.5, crossover=0.7, cleanup_generations=False, name='no-name', local_logdir=False, versioned_resources=None, description=None):
     """
@@ -251,7 +248,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        tensorboard_logdir, best_param, best_metric = diff_evo_impl._search(spark, objective_function, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
+        logdir, best_param, best_metric = diff_evo_impl._search(spark, objective_function, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
         duration = util._microseconds_to_millis(time.time() - start)
 
         experiment_json = util._finalize_experiment(experiment_json, best_param, best_metric, 'FINISHED', duration)
@@ -259,6 +256,8 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
 
         best_param_dict = util._convert_to_dict(best_param)
+
+        return logdir, best_param_dict
 
     except:
         _exception_handler(util._microseconds_to_millis(time.time() - start))
@@ -268,8 +267,6 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         run_id +=1
         running = False
         sc.setJobGroup("", "")
-
-    return tensorboard_logdir, best_param_dict
 
 def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdir=False, versioned_resources=None, description=None):
     """
@@ -336,12 +333,14 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         grid_params = util.grid_params(args_dict)
 
-        tensorboard_logdir, param, metric = grid_search_impl._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name)
+        logdir, param, metric = grid_search_impl._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name)
         duration = util._microseconds_to_millis(time.time() - start)
 
         experiment_json = util._finalize_experiment(experiment_json, param, metric, 'FINISHED', duration)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+
+        return logdir
     except:
         _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
@@ -350,8 +349,6 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         run_id +=1
         running = False
         sc.setJobGroup("", "")
-
-    return tensorboard_logdir
 
 def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
     """
@@ -418,6 +415,8 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         experiment_json = util._finalize_experiment(experiment_json, None, retval, 'FINISHED', duration)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+
+        return logdir
     except:
         _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
@@ -426,8 +425,6 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         run_id +=1
         running = False
         sc.setJobGroup("", "")
-
-    return logdir
 
 def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
     """
@@ -493,6 +490,8 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         experiment_json = util._finalize_experiment(experiment_json, None, retval, 'FINISHED', duration)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+
+        return logdir
     except:
         _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
@@ -501,8 +500,6 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         run_id +=1
         running = False
         sc.setJobGroup("", "")
-
-    return logdir
 
 def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
     """
@@ -564,6 +561,8 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         experiment_json = util._finalize_experiment(experiment_json, None, retval, 'FINISHED', duration)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+
+        return logdir
     except:
         _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
@@ -573,15 +572,12 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         running = False
         sc.setJobGroup("", "")
 
-    return logdir
-
 def _exception_handler(duration):
     """
 
     Returns:
 
     """
-
     try:
         global running
         global experiment_json

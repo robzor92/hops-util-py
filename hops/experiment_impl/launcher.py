@@ -55,7 +55,7 @@ def _launch(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-na
             with pydoop.hdfs.open(path_to_metric, "r") as fi:
                 metric = float(fi.read())
                 fi.close()
-                return metric, util._get_logdir(app_id, run_id), None
+                return util._get_logdir(app_id, run_id), None, metric
     elif num_executions == 1 and not args_dict == None:
         arg_count = six.get_function_code(map_fun).co_argcount
         arg_names = six.get_function_code(map_fun).co_varnames
@@ -73,12 +73,12 @@ def _launch(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-na
             with pydoop.hdfs.open(path_to_metric, "r") as fi:
                 metric = float(fi.read())
                 fi.close()
-                return metric, util._get_logdir(app_id, run_id), param_string
+                return util._get_logdir(app_id, run_id), param_string, metric
         else:
-            return None, util._get_logdir(app_id, run_id), param_string
+            return util._get_logdir(app_id, run_id), param_string, None
 
 
-    return None, util._get_logdir(app_id, run_id), None
+    return util._get_logdir(app_id, run_id), None, None
 
 #Helper to put Spark required parameter iter in function signature
 def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
