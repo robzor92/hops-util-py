@@ -342,6 +342,8 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
 
+        raise Exception(best_param)
+
         best_param_dict = util._convert_to_dict(best_param)
 
         return logdir, best_param_dict, best_metric
