@@ -549,7 +549,7 @@ def _search(spark, function, search_dict, direction = 'max', generations=4, pops
 
     param_string = ''
     for hp in best_param:
-        param_string = param_string + hp + '.'
+        param_string = param_string + hp + '&'
     param_string = param_string[:-1]
 
     print('Finished Experiment \n')
