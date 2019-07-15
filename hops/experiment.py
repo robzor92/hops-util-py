@@ -71,6 +71,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
     if running:
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
+    start = time.time()
     try:
         global app_id
         global experiment_json
@@ -90,7 +91,6 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        start = time.time()
         retval, tensorboard_logdir, hp = launcher._launch(sc, map_fun, run_id, args_dict, local_logdir)
         duration = util._microseconds_to_millis(time.time() - start)
 
@@ -98,7 +98,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
         return tensorboard_logdir
     except:
-        _exception_handler()
+        _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -148,6 +148,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
     if running:
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
+    start = time.time()
     try:
         global app_id
         global experiment_json
@@ -167,7 +168,6 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        start = time.time()
         tensorboard_logdir, param, metric = r_search_impl._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
         duration = util._microseconds_to_millis(time.time() - start)
 
@@ -178,7 +178,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         return tensorboard_logdir
 
     except:
-        _exception_handler()
+        _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -233,6 +233,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
     if running:
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
+    start = time.time()
     try:
         global app_id
         global experiment_json
@@ -250,7 +251,6 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        start = time.time()
         tensorboard_logdir, best_param, best_metric = diff_evo_impl._search(spark, objective_function, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
         duration = util._microseconds_to_millis(time.time() - start)
 
@@ -261,7 +261,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         best_param_dict = util._convert_to_dict(best_param)
 
     except:
-        _exception_handler()
+        _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -318,6 +318,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
     if running:
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
+    start = time.time()
     try:
         global app_id
         global experiment_json
@@ -335,7 +336,6 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         grid_params = util.grid_params(args_dict)
 
-        start = time.time()
         tensorboard_logdir, param, metric = grid_search_impl._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name)
         duration = util._microseconds_to_millis(time.time() - start)
 
@@ -343,7 +343,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except:
-        _exception_handler()
+        _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -396,6 +396,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
     if running:
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
+    start = time.time()
     try:
         global app_id
         global experiment_json
@@ -411,7 +412,6 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        start = time.time()
         retval, logdir = allreduce_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = util._microseconds_to_millis(time.time() - start)
 
@@ -419,7 +419,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except:
-        _exception_handler()
+        _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -471,6 +471,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
     if running:
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
+    start = time.time()
     try:
         global app_id
         global experiment_json
@@ -486,7 +487,6 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        start = time.time()
         retval, logdir = ps_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = util._microseconds_to_millis(time.time() - start)
 
@@ -494,7 +494,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except:
-        _exception_handler()
+        _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -542,6 +542,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
     if evaluator:
         assert num_workers > 2, "number of workers must be atleast 3 if evaluator role is required"
 
+    start = time.time()
     try:
         global app_id
         global experiment_json
@@ -557,7 +558,6 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        start = time.time()
         retval, logdir = mirrored_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = util._microseconds_to_millis(time.time() - start)
 
@@ -565,7 +565,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except:
-        _exception_handler()
+        _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -575,20 +575,25 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
     return logdir
 
-def _exception_handler():
+def _exception_handler(duration):
     """
 
     Returns:
 
     """
-    global running
-    global experiment_json
-    if running and experiment_json != None:
-        experiment_json = json.loads(experiment_json)
-        experiment_json['status'] = "FAILED"
-        experiment_json['finished'] = time.time()
-        experiment_json = json.dumps(experiment_json)
-        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+
+    try:
+        global running
+        global experiment_json
+        if running and experiment_json != None:
+            experiment_json = json.loads(experiment_json)
+            experiment_json['state'] = "FAILED"
+            experiment_json['duration'] = duration
+            experiment_json = json.dumps(experiment_json)
+            util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+    except Exception as err:
+        print(err)
+        pass
 
 def _exit_handler():
     """
@@ -596,21 +601,23 @@ def _exit_handler():
     Returns:
 
     """
-    global running
-    global experiment_json
-    if running and experiment_json != None:
-        experiment_json = json.loads(experiment_json)
-        experiment_json['status'] = "KILLED"
-        experiment_json['finished'] = time.time()
-        experiment_json = json.dumps(experiment_json)
-        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+    try:
+        global running
+        global experiment_json
+        if running and experiment_json != None:
+            experiment_json = json.loads(experiment_json)
+            experiment_json['state'] = "KILLED"
+            experiment_json = json.dumps(experiment_json)
+            util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+    except Exception as err:
+        print(err)
+        pass
 
 atexit.register(_exit_handler)
 
 def _setup_experiment(versioned_resources, logdir, app_id, run_id):
     versioned_path = util._version_resources(versioned_resources, logdir)
     hopshdfs.mkdir(util._get_logdir(app_id, run_id))
-    #hopshdfs.mkdir(hopshdfs.get_plain_path(util._get_experiments_dir()) + "/" + app_id + "_" + str(run_id))
     return versioned_path
 
 def _finalize_experiment(experiment_json, hp, app_id, duration):
