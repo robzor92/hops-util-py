@@ -545,9 +545,15 @@ def _search(spark, function, search_dict, direction = 'max', generations=10, pop
 
     best_param, best_metric = diff_evo._solve(root_dir)
 
+
+    param_string = ''
+    for hp in best_param:
+        param_string = param_string + hp + '.'
+    param_string = param_string[:-1]
+
     print('Finished Experiment \n')
 
-    return str(root_dir), best_param, best_metric
+    return str(root_dir), param_string, best_metric
 
 def _evolutionary_launch(spark_session, map_fun, args_dict, name="no-name"):
     """ Run the wrapper function with each hyperparameter combination as specified by the dictionary
