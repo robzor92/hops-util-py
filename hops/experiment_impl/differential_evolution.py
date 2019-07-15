@@ -506,6 +506,9 @@ def _search(spark, function, search_dict, direction = 'max', generations=10, pop
             raise ValueError('Boundary list must contain exactly two elements, [lower_bound, upper_bound] for float/int '
                              'or [category1, category2] in the case of strings')
 
+    assert popsize > 3, 'population should be greater than 3'
+    assert generations > 2, 'generations should be greater than 2'
+
     argIndex = 0
     while argcount != 0:
         ordered_arr.append((arg_names[argIndex], search_dict[arg_names[argIndex]]))
