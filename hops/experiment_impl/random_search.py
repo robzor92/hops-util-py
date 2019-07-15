@@ -80,21 +80,9 @@ def _launch(sc, map_fun, run_id, args_dict, samples, direction='max', local_logd
     if direction == 'max':
         param_combination = max_hp
         best_val = str(max_val)
-        results = '\n------ Random Search results ------ direction(' + direction + ') \n' \
-        'BEST combination ' + max_hp + ' -- metric ' + str(max_val) + '\n' \
-        'WORST combination ' + min_hp + ' -- metric ' + str(min_val) + '\n' \
-        'AVERAGE metric -- ' + str(avg) + '\n' \
-        'Total job time ' + job_time_str + '\n'
-        print(results)
     elif direction == 'min':
         param_combination = min_hp
         best_val = str(min_val)
-        results = '\n------ Random Search results ------ direction(' + direction + ') \n' \
-        'BEST combination ' + min_hp + ' -- metric ' + str(min_val) + '\n' \
-        'WORST combination ' + max_hp + ' -- metric ' + str(max_val) + '\n' \
-        'AVERAGE metric -- ' + str(avg) + '\n' \
-        'Total job time ' + job_time_str + '\n'
-        print(results)
 
     print('Finished Experiment \n')
 

@@ -96,7 +96,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
         experiment_json = util._finalize_experiment(experiment_json, hp, metric, 'FINISHED', duration)
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
-        return logdir
+        return logdir, hp, metric
     except:
         _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
@@ -168,14 +168,14 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        logdir, param, metric = r_search_impl._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
+        logdir, best_param, best_metric = r_search_impl._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
         duration = util._microseconds_to_millis(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, param, metric, 'FINISHED', duration)
+        experiment_json = util._finalize_experiment(experiment_json, best_param, best_metric, 'FINISHED', duration)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
 
-        return logdir
+        return logdir, best_param, best_metric
     except:
         _exception_handler(util._microseconds_to_millis(time.time() - start))
         raise
@@ -257,7 +257,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
         best_param_dict = util._convert_to_dict(best_param)
 
-        return logdir, best_param_dict
+        return logdir, best_param_dict, best_metric
 
     except:
         _exception_handler(util._microseconds_to_millis(time.time() - start))
