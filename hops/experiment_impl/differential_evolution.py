@@ -50,7 +50,7 @@ def _get_all_accuracies(tensorboard_hdfs_logdir, args_dict, number_params):
     for i in range(number_params):
         path_to_log= tensorboard_hdfs_logdir + "_" + str(run_id) + "/generation." + str(generation_id - 1) + "/"
         for k in population_dict:
-            path_to_log+=k+"="+str(args_dict[k][i])+"."
+            path_to_log+=k+'='+str(args_dict[k][i])+ '&'
         path_to_log = path_to_log[:(len(path_to_log) -1)]
         path_to_log = path_to_log + '/metric'
 
@@ -638,7 +638,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id):
                     #Get args for executor and run function
                     param_name = names[argIndex]
                     param_val = args_dict[param_name][executor_num]
-                    param_string += str(param_name) + '=' + str(param_val) + '.'
+                    param_string += str(param_name) + '=' + str(param_val) + '&'
                     args.append(param_val)
                     argcount -= 1
                     argIndex += 1
