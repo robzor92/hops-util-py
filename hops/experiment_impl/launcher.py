@@ -64,7 +64,7 @@ def _launch(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-na
         while arg_count > 0:
             param_name = arg_names[argIndex]
             param_val = args_dict[param_name][0]
-            param_string += str(param_name) + '=' + str(param_val) + '.'
+            param_string += str(param_name) + '=' + str(param_val) + '&'
             arg_count -= 1
             argIndex += 1
         param_string = param_string[:-1]
@@ -128,7 +128,7 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                     #Get args for executor and run function
                     param_name = names[argIndex]
                     param_val = args_dict[param_name][executor_num]
-                    param_string += str(param_name) + '=' + str(param_val) + '.'
+                    param_string += str(param_name) + '=' + str(param_val) + '&'
                     args.append(param_val)
                     argcount -= 1
                     argIndex += 1

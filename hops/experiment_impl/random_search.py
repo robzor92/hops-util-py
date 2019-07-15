@@ -90,7 +90,7 @@ def _remove_duplicates(random_dict, samples):
     for index in range(samples):
         separated_hp_comb = ""
         for hp in hp_names:
-            separated_hp_comb = separated_hp_comb + str(random_dict[hp][index]) + "%"
+            separated_hp_comb = separated_hp_comb + str(random_dict[hp][index]) + "&"
         concatenated_hp_combs_arr.append(separated_hp_comb)
 
     entry_index = 0
@@ -162,7 +162,7 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                     #Get args for executor and run function
                     param_name = names[argIndex]
                     param_val = args_dict[param_name][executor_num]
-                    param_string += str(param_name) + '=' + str(param_val) + '.'
+                    param_string += str(param_name) + '=' + str(param_val) + '&'
                     args.append(param_val)
                     argcount -= 1
                     argIndex += 1
@@ -251,7 +251,7 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir)
             #Get args for executor and run function
             param_name = arg_names[argIndex]
             param_val = args_dict[param_name][i]
-            param_string += str(param_name) + '=' + str(param_val) + '.'
+            param_string += str(param_name) + '=' + str(param_val) + '&'
             num_args -= 1
             argIndex += 1
 
