@@ -49,7 +49,7 @@ def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=F
 
     logdir = util._get_logdir(app_id, run_id)
 
-    path_to_metric = logdir + '/metric'
+    path_to_metric = logdir + '/.metric'
     if pydoop.hdfs.path.exists(path_to_metric):
         with pydoop.hdfs.open(path_to_metric, "r") as fi:
             metric = float(fi.read())
@@ -173,7 +173,7 @@ def _handle_return(val, hdfs_exec_logdir):
     except:
         raise ValueError('Your function should return a metric (number).')
 
-    metric_file = hdfs_exec_logdir + '/metric'
+    metric_file = hdfs_exec_logdir + '/.metric'
     fs_handle = hopshdfs.get_fs()
     try:
         fd = fs_handle.open_file(metric_file, mode='w')

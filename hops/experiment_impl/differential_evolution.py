@@ -52,7 +52,7 @@ def _get_all_accuracies(tensorboard_hdfs_logdir, args_dict, number_params):
         for k in population_dict:
             path_to_log+=k+'='+str(args_dict[k][i])+ '&'
         path_to_log = path_to_log[:(len(path_to_log) -1)]
-        path_to_log = path_to_log + '/metric'
+        path_to_log = path_to_log + '/.metric'
 
         with pydoop.hdfs.open(path_to_log, "r") as fi:
             metric = fi.read()
@@ -666,7 +666,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id):
                    raise ValueError('Your function needs to return a metric (number) which should be maximized or minimized')
 
 
-                metric_file = hdfs_exec_logdir + '/metric'
+                metric_file = hdfs_exec_logdir + '/.metric'
                 fs_handle = hopshdfs.get_fs()
                 try:
                     fd = fs_handle.open_file(metric_file, mode='w')
@@ -700,7 +700,7 @@ def _get_metric(param_string, app_id, generation_id, run_id):
     handle = hopshdfs.get()
     for i in range(generation_id):
         possible_result_path = util._get_experiments_dir() + '/' + app_id + '_' \
-                               + str(run_id) + '/generation.' + str(i) + '/' + param_string + '/metric'
+                               + str(run_id) + '/generation.' + str(i) + '/' + param_string + '/.metric'
         if handle.exists(possible_result_path):
             with pydoop.hdfs.open(possible_result_path, "r") as fi:
                 metric = float(fi.read())
