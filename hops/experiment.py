@@ -187,7 +187,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         running = False
         sc.setJobGroup("", "")
 
-def differential_evolution(objective_function, boundary_dict, direction = 'max', generations=10, population=10, mutation=0.5, crossover=0.7, cleanup_generations=False, name='no-name', local_logdir=False, versioned_resources=None, description=None):
+def differential_evolution(objective_function, boundary_dict, direction = 'max', generations=4, population=6, mutation=0.5, crossover=0.7, cleanup_generations=False, name='no-name', local_logdir=False, versioned_resources=None, description=None):
     """
     *Parallel Experiment*
 

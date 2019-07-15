@@ -460,7 +460,7 @@ class DifferentialEvolution:
     def get_dict(self):
         return self._ordered_population_dict
 
-def _search(spark, function, search_dict, direction = 'max', generations=10, popsize=10, mutation=0.5, crossover=0.7, cleanup_generations=False, local_logdir=False, name="no-name"):
+def _search(spark, function, search_dict, direction = 'max', generations=4, popsize=6, mutation=0.5, crossover=0.7, cleanup_generations=False, local_logdir=False, name="no-name"):
     """
 
     Args:
