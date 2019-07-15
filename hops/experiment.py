@@ -336,7 +336,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         logdir, best_param, best_metric = grid_search_impl._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name)
         duration = util._microseconds_to_millis(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, param, metric, 'FINISHED', duration)
+        experiment_json = util._finalize_experiment(experiment_json, best_param, best_metric, 'FINISHED', duration)
 
         util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
 
