@@ -50,7 +50,7 @@ def _launch(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-na
     print('Finished Experiment \n')
 
     if args_dict == None:
-        path_to_metric = util._get_logdir(app_id, run_id) + '/metric'
+        path_to_metric = util._get_logdir(app_id, run_id) + '/.metric'
         if pydoop.hdfs.path.exists(path_to_metric):
             with pydoop.hdfs.open(path_to_metric, "r") as fi:
                 metric = float(fi.read())
@@ -68,7 +68,7 @@ def _launch(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-na
             arg_count -= 1
             argIndex += 1
         param_string = param_string[:-1]
-        path_to_metric = util._get_logdir(app_id, run_id) + '/' + param_string + '/metric'
+        path_to_metric = util._get_logdir(app_id, run_id) + '/' + param_string + '/.metric'
         if pydoop.hdfs.path.exists(path_to_metric):
             with pydoop.hdfs.open(path_to_metric, "r") as fi:
                 metric = float(fi.read())
@@ -183,7 +183,7 @@ def _handle_return(val, hdfs_exec_logdir):
     except:
         raise ValueError('Your function needs to return a metric (number) which should be maximized or minimized')
 
-    metric_file = hdfs_exec_logdir + '/metric'
+    metric_file = hdfs_exec_logdir + '/.metric'
     fs_handle = hopshdfs.get_fs()
     try:
         fd = fs_handle.open_file(metric_file, mode='w')

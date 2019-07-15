@@ -204,7 +204,7 @@ def _handle_return(val, hdfs_exec_logdir):
     except:
         raise ValueError('Your function needs to return a metric (number) which should be maximized or minimized')
 
-    metric_file = hdfs_exec_logdir + '/metric'
+    metric_file = hdfs_exec_logdir + '/.metric'
     fs_handle = hopshdfs.get_fs()
     try:
         fd = fs_handle.open_file(metric_file, mode='w')
@@ -257,7 +257,7 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir)
 
         param_string = param_string[:-1]
 
-        path_to_metric = hdfs_appid_dir + '/' + param_string + '/metric'
+        path_to_metric = hdfs_appid_dir + '/' + param_string + '/.metric'
 
         with pydoop.hdfs.open(path_to_metric, "r") as fi:
             metric = float(fi.read())
