@@ -94,8 +94,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         logdir, hp, metric = launcher._launch(sc, map_fun, run_id, args_dict, local_logdir)
         duration = util._microseconds_to_millis(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, hp, metric, 'FINISHED', duration)
-        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+        experiment_json = _finalize_experiment(experiment_json, hp, metric, 'FINISHED', duration, logdir)
         return logdir, hp, metric
     except:
         _exception_handler(util._microseconds_to_millis(time.time() - start))
@@ -171,9 +170,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         logdir, best_param, best_metric = r_search_impl._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
         duration = util._microseconds_to_millis(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, best_param, best_metric, 'FINISHED', duration)
-
-        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+        experiment_json = _finalize_experiment(experiment_json, best_param, best_metric, 'FINISHED', duration, logdir)
 
         best_param_dict = util._convert_to_dict(best_param)
 
@@ -253,9 +250,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         logdir, best_param, best_metric = diff_evo_impl._search(spark, objective_function, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
         duration = util._microseconds_to_millis(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, best_param, best_metric, 'FINISHED', duration)
-
-        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+        experiment_json = _finalize_experiment(experiment_json, best_param, best_metric, 'FINISHED', duration, logdir)
 
         best_param_dict = util._convert_to_dict(best_param)
 
@@ -338,9 +333,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         logdir, best_param, best_metric = grid_search_impl._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name)
         duration = util._microseconds_to_millis(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, best_param, best_metric, 'FINISHED', duration)
-
-        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+        experiment_json = _finalize_experiment(experiment_json, best_param, best_metric, 'FINISHED', duration, logdir)
 
         best_param_dict = util._convert_to_dict(best_param)
 
@@ -416,9 +409,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         retval, logdir = allreduce_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = util._microseconds_to_millis(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, None, retval, 'FINISHED', duration)
-
-        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+        experiment_json = _finalize_experiment(experiment_json, None, retval, 'FINISHED', duration, logdir)
 
         return logdir
     except:
@@ -491,9 +482,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         retval, logdir = ps_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = util._microseconds_to_millis(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, None, retval, 'FINISHED', duration)
-
-        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+        experiment_json = _finalize_experiment(experiment_json, None, retval, 'FINISHED', duration, logdir)
 
         return logdir
     except:
@@ -562,9 +551,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         retval, logdir = mirrored_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = util._microseconds_to_millis(time.time() - start)
 
-        experiment_json = util._finalize_experiment(experiment_json, None, retval, 'FINISHED', duration)
-
-        util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+        experiment_json = _finalize_experiment(experiment_json, None, retval, 'FINISHED', duration, logdir)
 
         return logdir
     except:
@@ -620,6 +607,10 @@ def _setup_experiment(versioned_resources, logdir, app_id, run_id):
     hopshdfs.mkdir(util._get_logdir(app_id, run_id))
     return versioned_path
 
-def _finalize_experiment(experiment_json, hp, app_id, duration):
-    experiment_json = util._finalize_experiment(experiment_json, hp, None, 'FINISHED', duration)
+def _finalize_experiment(experiment_json, hp, metric, app_id, duration, logdir):
+
+    hp_combs = util._build_hyperparameter_json(logdir)
+
+    experiment_json = util._finalize_experiment(experiment_json, hp, metric, 'FINISHED', duration, hp_combs)
+
     util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
