@@ -580,7 +580,7 @@ def _cleanup(local_logdir_bool, local_tb_path, hdfs_exec_logdir, gpu_thread, tb_
             pass
 
 def _build_hyperparameter_json(logdir):
-    metric_files = hdfs.glob(logdir + '/**/.metric', recursive=True)
+    metric_files = hdfs.glob(logdir + '/**/*/.metric', recursive=True)
     print("found files")
     print(metric_files)
 
