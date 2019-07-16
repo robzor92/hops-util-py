@@ -13,9 +13,9 @@ import json
 import ssl
 import jks
 from pathlib import Path
+import fnmatch
 
 from hops import hdfs
-from hops import version
 from hops import constants
 from hops import tls
 from hops import devices
@@ -360,7 +360,7 @@ def _populate_experiment(sc, model_name, module, function, hyperparameter_space,
     """
     return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING'})
 
-def _finalize_experiment(experiment_json, hyperparameter, metric, state, duration):
+def _finalize_experiment(experiment_json, hyperparameter, metric, state, duration, hp_combs):
     """
     Args:
         :experiment_json:
@@ -374,6 +374,7 @@ def _finalize_experiment(experiment_json, hyperparameter, metric, state, duratio
     experiment_json['metric'] = metric
     experiment_json['state'] = state
     experiment_json['duration'] = duration
+    experiment_json['results'] = hp_combs
 
     #experiment_json['hyperparameter'] = hyperparameter
 
@@ -579,10 +580,29 @@ def _cleanup(local_logdir_bool, local_tb_path, hdfs_exec_logdir, gpu_thread, tb_
         except:
             pass
 
+# Search for .metric file in max two levels
 def _build_hyperparameter_json(logdir):
-    metric_files = hdfs.glob(logdir + '/**/*/.metric', recursive=True)
-    print("found files")
-    print(metric_files)
+
+    hyperparameters = []
+    metric_files = []
+
+    for experiment_dir in hdfs.ls(logdir):
+        runs = hdfs.ls(experiment_dir, recursive=True)
+        for run in runs:
+            if run.endswith('.metric'):
+                metric_files.append(run)
+
+    for metric_file in metric_files:
+        metric_file = hdfs.abs_path(metric_file)
+        hyperparameter_combination = os.path.split(os.path.dirname(metric_file))[1]
+        hp_dict = _convert_to_dict(hyperparameter_combination)
+        metric = hdfs.load(metric_file).decode("UTF-8")
+        hyperparameters.append([{'metrics': {'metric': metric}, 'hyperparameter': hp_dict}])
+
+    return hyperparameters
+
+
+
 
 
 
