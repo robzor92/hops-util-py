@@ -441,6 +441,15 @@ def _convert_to_dict(best_param):
 
     return best_param_dict
 
+def _convert_param_to_arr(best_param):
+    best_param_arr=[]
+    best_param = best_param.split('&')
+    for hp in best_param:
+        hp = hp.split('=')
+        best_param_arr.append({hp[0]: hp[1]})
+
+    return best_param_arr
+
 def _find_spark():
     """
 
@@ -595,9 +604,10 @@ def _build_hyperparameter_json(logdir):
     for metric_file in metric_files:
         metric_file = hdfs.abs_path(metric_file)
         hyperparameter_combination = os.path.split(os.path.dirname(metric_file))[1]
-        hp_dict = _convert_to_dict(hyperparameter_combination)
+        hp_arr = _convert_param_to_arr(hyperparameter_combination)
+
         metric = hdfs.load(metric_file).decode("UTF-8")
-        hyperparameters.append({'metrics': {'metric': metric}, 'hyperparameter': hp_dict})
+        hyperparameters.append({'metrics': [{'metric': metric}], 'hyperparameters': hp_arr})
 
     return hyperparameters
 
