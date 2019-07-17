@@ -608,7 +608,7 @@ def _build_hyperparameter_json(logdir):
         metric = hdfs.load(metric_file).decode("UTF-8")
         hyperparameters.append({'metrics': [{'key':'metric', 'value': metric}], 'hyperparameters': hp_arr})
 
-    return jsons.dumps({'results': hyperparameters})
+    return json.dumps({'results': hyperparameters})
 
 
 
