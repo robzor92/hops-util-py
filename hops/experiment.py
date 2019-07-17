@@ -610,7 +610,9 @@ def _setup_experiment(versioned_resources, logdir, app_id, run_id):
 def _finalize_experiment(experiment_json, hp, metric, app_id, state, duration, logdir):
 
     hp_combs = util._build_hyperparameter_json(logdir)
+    if hp_combs:
+        hopshdfs.dump(hp_combs, logdir + '/.summary')
 
-    experiment_json = util._finalize_experiment(experiment_json, hp, metric, state, duration, hp_combs)
+    experiment_json = util._finalize_experiment(experiment_json, hp, metric, state, duration)
 
     util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
