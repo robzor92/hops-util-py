@@ -360,7 +360,7 @@ def _populate_experiment(sc, model_name, module, function, hyperparameter_space,
     """
     return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING'})
 
-def _finalize_experiment(experiment_json, hyperparameter, metric, state, duration, hp_combs):
+def _finalize_experiment(experiment_json, hyperparameter, metric, state, duration):
     """
     Args:
         :experiment_json:
@@ -374,7 +374,6 @@ def _finalize_experiment(experiment_json, hyperparameter, metric, state, duratio
     experiment_json['metric'] = metric
     experiment_json['state'] = state
     experiment_json['duration'] = duration
-    experiment_json['results'] = hp_combs
 
     #experiment_json['hyperparameter'] = hyperparameter
 
