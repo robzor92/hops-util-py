@@ -5,7 +5,6 @@ These utils facilitates development by hiding complexity for programs interactin
 """
 
 import os
-from hops import hdfs as hopshdfs
 from hops.experiment_impl.tensorboard import tensorboard
 from hops import devices
 from hops.experiment_impl.util import experiment_utils
@@ -156,28 +155,3 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
                 experiment_utils._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, logdir, t, tb_hdfs_path)
 
     return _wrapper_fun
-
-def _handle_return(val, hdfs_exec_logdir):
-    """
-
-    Args:
-        val:
-        hdfs_exec_logdir:
-
-    Returns:
-
-    """
-    try:
-        test = int(val)
-    except:
-        raise ValueError('Your function should return a metric (number).')
-
-    metric_file = hdfs_exec_logdir + '/.metric'
-    fs_handle = hopshdfs.get_fs()
-    try:
-        fd = fs_handle.open_file(metric_file, mode='w')
-    except:
-        fd = fs_handle.open_file(metric_file, flags='w')
-    fd.write(str(float(val)).encode())
-    fd.flush()
-    fd.close()
