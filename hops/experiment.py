@@ -265,7 +265,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         running = False
         sc.setJobGroup("", "")
 
-def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdir=False, versioned_resources=None, description=None):
+def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
     """
     *Parallel Experiment*
 
@@ -330,7 +330,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         grid_params = util.grid_params(args_dict)
 
-        logdir, best_param, best_metric = grid_search_impl._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name)
+        logdir, best_param, best_metric = grid_search_impl._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name, optimization_key=optimization_key)
         duration = util._microseconds_to_millis(time.time() - start)
 
         _finalize_experiment(experiment_json, best_param, best_metric, app_id, 'FINISHED', duration, logdir)
