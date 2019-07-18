@@ -17,8 +17,10 @@ from hops import hdfs
 from hops import constants
 from hops import tls
 from hops import devices
-
+from hops import util
 from hops import hdfs
+
+import pydoop.hdfs
 
 def _handle_return(retval, hdfs_exec_logdir, optimization_key):
     """
@@ -280,7 +282,7 @@ def _publish_experiment(app_id, run_id, json_data, xattr):
                    constants.REST_CONFIG.HOPSWORKS_EXPERIMENTS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    app_id + "_" + str(run_id) + "?xattr=" + xattr
 
-    resp = send_request_with_session('POST', resource_url, data=json_data, headers=headers)
+    resp = util.send_request_with_session('POST', resource_url, data=json_data, headers=headers)
     print(resp)
 
 
@@ -498,7 +500,7 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir)
 
         path_to_metric = hdfs_appid_dir + '/' + param_string + '/.metric'
 
-        with pydoop.hdfs.open(path_to_metric, "r") as fi:
+        with hdfs.open_file(path_to_metric, flags="r") as fi:
             metric = float(fi.read())
             fi.close()
 
