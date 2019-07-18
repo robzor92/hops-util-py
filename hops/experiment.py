@@ -19,7 +19,7 @@ from hops.experiment_impl.distribute import allreduce as allreduce_impl, paramet
 
 from hops import tensorboard
 
-from hops import util
+from hops.experiment_impl import experiment_utils
 
 import time
 import atexit
@@ -64,7 +64,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
     """
 
-    num_ps = util.num_param_servers()
+    num_ps = experiment_utils.num_param_servers()
     assert num_ps == 0, "number of parameter servers should be 0"
 
     global running
@@ -78,26 +78,26 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         global run_id
         running = True
 
-        sc = util._find_spark().sparkContext
+        sc = experiment_utils._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = None
         if args_dict:
-            experiment_json = util._populate_experiment(sc, name, 'experiment', 'launcher', json.dumps(args_dict), versioned_path, description)
+            experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'launcher', json.dumps(args_dict), versioned_path, description)
         else:
-            experiment_json = util._populate_experiment(sc, name, 'experiment', 'launcher', None, versioned_path, description)
+            experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'launcher', None, versioned_path, description)
 
-        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
         logdir, hp, metric = launcher._launch(sc, map_fun, run_id, args_dict, local_logdir)
-        duration = util._microseconds_to_millis(time.time() - start)
+        duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         _finalize_experiment(experiment_json, hp, metric, app_id, 'FINISHED', duration, logdir)
         return logdir, hp, metric
     except:
-        _exception_handler(util._microseconds_to_millis(time.time() - start))
+        _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -140,7 +140,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
     """
 
-    num_ps = util.num_param_servers()
+    num_ps = experiment_utils.num_param_servers()
     assert num_ps == 0, "number of parameter servers should be 0"
 
     global running
@@ -154,29 +154,29 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         global run_id
         running = True
 
-        sc = util._find_spark().sparkContext
+        sc = experiment_utils._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
         r_search_impl.run_id = run_id
 
-        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = util._populate_experiment(sc, name, 'experiment', 'random_search', json.dumps(boundary_dict), versioned_path, description)
+        experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'random_search', json.dumps(boundary_dict), versioned_path, description)
 
-        util._version_resources(versioned_resources, util._get_logdir(app_id, run_id))
+        experiment_utils._version_resources(versioned_resources, util._get_logdir(app_id, run_id))
 
-        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
         logdir, best_param, best_metric = r_search_impl._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
-        duration = util._microseconds_to_millis(time.time() - start)
+        duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         _finalize_experiment(experiment_json, best_param, best_metric, app_id,'FINISHED', duration, logdir)
 
-        best_param_dict = util._convert_to_dict(best_param)
+        best_param_dict = experiment_utils._convert_to_dict(best_param)
 
         return logdir, best_param_dict, best_metric
     except:
-        _exception_handler(util._microseconds_to_millis(time.time() - start))
+        _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -222,7 +222,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
     """
 
-    num_ps = util.num_param_servers()
+    num_ps = experiment_utils.num_param_servers()
     assert num_ps == 0, "number of parameter servers should be 0"
 
     global running
@@ -235,29 +235,29 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         global experiment_json
         global run_id
         running = True
-        spark = util._find_spark()
+        spark = experiment_utils._find_spark()
         sc = spark.sparkContext
         app_id = str(sc.applicationId)
 
         diff_evo_impl.run_id = run_id
 
-        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = util._populate_experiment(sc, name, 'experiment', 'differential_evolution', json.dumps(boundary_dict), versioned_path, description)
+        experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'differential_evolution', json.dumps(boundary_dict), versioned_path, description)
 
-        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
         logdir, best_param, best_metric = diff_evo_impl._search(spark, objective_function, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
-        duration = util._microseconds_to_millis(time.time() - start)
+        duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         _finalize_experiment(experiment_json, best_param, best_metric, app_id, 'FINISHED', duration, logdir)
 
-        best_param_dict = util._convert_to_dict(best_param)
+        best_param_dict = experiment_utils._convert_to_dict(best_param)
 
         return logdir, best_param_dict, best_metric
 
     except:
-        _exception_handler(util._microseconds_to_millis(time.time() - start))
+        _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -305,7 +305,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
     """
 
-    num_ps = util.num_param_servers()
+    num_ps = experiment_utils.num_param_servers()
     assert num_ps == 0, "number of parameter servers should be 0"
 
     global running
@@ -319,27 +319,27 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         global run_id
         running = True
 
-        sc = util._find_spark().sparkContext
+        sc = experiment_utils._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
         versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = util._populate_experiment(sc, name, 'experiment', 'grid_search', json.dumps(args_dict), versioned_path, description)
+        experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'grid_search', json.dumps(args_dict), versioned_path, description)
 
-        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        grid_params = util.grid_params(args_dict)
+        grid_params = experiment_utils.grid_params(args_dict)
 
         logdir, best_param, best_metric = grid_search_impl._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name, optimization_key=optimization_key)
-        duration = util._microseconds_to_millis(time.time() - start)
+        duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         _finalize_experiment(experiment_json, best_param, best_metric, app_id, 'FINISHED', duration, logdir)
 
-        best_param_dict = util._convert_to_dict(best_param)
+        best_param_dict = experiment_utils._convert_to_dict(best_param)
 
         return logdir, best_param_dict, best_metric
     except:
-        _exception_handler(util._microseconds_to_millis(time.time() - start))
+        _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -378,8 +378,8 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
     """
 
-    num_ps = util.num_param_servers()
-    num_executors = util.num_executors()
+    num_ps = experiment_utils.num_param_servers()
+    num_executors = experiment_utils.num_executors()
 
     assert num_ps == 0, "number of parameter servers should be 0"
     assert num_executors > 1, "number of workers (executors) should be greater than 1"
@@ -400,20 +400,20 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = util._populate_experiment(sc, name, 'experiment', 'collective_all_reduce', None, versioned_path, description)
+        experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'collective_all_reduce', None, versioned_path, description)
 
-        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
         retval, logdir = allreduce_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
-        duration = util._microseconds_to_millis(time.time() - start)
+        duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         _finalize_experiment(experiment_json, None, retval, app_id, 'FINISHED', duration, logdir)
 
         return logdir
     except:
-        _exception_handler(util._microseconds_to_millis(time.time() - start))
+        _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -451,8 +451,8 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         HDFS path in your project where the experiment is stored
 
     """
-    num_ps = util.num_param_servers()
-    num_executors = util.num_executors()
+    num_ps = experiment_utils.num_param_servers()
+    num_executors = experiment_utils.num_executors()
 
     assert num_ps > 0, "number of parameter servers should be greater than 0"
     assert num_ps < num_executors, "num_ps cannot be greater than num_executors (i.e. num_executors == num_ps + num_workers)"
@@ -470,23 +470,23 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         global run_id
         running = True
 
-        sc = util._find_spark().sparkContext
+        sc = experiment_utils._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = util._populate_experiment(sc, name, 'experiment', 'parameter_server', None, versioned_path, description)
+        experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'parameter_server', None, versioned_path, description)
 
-        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
         retval, logdir = ps_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
-        duration = util._microseconds_to_millis(time.time() - start)
+        duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         _finalize_experiment(experiment_json, None, retval, app_id, 'FINISHED', duration, logdir)
 
         return logdir
     except:
-        _exception_handler(util._microseconds_to_millis(time.time() - start))
+        _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -521,14 +521,14 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
     """
 
-    num_ps = util.num_param_servers()
+    num_ps = experiment_utils.num_param_servers()
     assert num_ps == 0, "number of parameter servers should be 0"
 
     global running
     if running:
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
-    num_workers = util.num_executors()
+    num_workers = experiment_utils.num_executors()
     if evaluator:
         assert num_workers > 2, "number of workers must be atleast 3 if evaluator role is required"
 
@@ -539,23 +539,23 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         global run_id
         running = True
 
-        sc = util._find_spark().sparkContext
+        sc = experiment_utils._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = _setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = util._populate_experiment(sc, name, 'experiment', 'mirrored', None, versioned_path, description)
+        experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'mirrored', None, versioned_path, description)
 
-        util._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
         retval, logdir = mirrored_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
-        duration = util._microseconds_to_millis(time.time() - start)
+        duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         _finalize_experiment(experiment_json, None, retval, app_id, 'FINISHED', duration, logdir)
 
         return logdir
     except:
-        _exception_handler(util._microseconds_to_millis(time.time() - start))
+        _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
         #cleanup spark jobs
@@ -577,7 +577,7 @@ def _exception_handler(duration):
             experiment_json['state'] = "FAILED"
             experiment_json['duration'] = duration
             experiment_json = json.dumps(experiment_json)
-            util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+            experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except Exception as err:
         print(err)
         pass
@@ -595,7 +595,7 @@ def _exit_handler():
             experiment_json = json.loads(experiment_json)
             experiment_json['state'] = "KILLED"
             experiment_json = json.dumps(experiment_json)
-            util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+            experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
     except Exception as err:
         print(err)
         pass
@@ -603,16 +603,16 @@ def _exit_handler():
 atexit.register(_exit_handler)
 
 def _setup_experiment(versioned_resources, logdir, app_id, run_id):
-    versioned_path = util._version_resources(versioned_resources, logdir)
-    hopshdfs.mkdir(util._get_logdir(app_id, run_id))
+    versioned_path = experiment_utils._version_resources(versioned_resources, logdir)
+    hopshdfs.mkdir(experiment_utils._get_logdir(app_id, run_id))
     return versioned_path
 
 def _finalize_experiment(experiment_json, hp, metric, app_id, state, duration, logdir):
 
-    hp_combs = util._build_hyperparameter_json(logdir)
+    hp_combs = experiment_utils._build_hyperparameter_json(logdir)
     if hp_combs:
         hopshdfs.dump(hp_combs, logdir + '/.summary')
 
-    experiment_json = util._finalize_experiment(experiment_json, hp, metric, state, duration)
+    experiment_json = experiment_utils._finalize_experiment(experiment_json, hp, metric, state, duration)
 
-    util._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+    experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
