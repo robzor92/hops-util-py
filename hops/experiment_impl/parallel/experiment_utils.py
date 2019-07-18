@@ -73,7 +73,6 @@ def _cleanup(local_logdir_bool, local_tb_path, hdfs_exec_logdir, gpu_thread, tb_
         if devices.get_num_gpus() > 0 and gpu_thread.isAlive():
             gpu_thread.do_run = False
             gpu_thread.join(20)
-
         handle = hdfs.get()
         try:
             if tb_hdfs_file and handle.exists(tb_hdfs_file):
