@@ -6,7 +6,6 @@ from hops.experiment_impl import experiment_utils
 from hops import tensorboard
 from hops import devices
 
-import pydoop.hdfs
 import threading
 import six
 import time
