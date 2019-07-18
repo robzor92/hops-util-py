@@ -6,9 +6,8 @@ from hops import hdfs as hopshdfs
 from hops import tensorboard
 from hops import devices
 
-from hops.experiment_impl import experiment_utils
+from hops.experiment_impl.parallel import experiment_utils
 
-import pydoop.hdfs
 import threading
 import six
 import time

@@ -524,3 +524,18 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir)
     avg = sum(results)/float(len(results))
 
     return max_val, max_hp, min_val, min_hp, avg
+
+def _setup_experiment(versioned_resources, logdir, app_id, run_id):
+    versioned_path = _version_resources(versioned_resources, logdir)
+    hdfs.mkdir(_get_logdir(app_id, run_id))
+    return versioned_path
+
+def _finalize_experiment(experiment_json, hp, metric, app_id, run_id, state, duration, logdir):
+
+    hp_combs = _build_hyperparameter_json(logdir)
+    if hp_combs:
+        hdfs.dump(hp_combs, logdir + '/.summary')
+
+    experiment_json = _finalize_experiment(experiment_json, hp, metric, state, duration)
+
+    _publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
