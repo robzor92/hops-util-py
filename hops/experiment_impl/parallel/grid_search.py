@@ -3,7 +3,7 @@ Gridsearch implementation
 """
 
 from hops import hdfs as hopshdfs
-from hops import tensorboard
+from hops.experiment_impl.tensorboard import tensorboard
 from hops import devices
 
 from hops.experiment_impl.util import experiment_utils

@@ -18,7 +18,7 @@ from hops.experiment_impl.parallel import differential_evolution as diff_evo_imp
 from hops.experiment_impl.util import experiment_utils
 from hops.experiment_impl.distribute import allreduce as allreduce_impl, parameter_server as ps_impl, mirrored as mirrored_impl
 
-from hops import tensorboard
+from hops.experiment_impl.tensorboard import tensorboard
 
 import time
 import atexit
@@ -42,8 +42,8 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
     >>> from hops import experiment
     >>> def train_nn():
-    >>>    import tensorflow
-    >>>    from hops import tensorboard
+    >>>    from hops.experiment_impl.tensorboard import tensorboard
+           import tensorflow
     >>>    logdir = tensorboard.logdir()
     >>>    # code for preprocessing, training and exporting model
     >>>    # optionally return a value for the experiment which is registered in Experiments service
