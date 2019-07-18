@@ -19,7 +19,8 @@ import time
 import copy
 
 objective_function=None
-spark_session=None
+spark=None
+opt_key=None
 diff_evo=None
 cleanup=None
 fs_handle=None
@@ -97,7 +98,7 @@ def _execute_all(population_dict, name="no-name"):
         else:
             i+=1
 
-    tensorboard_hdfs_logdir = _evolutionary_launch(spark_session, objective_function, population_dict, name=name)
+    tensorboard_hdfs_logdir = _evolutionary_launch(spark, objective_function, population_dict, name=name)
 
     return _get_all_accuracies(tensorboard_hdfs_logdir, initial_pop, [len(v) for v in initial_pop.values()][0])
 
@@ -460,7 +461,7 @@ class DifferentialEvolution:
     def get_dict(self):
         return self._ordered_population_dict
 
-def _search(spark, function, search_dict, direction = 'max', generations=4, popsize=6, mutation=0.5, crossover=0.7, cleanup_generations=False, local_logdir=False, name="no-name"):
+def _search(function, search_dict, direction = 'max', generations=4, popsize=6, mutation=0.5, crossover=0.7, cleanup_generations=False, local_logdir=False, name="no-name", optimization_key=None):
     """
 
     Args:
@@ -484,14 +485,17 @@ def _search(spark, function, search_dict, direction = 'max', generations=4, pops
     global local_logdir_bool
     local_logdir_bool = local_logdir
 
-    global spark_session
-    spark_session = spark
+    global spark
+    spark = experiment_utils._find_spark()
 
     global objective_function
     objective_function = function
 
     global cleanup
     cleanup = cleanup_generations
+
+    global opt_key
+    opt_key = optimization_key
 
     argcount = six.get_function_code(function).co_argcount
     arg_names = six.get_function_code(function).co_varnames
@@ -556,7 +560,7 @@ def _search(spark, function, search_dict, direction = 'max', generations=4, pops
 
     return str(root_dir), param_string, best_metric
 
-def _evolutionary_launch(spark_session, map_fun, args_dict, name="no-name"):
+def _evolutionary_launch(spark, map_fun, args_dict, name="no-name"):
     """ Run the wrapper function with each hyperparameter combination as specified by the dictionary
 
     Args:
@@ -565,7 +569,7 @@ def _evolutionary_launch(spark_session, map_fun, args_dict, name="no-name"):
         :args_dict: (optional) A dictionary containing hyperparameter values to insert as arguments for each TensorFlow job
     """
 
-    sc = spark_session.sparkContext
+    sc = spark.sparkContext
     app_id = str(sc.applicationId)
 
 
@@ -581,7 +585,7 @@ def _evolutionary_launch(spark_session, map_fun, args_dict, name="no-name"):
 
     #Make SparkUI intuitive by grouping jobs
     sc.setJobGroup("Differential Evolution ", "{} | Hyperparameter Optimization, generation: {}".format(name, generation_id))
-    nodeRDD.foreachPartition(_prepare_func(app_id, generation_id, map_fun, args_dict, run_id))
+    nodeRDD.foreachPartition(_prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key))
 
     generation_id += 1
 
@@ -589,7 +593,7 @@ def _evolutionary_launch(spark_session, map_fun, args_dict, name="no-name"):
 
 
 #Helper to put Spark required parameter iter in function signature
-def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id):
+def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
     """
 
     Args:

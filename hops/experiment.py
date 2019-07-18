@@ -103,7 +103,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         running = False
         sc.setJobGroup("", "")
 
-def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-name', local_logdir=False, versioned_resources=None, description=None):
+def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
     """
 
     *Parallel Experiment*
@@ -157,15 +157,15 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         r_search_impl.run_id = run_id
 
-        versioned_path = _setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'random_search', json.dumps(boundary_dict), versioned_path, description)
 
-        experiment_utils._version_resources(versioned_resources, util._get_logdir(app_id, run_id))
+        experiment_utils._version_resources(versioned_resources, experiment_utils._get_logdir(app_id, run_id))
 
         experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        logdir, best_param, best_metric = r_search_impl._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
+        logdir, best_param, best_metric = r_search_impl._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir, optimization_key=optimization_key)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         experiment_utils._finalize_experiment(experiment_json, best_param, best_metric, app_id, run_id, 'FINISHED', duration, logdir)
@@ -182,7 +182,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         running = False
         sc.setJobGroup("", "")
 
-def differential_evolution(objective_function, boundary_dict, direction = 'max', generations=4, population=6, mutation=0.5, crossover=0.7, cleanup_generations=False, name='no-name', local_logdir=False, versioned_resources=None, description=None):
+def differential_evolution(objective_function, boundary_dict, direction = 'max', generations=4, population=6, mutation=0.5, crossover=0.7, cleanup_generations=False, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
     """
     *Parallel Experiment*
 
@@ -239,13 +239,13 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
         diff_evo_impl.run_id = run_id
 
-        versioned_path = _setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'differential_evolution', json.dumps(boundary_dict), versioned_path, description)
 
         experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
-        logdir, best_param, best_metric = diff_evo_impl._search(spark, objective_function, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
+        logdir, best_param, best_metric = diff_evo_impl._search(objective_function, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name, optimization_key=optimization_key)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         experiment_utils._finalize_experiment(experiment_json, best_param, best_metric, app_id, run_id, 'FINISHED', duration, logdir)

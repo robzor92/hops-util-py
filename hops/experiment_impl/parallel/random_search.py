@@ -11,7 +11,7 @@ import six
 import time
 import random
 
-def _launch(sc, map_fun, run_id, args_dict, samples, direction='max', local_logdir=False, name="no-name"):
+def _launch(sc, map_fun, run_id, args_dict, samples, direction='max', local_logdir=False, name="no-name", optimization_key=None):
     """
 
     Args:
@@ -60,7 +60,7 @@ def _launch(sc, map_fun, run_id, args_dict, samples, direction='max', local_logd
     #Each TF task should be run on 1 executor
     nodeRDD = sc.parallelize(range(new_samples), new_samples)
 
-    nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, random_dict, local_logdir))
+    nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, random_dict, local_logdir, optimization_key))
 
     arg_count = six.get_function_code(map_fun).co_argcount
     arg_names = six.get_function_code(map_fun).co_varnames
@@ -114,7 +114,7 @@ def _remove_duplicates(random_dict, samples):
     return random_dict, samples - len(indices_to_skip)
 
 #Helper to put Spark required parameter iter in function signature
-def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
+def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir, optimization_key):
     """
 
     Args:
@@ -175,7 +175,7 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 task_start = time.time()
                 retval = map_fun(*args)
                 task_end = time.time()
-                experiment_utils._handle_return(retval, hdfs_exec_logdir)
+                experiment_utils._handle_return(retval, hdfs_exec_logdir, optimization_key)
                 time_str = 'Finished task ' + param_string + ' - took ' + experiment_utils._time_diff(task_start, task_end)
                 print('\n' + time_str)
                 print('Returning metric ' + str(retval))
