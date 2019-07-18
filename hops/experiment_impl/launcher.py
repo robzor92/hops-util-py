@@ -3,7 +3,6 @@ Simple experiment implementation
 """
 
 from hops.experiment_impl import experiment_utils
-from hops import hdfs as hopshdfs
 from hops import tensorboard
 from hops import devices
 
@@ -143,7 +142,7 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 retval = map_fun(*args)
                 task_end = time.time()
                 if retval:
-                    _handle_return(retval, hdfs_exec_logdir)
+                    experiment_utils._handle_return(retval, hdfs_exec_logdir)
                 time_str = 'Finished task ' + param_string + ' - took ' + experiment_utils._time_diff(task_start, task_end)
                 print('\n' + time_str)
                 print('-------------------------------------------------------')
@@ -157,7 +156,7 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 retval = map_fun()
                 task_end = time.time()
                 if retval:
-                    _handle_return(retval, hdfs_exec_logdir)
+                    experiment_utils._handle_return(retval, hdfs_exec_logdir)
                 time_str = 'Finished task - took ' + experiment_utils._time_diff(task_start, task_end)
                 print('\n' + time_str)
                 print('-------------------------------------------------------')
@@ -167,28 +166,3 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
             experiment_utils._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, hdfs_exec_logdir, t, tb_hdfs_path)
 
     return _wrapper_fun
-
-def _handle_return(val, hdfs_exec_logdir):
-    """
-
-    Args:
-        val:
-        hdfs_exec_logdir:
-
-    Returns:
-
-    """
-    try:
-        test = int(val)
-    except:
-        raise ValueError('Your function needs to return a metric (number) which should be maximized or minimized')
-
-    metric_file = hdfs_exec_logdir + '/.metric'
-    fs_handle = hopshdfs.get_fs()
-    try:
-        fd = fs_handle.open_file(metric_file, mode='w')
-    except:
-        fd = fs_handle.open_file(metric_file, flags='w')
-    fd.write(str(float(val)).encode())
-    fd.flush()
-    fd.close()
