@@ -8,7 +8,7 @@ import os
 from hops import hdfs as hopshdfs
 from hops import tensorboard
 from hops import devices
-from hops import util
+from hops.experiment_impl.util import experiment_utils
 
 import pydoop.hdfs
 import threading
@@ -32,7 +32,7 @@ def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=F
     """
     app_id = str(sc.applicationId)
 
-    num_executions = util.num_executors()
+    num_executions = experiment_utils.num_executors()
 
     #Each TF task should be run on 1 executor
     nodeRDD = sc.parallelize(range(num_executions), num_executions)
@@ -44,9 +44,9 @@ def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=F
     server_addr = server.start()
 
     #Force execution on executor, since GPU is located on executor
-    nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator, util.num_executors()))
+    nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator, experiment_utils.num_executors()))
 
-    logdir = util._get_logdir(app_id, run_id)
+    logdir = experiment_utils._get_logdir(app_id, run_id)
 
     path_to_metric = logdir + '/.metric'
     if pydoop.hdfs.path.exists(path_to_metric):
@@ -91,7 +91,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
 
         is_chief = False
         try:
-            host = util._get_ip_address()
+            host = experiment_utils._get_ip_address()
 
             tmp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             tmp_socket.bind(('', 0))
@@ -105,7 +105,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
             tmp_socket.close()
             client.close()
 
-            task_index = _find_index(host_port, cluster)
+            task_index = experiment_utils._find_index(host_port, cluster)
 
             if task_index == -1:
                 cluster["task"] = {"type": "chief", "index": 0}
@@ -129,10 +129,10 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
             is_evaluator = evaluator_node == host_port
 
             if is_chief:
-                logdir = util._get_logdir(app_id, run_id)
+                logdir = experiment_utils._get_logdir(app_id, run_id)
                 tb_hdfs_path, tb_pid = tensorboard._register(logdir, logdir, executor_num, local_logdir=local_logdir)
             elif is_evaluator:
-                logdir = util._get_logdir(app_id, run_id)
+                logdir = experiment_utils._get_logdir(app_id, run_id)
                 tensorboard.events_logdir = logdir
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
 
@@ -146,14 +146,14 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
                 if retval:
                     _handle_return(retval, logdir)
             task_end = time.time()
-            time_str = 'Finished task - took ' + util._time_diff(task_start, task_end)
+            time_str = 'Finished task - took ' + experiment_utils._time_diff(task_start, task_end)
             print('\n' + time_str)
             print('-------------------------------------------------------')
         except:
             raise
         finally:
             if is_chief:
-                util._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, logdir, t, tb_hdfs_path)
+                experiment_utils._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, logdir, t, tb_hdfs_path)
 
     return _wrapper_fun
 
@@ -181,21 +181,3 @@ def _handle_return(val, hdfs_exec_logdir):
     fd.write(str(float(val)).encode())
     fd.flush()
     fd.close()
-
-def _find_index(host_port, cluster_spec):
-    """
-
-    Args:
-        host_port:
-        cluster_spec:
-
-    Returns:
-
-    """
-    index = 0
-    for entry in cluster_spec["cluster"]["worker"]:
-        if entry == host_port:
-            return index
-        else:
-            index = index + 1
-    return -1
