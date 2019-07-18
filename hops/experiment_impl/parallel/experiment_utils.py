@@ -41,7 +41,10 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
         raise Exception('Returned dict is empty, must contain atleast 1 metric to maximize or minimize.')
 
     return_file = hdfs_exec_logdir + '/.return'
-    hdfs.dump(retval, return_file)
+    if type(retval) is dict:
+        hdfs.dump(json.dumps(retval), return_file)
+    else:
+        hdfs.dump(retval, return_file)
 
     # Get the metric from dict from dict or directly returned value
     if optimization_key and type(retval) is dict:
@@ -96,21 +99,21 @@ def _store_local_tensorboard(local_tb, hdfs_exec_logdir):
 def _build_hyperparameter_json(logdir):
 
     hyperparameters = []
-    metric_files = []
+    return_files = []
 
     for experiment_dir in hdfs.ls(logdir):
         runs = hdfs.ls(experiment_dir, recursive=True)
         for run in runs:
-            if run.endswith('.metric'):
-                metric_files.append(run)
+            if run.endswith('.return'):
+                return_files.append(run)
 
-    for metric_file in metric_files:
-        metric_file = hdfs.abs_path(metric_file)
-        hyperparameter_combination = os.path.split(os.path.dirname(metric_file))[1]
+    for return_file in return_files:
+        return_file_abs = hdfs.abs_path(return_file)
+        hyperparameter_combination = os.path.split(os.path.dirname(return_file_abs))[1]
+
         hp_arr = _convert_param_to_arr(hyperparameter_combination)
-
-        metric = hdfs.load(metric_file).decode("UTF-8")
-        hyperparameters.append({'metrics': [{'key':'metric', 'value': metric}], 'hyperparameters': hp_arr})
+        metric_arr = _convert_return_file_to_arr(return_file)
+        hyperparameters.append({'metrics': metric_arr, 'hyperparameters': hp_arr})
 
     return json.dumps({'results': hyperparameters})
 
@@ -210,6 +213,23 @@ def _convert_param_to_arr(best_param):
         best_param_arr.append({'key': hp[0], 'value': hp[1]})
 
     return best_param_arr
+
+def _convert_return_file_to_arr(return_file_path):
+    return_file_contents = hdfs.load(return_file_path)
+
+    # Could be a number
+    try:
+        metric = int(return_file_contents)
+        return [{'key':'metric', 'value': metric}]
+    except:
+        pass
+
+    metrics_return_file = json.loads(return_file_contents)
+    metrics_arr = []
+    for metric_key in metrics_return_file:
+        metrics_arr.append([{'key':metric_key, 'value': metrics_return_file[metric_key]}])
+
+    return metrics_arr
 
 def _find_spark():
     """
