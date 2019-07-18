@@ -461,7 +461,7 @@ class DifferentialEvolution:
     def get_dict(self):
         return self._ordered_population_dict
 
-def _search(function, search_dict, direction = 'max', generations=4, popsize=6, mutation=0.5, crossover=0.7, cleanup_generations=False, local_logdir=False, name="no-name", optimization_key=None):
+def _run(function, search_dict, direction = 'max', generations=4, popsize=6, mutation=0.5, crossover=0.7, cleanup_generations=False, local_logdir=False, name="no-name", optimization_key=None):
     """
 
     Args:
