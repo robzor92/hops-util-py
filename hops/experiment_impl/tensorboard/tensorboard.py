@@ -8,7 +8,7 @@ import subprocess
 import time
 import os
 from hops import hdfs as hopshdfs
-from hops import util
+from hops.experiment_impl.util import experiment_utils
 import pydoop.hdfs
 import shutil
 from os.path import splitext
@@ -62,7 +62,7 @@ def _register(hdfs_exec_dir, endpoint_dir, exec_num, local_logdir=False):
         tb_addr, tb_port = tb_socket.getsockname()
 
         global tb_path
-        tb_path = util._find_tensorboard()
+        tb_path = experiment_utils._find_tensorboard()
 
         tb_socket.close()
 
@@ -79,10 +79,10 @@ def _register(hdfs_exec_dir, endpoint_dir, exec_num, local_logdir=False):
 
             local_logdir_path = local_logdir_path + '/'
             tb_proc = subprocess.Popen([pypath, tb_path, "--logdir=%s" % local_logdir_path, "--port=%d" % tb_port, "--host=%s" % "0.0.0.0"],
-                                       env=tb_env, preexec_fn=util._on_executor_exit('SIGTERM'))
+                                       env=tb_env, preexec_fn=experiment_utils._on_executor_exit('SIGTERM'))
         else:
             tb_proc = subprocess.Popen([pypath, tb_path, "--logdir=%s" % events_logdir, "--port=%d" % tb_port, "--host=%s" % "0.0.0.0"],
-                                   env=tb_env, preexec_fn=util._on_executor_exit('SIGTERM'))
+                                   env=tb_env, preexec_fn=experiment_utils._on_executor_exit('SIGTERM'))
 
         tb_pid = tb_proc.pid
 
@@ -167,12 +167,12 @@ def _restart_debugging(interactive=True):
 
     if interactive:
         tb_proc = subprocess.Popen([pypath, tb_path, "--logdir=%s" % logdir(), "--port=%d" % tb_port, "--debugger_port=%d" % debugger_port, "--host=%s" % "0.0.0.0"],
-                                   env=tb_env, preexec_fn=util._on_executor_exit('SIGTERM'))
+                                   env=tb_env, preexec_fn=experiment_utils._on_executor_exit('SIGTERM'))
         tb_pid = tb_proc.pid
 
     if not interactive:
         tb_proc = subprocess.Popen([pypath, tb_path, "--logdir=%s" % logdir(), "--port=%d" % tb_port, "--debugger_data_server_grpc_port=%d" % debugger_port, "--host=%s" % "0.0.0.0"],
-                                   env=tb_env, preexec_fn=util._on_executor_exit('SIGTERM'))
+                                   env=tb_env, preexec_fn=experiment_utils._on_executor_exit('SIGTERM'))
         tb_pid = tb_proc.pid
 
     time.sleep(2)
@@ -212,7 +212,7 @@ def visualize(hdfs_root_logdir):
     tb_env = _init_tb_env()
 
     tb_proc = subprocess.Popen([pypath, tb_path, "--logdir=%s" % logdir, "--port=%d" % tb_port, "--host=%s" % "0.0.0.0"],
-                               env=tb_env, preexec_fn=util._on_executor_exit('SIGTERM'))
+                               env=tb_env, preexec_fn=experiment_utils._on_executor_exit('SIGTERM'))
 
     host = socket.gethostname()
     tb_url = "http://{0}:{1}".format(host, tb_port)
