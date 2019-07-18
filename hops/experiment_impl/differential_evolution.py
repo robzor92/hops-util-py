@@ -10,7 +10,7 @@ import os
 from hops import hdfs as hopshdfs
 from hops import tensorboard
 from hops import devices
-from hops import util
+from hops.experiment_impl import experiment_utils
 
 import pydoop.hdfs
 import threading
@@ -542,7 +542,7 @@ def _search(spark, function, search_dict, direction = 'max', generations=4, pops
                                      mutation=mutation,
                                      name=name)
 
-    root_dir = util._get_experiments_dir() + "/" + str(app_id) + "_" + str(run_id)
+    root_dir = experiment_utils._get_experiments_dir() + "/" + str(app_id) + "_" + str(run_id)
 
     best_param, best_metric = diff_evo._solve(root_dir)
 
@@ -585,7 +585,7 @@ def _evolutionary_launch(spark_session, map_fun, args_dict, name="no-name"):
 
     generation_id += 1
 
-    return util._get_experiments_dir() + '/' + app_id
+    return experiment_utils._get_experiments_dir() + '/' + app_id
 
 
 #Helper to put Spark required parameter iter in function signature
@@ -646,7 +646,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id):
                 param_string = param_string[:-1]
 
                 val = _get_metric(param_string, app_id, generation_id, run_id)
-                hdfs_exec_logdir, hdfs_appid_logdir = util._create_experiment_subdirectories(app_id, run_id, param_string, 'differential_evolution', sub_type='generation.' + str(generation_id))
+                hdfs_exec_logdir, hdfs_appid_logdir = experiment_utils._create_experiment_subdirectories(app_id, run_id, param_string, 'differential_evolution', sub_type='generation.' + str(generation_id))
                 pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir_bool)
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
@@ -659,7 +659,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id):
                 if not val:
                     val = map_fun(*args)
                 task_end = time.time()
-                time_str = 'Finished task ' + param_string + ' - took ' + util._time_diff(task_start, task_end)
+                time_str = 'Finished task ' + param_string + ' - took ' + experiment_utils._time_diff(task_start, task_end)
                 print('\n' + time_str)
                 try:
                     castval = int(val)
@@ -682,7 +682,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id):
         except:
             raise
         finally:
-            util._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, hdfs_exec_logdir, t, tb_hdfs_path)
+            experiment_utils._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, hdfs_exec_logdir, t, tb_hdfs_path)
 
     return _wrapper_fun
 
@@ -700,7 +700,7 @@ def _get_metric(param_string, app_id, generation_id, run_id):
     """
     handle = hopshdfs.get()
     for i in range(generation_id):
-        possible_result_path = util._get_experiments_dir() + '/' + app_id + '_' \
+        possible_result_path = experiment_utils._get_experiments_dir() + '/' + app_id + '_' \
                                + str(run_id) + '/generation.' + str(i) + '/' + param_string + '/.metric'
         if handle.exists(possible_result_path):
             with pydoop.hdfs.open(possible_result_path, "r") as fi:
