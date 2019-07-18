@@ -19,7 +19,7 @@ import json
 from . import allreduce_reservation
 
 
-def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=False):
+def _run(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=False):
     """
 
     Args:

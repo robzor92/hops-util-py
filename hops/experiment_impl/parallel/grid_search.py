@@ -12,7 +12,7 @@ import threading
 import six
 import time
 
-def _grid_launch(sc, map_fun, run_id, args_dict, direction='max', local_logdir=False, name="no-name", optimization_key=None):
+def _run(sc, map_fun, run_id, args_dict, direction='max', local_logdir=False, name="no-name", optimization_key=None):
     """
     Run the wrapper function with each hyperparameter combination as specified by the dictionary
 

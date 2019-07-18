@@ -11,7 +11,7 @@ import six
 import time
 import random
 
-def _launch(sc, map_fun, run_id, args_dict, samples, direction='max', local_logdir=False, name="no-name", optimization_key=None):
+def _run(sc, map_fun, run_id, args_dict, samples, direction='max', local_logdir=False, name="no-name", optimization_key=None):
     """
 
     Args:
