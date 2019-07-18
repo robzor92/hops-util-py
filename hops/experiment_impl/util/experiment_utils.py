@@ -558,3 +558,47 @@ def _finalize_experiment(experiment_json, hp, metric, app_id, run_id, state, dur
     experiment_json = _finalize_experiment(experiment_json, hp, metric, state, duration)
 
     _publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+
+def _find_task_and_index(host_port, cluster_spec):
+    """
+
+    Args:
+        host_port:
+        cluster_spec:
+
+    Returns:
+
+    """
+    index = 0
+    for entry in cluster_spec["worker"]:
+        if entry == host_port:
+            return "worker", index
+        index = index + 1
+
+    index = 0
+    for entry in cluster_spec["ps"]:
+        if entry == host_port:
+            return "ps", index
+        index = index + 1
+
+
+    if cluster_spec["chief"][0] == host_port:
+        return "chief", 0
+
+def _find_index(host_port, cluster_spec):
+    """
+
+    Args:
+        host_port:
+        cluster_spec:
+
+    Returns:
+
+    """
+    index = 0
+    for entry in cluster_spec["cluster"]["worker"]:
+        if entry == host_port:
+            return index
+        else:
+            index = index + 1
+    return -1

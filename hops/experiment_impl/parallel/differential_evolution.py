@@ -10,7 +10,7 @@ import os
 from hops import hdfs as hopshdfs
 from hops import tensorboard
 from hops import devices
-from hops.experiment_impl.parallel import experiment_utils
+from hops.experiment_impl.util import experiment_utils
 
 import pydoop.hdfs
 import threading

@@ -2,7 +2,7 @@
 Random Search implementation
 """
 
-from hops.experiment_impl.parallel import experiment_utils
+from hops.experiment_impl.util import experiment_utils
 from hops import tensorboard
 from hops import devices
 

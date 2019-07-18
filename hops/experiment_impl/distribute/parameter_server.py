@@ -8,7 +8,7 @@ import os
 from hops import hdfs as hopshdfs
 from hops import tensorboard
 from hops import devices
-from hops import util
+from hops.experiment_impl.util import experiment_utils
 
 import pydoop.hdfs
 import threading
@@ -32,7 +32,7 @@ def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=F
     """
     app_id = str(sc.applicationId)
 
-    num_executions = util.num_executors()
+    num_executions = experiment_utils.num_executors()
 
     #Each TF task should be run on 1 executor
     nodeRDD = sc.parallelize(range(num_executions), num_executions)
@@ -43,12 +43,12 @@ def _launch(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=F
     server = parameter_server_reservation.Server(num_executions)
     server_addr = server.start()
 
-    num_ps = util.num_param_servers()
+    num_ps = experiment_utils.num_param_servers()
 
     #Force execution on executor, since GPU is located on executor
     nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, evaluator))
 
-    logdir = util._get_logdir(app_id, run_id)
+    logdir = experiment_utils._get_logdir(app_id, run_id)
 
     path_to_metric = logdir + '/.metric'
     if pydoop.hdfs.path.exists(path_to_metric):
@@ -98,7 +98,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
         client = parameter_server_reservation.Client(server_addr)
 
         try:
-            host = util._get_ip_address()
+            host = experiment_utils._get_ip_address()
 
             tmp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             tmp_socket.bind(('', 0))
@@ -119,7 +119,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
 
             tmp_socket.close()
 
-            role, index = _find_task_and_index(host_port, cluster)
+            role, index = experiment_utils._find_task_and_index(host_port, cluster)
 
             cluster_spec = {}
             cluster_spec["cluster"] = cluster
@@ -138,10 +138,10 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
             os.environ["TF_CONFIG"] = json.dumps(cluster_spec)
 
             if role == "chief":
-                logdir = util._get_logdir(app_id, run_id)
+                logdir = experiment_utils._get_logdir(app_id, run_id)
                 tb_hdfs_path, tb_pid = tensorboard._register(logdir, logdir, executor_num, local_logdir=local_logdir)
             elif role == "evaluator":
-                logdir = util._get_logdir(app_id, run_id)
+                logdir = experiment_utils._get_logdir(app_id, run_id)
                 tensorboard.events_logdir = logdir
                 
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
@@ -160,10 +160,10 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
 
             if role == "chief":
                 if retval:
-                    _handle_return(retval, logdir)
+                    experiment_utils._handle_return(retval, logdir)
 
             task_end = time.time()
-            time_str = 'Finished task - took ' + util._time_diff(task_start, task_end)
+            time_str = 'Finished task - took ' + experiment_utils._time_diff(task_start, task_end)
             print('\n' + time_str)
             print('-------------------------------------------------------')
         except:
@@ -173,58 +173,6 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
                 client.register_worker_finished()
             client.close()
             if role == "chief":
-                util._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, logdir, t, tb_hdfs_path)
+                experiment_utils._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, logdir, t, tb_hdfs_path)
 
     return _wrapper_fun
-
-def _find_task_and_index(host_port, cluster_spec):
-    """
-
-    Args:
-        host_port:
-        cluster_spec:
-
-    Returns:
-
-    """
-    index = 0
-    for entry in cluster_spec["worker"]:
-        if entry == host_port:
-            return "worker", index
-        index = index + 1
-
-    index = 0
-    for entry in cluster_spec["ps"]:
-        if entry == host_port:
-            return "ps", index
-        index = index + 1
-
-
-    if cluster_spec["chief"][0] == host_port:
-       return "chief", 0
-
-def _handle_return(val, hdfs_exec_logdir):
-    """
-
-    Args:
-        val:
-        hdfs_exec_logdir:
-
-    Returns:
-
-    """
-    try:
-        test = int(val)
-    except:
-        raise ValueError('Your function should return a metric (number).')
-
-    metric_file = hdfs_exec_logdir + '/.metric'
-    fs_handle = hopshdfs.get_fs()
-    try:
-        fd = fs_handle.open_file(metric_file, mode='w')
-    except:
-        fd = fs_handle.open_file(metric_file, flags='w')
-    fd.write(str(float(val)).encode())
-    fd.flush()
-    fd.close()
-

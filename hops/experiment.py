@@ -14,7 +14,8 @@ Whenever a function to run an experiment is invoked it is also registered in the
 
 from hops.experiment_impl import launcher as launcher
 from hops.experiment_impl.parallel import differential_evolution as diff_evo_impl, grid_search as grid_search_impl, \
-    random_search as r_search_impl, experiment_utils
+    random_search as r_search_impl
+from hops.experiment_impl.util import experiment_utils
 from hops.experiment_impl.distribute import allreduce as allreduce_impl, parameter_server as ps_impl, mirrored as mirrored_impl
 
 from hops import tensorboard
@@ -79,7 +80,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         sc = experiment_utils._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = None
         if args_dict:
@@ -320,7 +321,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         sc = experiment_utils._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, util._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'grid_search', json.dumps(args_dict), versioned_path, description)
 
@@ -395,10 +396,10 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         global run_id
         running = True
 
-        sc = util._find_spark().sparkContext
+        sc = experiment_utils._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'collective_all_reduce', None, versioned_path, description)
 
@@ -471,7 +472,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         sc = experiment_utils._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'parameter_server', None, versioned_path, description)
 
@@ -540,7 +541,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         sc = experiment_utils._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        versioned_path = _setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
+        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
         experiment_json = experiment_utils._populate_experiment(sc, name, 'experiment', 'mirrored', None, versioned_path, description)
 
