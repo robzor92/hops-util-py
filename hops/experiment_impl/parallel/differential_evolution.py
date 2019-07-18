@@ -690,7 +690,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
 
     return _wrapper_fun
 
-def _get_metric(param_string, app_id, generation_id, run_id):
+def _get_return_file(param_string, app_id, generation_id, run_id):
     """
 
     Args:
@@ -705,11 +705,9 @@ def _get_metric(param_string, app_id, generation_id, run_id):
     handle = hopshdfs.get()
     for i in range(generation_id):
         possible_result_path = experiment_utils._get_experiments_dir() + '/' + app_id + '_' \
-                               + str(run_id) + '/generation.' + str(i) + '/' + param_string + '/.metric'
+                               + str(run_id) + '/generation.' + str(i) + '/' + param_string + '/.return'
         if handle.exists(possible_result_path):
-            with pydoop.hdfs.open(possible_result_path, "r") as fi:
-                metric = float(fi.read())
-                fi.close()
-                return metric
+            return_file_contents = hopshdfs.load(possible_result_path)
+            return return_file_contents
 
     return None
