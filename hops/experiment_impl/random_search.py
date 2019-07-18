@@ -2,7 +2,7 @@
 Random Search implementation
 """
 
-from hops import util
+from hops.experiment_impl import experiment_utils
 from hops import hdfs as hopshdfs
 from hops import tensorboard
 from hops import devices
@@ -66,7 +66,7 @@ def _launch(sc, map_fun, run_id, args_dict, samples, direction='max', local_logd
 
     arg_count = six.get_function_code(map_fun).co_argcount
     arg_names = six.get_function_code(map_fun).co_varnames
-    exp_dir = util._get_logdir(app_id, run_id)
+    exp_dir = experiment_utils._get_logdir(app_id, run_id)
 
     max_val, max_hp, min_val, min_hp, avg = _get_best(random_dict, new_samples, arg_names, arg_count, exp_dir)
 
@@ -167,7 +167,7 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                     argcount -= 1
                     argIndex += 1
                 param_string = param_string[:-1]
-                hdfs_exec_logdir, hdfs_appid_logdir = util._create_experiment_subdirectories(app_id, run_id, param_string, 'random_search')
+                hdfs_exec_logdir, hdfs_appid_logdir = experiment_utils._create_experiment_subdirectories(app_id, run_id, param_string, 'random_search')
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)
 
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
@@ -178,14 +178,14 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 retval = map_fun(*args)
                 task_end = time.time()
                 _handle_return(retval, hdfs_exec_logdir)
-                time_str = 'Finished task ' + param_string + ' - took ' + util._time_diff(task_start, task_end)
+                time_str = 'Finished task ' + param_string + ' - took ' + experiment_utils._time_diff(task_start, task_end)
                 print('\n' + time_str)
                 print('Returning metric ' + str(retval))
                 print('-------------------------------------------------------')
         except:
             raise
         finally:
-            util._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, hdfs_exec_logdir, t, tb_hdfs_path)
+            experiment_utils._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, hdfs_exec_logdir, t, tb_hdfs_path)
 
     return _wrapper_fun
 
