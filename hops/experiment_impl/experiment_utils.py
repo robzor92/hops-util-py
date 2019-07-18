@@ -453,3 +453,72 @@ def _on_executor_exit(signame):
         if result != 0:
             raise Exception('prctl failed with error code %s' % result)
     return set_parent_exit_signal
+
+def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir):
+    """
+
+    Args:
+        args_dict:
+        num_combinations:
+        arg_names:
+        arg_count:
+        hdfs_appid_dir:
+        run_id:
+
+    Returns:
+
+    """
+
+    max_hp = ''
+    max_val = ''
+
+    min_hp = ''
+    min_val = ''
+
+    results = []
+
+    first = True
+
+    for i in range(num_combinations):
+
+        argIndex = 0
+        param_string = ''
+
+        num_args = arg_count
+
+        while num_args > 0:
+            #Get args for executor and run function
+            param_name = arg_names[argIndex]
+            param_val = args_dict[param_name][i]
+            param_string += str(param_name) + '=' + str(param_val) + '&'
+            num_args -= 1
+            argIndex += 1
+
+        param_string = param_string[:-1]
+
+        path_to_metric = hdfs_appid_dir + '/' + param_string + '/.metric'
+
+        with pydoop.hdfs.open(path_to_metric, "r") as fi:
+            metric = float(fi.read())
+            fi.close()
+
+            if first:
+                max_hp = param_string
+                max_val = metric
+                min_hp = param_string
+                min_val = metric
+                first = False
+
+            if metric > max_val:
+                max_val = metric
+                max_hp = param_string
+            if metric <  min_val:
+                min_val = metric
+                min_hp = param_string
+
+
+        results.append(metric)
+
+    avg = sum(results)/float(len(results))
+
+    return max_val, max_hp, min_val, min_hp, avg
