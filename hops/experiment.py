@@ -12,14 +12,12 @@ Whenever a function to run an experiment is invoked it is also registered in the
 
 """
 
-from hops import hdfs as hopshdfs
-
-from hops.experiment_impl import differential_evolution as diff_evo_impl, grid_search as grid_search_impl, random_search as r_search_impl, launcher as launcher
+from hops.experiment_impl import launcher as launcher
+from hops.experiment_impl.parallel import differential_evolution as diff_evo_impl, grid_search as grid_search_impl, \
+    random_search as r_search_impl, experiment_utils
 from hops.experiment_impl.distribute import allreduce as allreduce_impl, parameter_server as ps_impl, mirrored as mirrored_impl
 
 from hops import tensorboard
-
-from hops.experiment_impl import experiment_utils
 
 import time
 import atexit
@@ -94,7 +92,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         logdir, hp, metric = launcher._launch(sc, map_fun, run_id, args_dict, local_logdir)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        _finalize_experiment(experiment_json, hp, metric, app_id, 'FINISHED', duration, logdir)
+        experiment_utils._finalize_experiment(experiment_json, hp, metric, app_id, run_id, 'FINISHED', duration, logdir)
         return logdir, hp, metric
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
@@ -170,7 +168,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         logdir, best_param, best_metric = r_search_impl._launch(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        _finalize_experiment(experiment_json, best_param, best_metric, app_id,'FINISHED', duration, logdir)
+        experiment_utils._finalize_experiment(experiment_json, best_param, best_metric, app_id, run_id, 'FINISHED', duration, logdir)
 
         best_param_dict = experiment_utils._convert_to_dict(best_param)
 
@@ -250,7 +248,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         logdir, best_param, best_metric = diff_evo_impl._search(spark, objective_function, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        _finalize_experiment(experiment_json, best_param, best_metric, app_id, 'FINISHED', duration, logdir)
+        experiment_utils._finalize_experiment(experiment_json, best_param, best_metric, app_id, run_id, 'FINISHED', duration, logdir)
 
         best_param_dict = experiment_utils._convert_to_dict(best_param)
 
@@ -333,7 +331,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         logdir, best_param, best_metric = grid_search_impl._grid_launch(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name, optimization_key=optimization_key)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        _finalize_experiment(experiment_json, best_param, best_metric, app_id, 'FINISHED', duration, logdir)
+        experiment_utils._finalize_experiment(experiment_json, best_param, best_metric, app_id, run_id, 'FINISHED', duration, logdir)
 
         best_param_dict = experiment_utils._convert_to_dict(best_param)
 
@@ -409,7 +407,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         retval, logdir = allreduce_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        _finalize_experiment(experiment_json, None, retval, app_id, 'FINISHED', duration, logdir)
+        experiment_utils._finalize_experiment(experiment_json, None, retval, app_id, run_id, 'FINISHED', duration, logdir)
 
         return logdir
     except:
@@ -482,7 +480,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         retval, logdir = ps_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        _finalize_experiment(experiment_json, None, retval, app_id, 'FINISHED', duration, logdir)
+        experiment_utils._finalize_experiment(experiment_json, None, retval, app_id, run_id, 'FINISHED', duration, logdir)
 
         return logdir
     except:
@@ -551,7 +549,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         retval, logdir = mirrored_impl._launch(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        _finalize_experiment(experiment_json, None, retval, app_id, 'FINISHED', duration, logdir)
+        experiment_utils._finalize_experiment(experiment_json, None, retval, app_id, run_id, 'FINISHED', duration, logdir)
 
         return logdir
     except:
@@ -601,18 +599,3 @@ def _exit_handler():
         pass
 
 atexit.register(_exit_handler)
-
-def _setup_experiment(versioned_resources, logdir, app_id, run_id):
-    versioned_path = experiment_utils._version_resources(versioned_resources, logdir)
-    hopshdfs.mkdir(experiment_utils._get_logdir(app_id, run_id))
-    return versioned_path
-
-def _finalize_experiment(experiment_json, hp, metric, app_id, state, duration, logdir):
-
-    hp_combs = experiment_utils._build_hyperparameter_json(logdir)
-    if hp_combs:
-        hopshdfs.dump(hp_combs, logdir + '/.summary')
-
-    experiment_json = experiment_utils._finalize_experiment(experiment_json, hp, metric, state, duration)
-
-    experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')

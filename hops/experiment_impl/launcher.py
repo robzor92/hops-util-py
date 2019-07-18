@@ -2,7 +2,7 @@
 Simple experiment implementation
 """
 
-from hops.experiment_impl import experiment_utils
+from hops.experiment_impl.parallel import experiment_utils
 from hops import tensorboard
 from hops import devices
 
