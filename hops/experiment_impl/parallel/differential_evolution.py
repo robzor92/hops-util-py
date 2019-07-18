@@ -649,7 +649,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
                     argIndex += 1
                 param_string = param_string[:-1]
 
-                val = _get_metric(param_string, app_id, generation_id, run_id)
+                val = _get_return_file(param_string, app_id, generation_id, run_id)
                 hdfs_exec_logdir, hdfs_appid_logdir = experiment_utils._create_experiment_subdirectories(app_id, run_id, param_string, 'differential_evolution', sub_type='generation.' + str(generation_id))
                 pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir_bool)
@@ -665,22 +665,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
                 task_end = time.time()
                 time_str = 'Finished task ' + param_string + ' - took ' + experiment_utils._time_diff(task_start, task_end)
                 print('\n' + time_str)
-                try:
-                    castval = int(val)
-                except:
-                   raise ValueError('Your function needs to return a metric (number) which should be maximized or minimized')
-
-
-                metric_file = hdfs_exec_logdir + '/.metric'
-                fs_handle = hopshdfs.get_fs()
-                try:
-                    fd = fs_handle.open_file(metric_file, mode='w')
-                except:
-                    fd = fs_handle.open_file(metric_file, flags='w')
-
-                fd.write(str(float(val)).encode())
-                fd.flush()
-                fd.close()
+                experiment_utils._handle_return(val, hdfs_exec_logdir, opt_key)
                 print('Returning metric ' + str(val))
                 print('-------------------------------------------------------')
         except:
