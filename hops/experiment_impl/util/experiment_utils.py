@@ -322,7 +322,7 @@ def _populate_experiment(model_name, function, type, hyperparameter_space, versi
     Returns:
 
     """
-    return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'type': type})
+    return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type})
 
 def _finalize_experiment(experiment_json, hyperparameter, metric, state, duration):
     """
