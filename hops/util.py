@@ -237,6 +237,12 @@ def num_param_servers():
     except:
         return 0
 
+def _find_spark():
+    """
+    Returns: SparkSession
+    """
+    return SparkSession.builder.getOrCreate()
+
 
 
 
