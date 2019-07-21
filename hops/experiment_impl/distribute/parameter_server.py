@@ -8,6 +8,7 @@ import os
 from hops.experiment_impl.tensorboard import tensorboard
 from hops import devices
 from hops.experiment_impl.util import experiment_utils
+from hops import util
 
 import pydoop.hdfs
 import threading
@@ -31,7 +32,7 @@ def _run(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=Fals
     """
     app_id = str(sc.applicationId)
 
-    num_executions = experiment_utils.num_executors()
+    num_executions = util.num_executors()
 
     #Each TF task should be run on 1 executor
     nodeRDD = sc.parallelize(range(num_executions), num_executions)
@@ -42,7 +43,7 @@ def _run(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=Fals
     server = parameter_server_reservation.Server(num_executions)
     server_addr = server.start()
 
-    num_ps = experiment_utils.num_param_servers()
+    num_ps = util.num_param_servers()
 
     #Force execution on executor, since GPU is located on executor
     nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, evaluator))

@@ -204,7 +204,6 @@ def get_job_name():
     else:
         None
 
-
 def get_jwt():
     """
     Retrieves jwt from local container
@@ -214,6 +213,29 @@ def get_jwt():
     """
     with open(constants.REST_CONFIG.JWT_TOKEN, "r") as jwt:
         return jwt.read()
+
+def num_executors():
+    """
+    Get the number of executors configured for Jupyter
+
+    Returns:
+        Number of configured executors for Jupyter
+    """
+    sc = _find_spark().sparkContext
+    return int(sc._conf.get("spark.dynamicAllocation.maxExecutors"))
+
+def num_param_servers():
+    """
+    Get the number of parameter servers configured for Jupyter
+
+    Returns:
+        Number of configured parameter servers for Jupyter
+    """
+    sc = _find_spark().sparkContext
+    try:
+        return int(sc._conf.get("spark.tensorflow.num.ps"))
+    except:
+        return 0
 
 
 
