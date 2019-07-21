@@ -40,7 +40,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
         raise Exception('Missing optimization_key argument, when returning multiple values in a dict the optimization_key argument must be set.')
     elif type(retval) is dict and optimization_key not in retval and len(retval.keys()) > 1:
         raise Exception('Specified optimization key {} not in returned dict'.format(optimization_key))
-    elif type(retval) is dict and retval(retval.keys()) == 0:
+    elif type(retval) is dict and len(retval.keys()) == 0:
         raise Exception('Returned dict is empty, must contain atleast 1 metric to maximize or minimize.')
     elif type(retval) is not dict:
         try:
