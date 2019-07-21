@@ -11,6 +11,7 @@ from hops import hdfs as hopshdfs
 from hops.experiment_impl.tensorboard import tensorboard
 from hops import devices
 from hops.experiment_impl.util import experiment_utils
+from hops import util
 
 import pydoop.hdfs
 import threading
@@ -486,7 +487,7 @@ def _run(function, search_dict, direction = 'max', generations=4, popsize=6, mut
     local_logdir_bool = local_logdir
 
     global spark
-    spark = experiment_utils._find_spark()
+    spark = util._find_spark()
 
     global objective_function
     objective_function = function

@@ -17,7 +17,7 @@ from hops.experiment_impl.parallel import differential_evolution as diff_evo_imp
     random_search as r_search_impl
 from hops.experiment_impl.util import experiment_utils
 from hops.experiment_impl.distribute import allreduce as allreduce_impl, parameter_server as ps_impl, mirrored as mirrored_impl
-
+from hops import util
 from hops.experiment_impl.tensorboard import tensorboard
 
 import time
@@ -77,7 +77,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         global run_id
         running = True
 
-        sc = experiment_utils._find_spark().sparkContext
+        sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
@@ -153,7 +153,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         global run_id
         running = True
 
-        sc = experiment_utils._find_spark().sparkContext
+        sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
         r_search_impl.run_id = run_id
@@ -234,7 +234,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         global experiment_json
         global run_id
         running = True
-        spark = experiment_utils._find_spark()
+        spark = util._find_spark()
         sc = spark.sparkContext
         app_id = str(sc.applicationId)
 
@@ -318,7 +318,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         global run_id
         running = True
 
-        sc = experiment_utils._find_spark().sparkContext
+        sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
@@ -396,7 +396,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         global run_id
         running = True
 
-        sc = experiment_utils._find_spark().sparkContext
+        sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
@@ -469,7 +469,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         global run_id
         running = True
 
-        sc = experiment_utils._find_spark().sparkContext
+        sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
@@ -538,7 +538,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         global run_id
         running = True
 
-        sc = experiment_utils._find_spark().sparkContext
+        sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
