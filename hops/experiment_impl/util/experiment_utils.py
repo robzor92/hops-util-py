@@ -41,7 +41,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
         raise Exception('Returned dict is empty, must contain atleast 1 metric to maximize or minimize.')
     elif type(retval) is not dict:
         try:
-            metric = int(metric)
+            metric = int(retval)
             retval = {'metric': metric}
         except:
             raise ValueError('Metric to maximize or minimize is not a number')
@@ -50,8 +50,6 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
     return_file = hdfs_exec_logdir + '/.return'
     if type(retval) is dict:
         hdfs.dump(json.dumps(retval), return_file)
-    else:
-        hdfs.dump(retval, return_file)
 
     # Get the metric from dict from dict or directly returned value
     if optimization_key and type(retval) is dict:
