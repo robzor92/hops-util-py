@@ -59,7 +59,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
         metric = retval[optimization_key]
 
     metric_file = hdfs_exec_logdir + '/.metric'
-    hdfs.dump(metric, metric_file)
+    hdfs.dump(str(metric), metric_file)
 
 def _cleanup(local_logdir_bool, local_tb_path, hdfs_exec_logdir, gpu_thread, tb_hdfs_file):
     try:
