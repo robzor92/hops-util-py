@@ -230,15 +230,6 @@ def _convert_return_file_to_arr(return_file_path):
 
     return metrics_arr
 
-def _find_spark():
-    """
-
-    Returns: SparkSession
-
-    """
-    return SparkSession.builder.getOrCreate()
-
-
 def _get_ip_address():
     """
     Simple utility to get host IP address
