@@ -53,7 +53,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
     return_file = hdfs_exec_logdir + '/.return'
     hdfs.dump(json.dumps(retval), return_file)
 
-    if retval.keys() == 1:
+    if len(retval.keys()) == 1:
         metric = retval[retval.keys()[0]]
     else:
         metric = retval[optimization_key]
