@@ -63,7 +63,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
     """
 
-    num_ps = experiment_utils.num_param_servers()
+    num_ps = util.num_param_servers()
     assert num_ps == 0, "number of parameter servers should be 0"
 
     global running
@@ -139,7 +139,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
     """
 
-    num_ps = experiment_utils.num_param_servers()
+    num_ps = util.num_param_servers()
     assert num_ps == 0, "number of parameter servers should be 0"
 
     global running
@@ -221,7 +221,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
     """
 
-    num_ps = experiment_utils.num_param_servers()
+    num_ps = util.num_param_servers()
     assert num_ps == 0, "number of parameter servers should be 0"
 
     global running
@@ -304,7 +304,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
     """
 
-    num_ps = experiment_utils.num_param_servers()
+    num_ps = util.num_param_servers()
     assert num_ps == 0, "number of parameter servers should be 0"
 
     global running
@@ -439,7 +439,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
     >>>    ...ParameterServerStrategy(num_gpus_per_worker=devices.get_num_gpus())...
     >>> experiment.parameter_server(distributed_training, local_logdir=True)
 
-    Args:
+    Args:f
         :map_fun: contains the code where you are using ParameterServerStrategy.
         :name: name of the experiment
         :local_logdir: True if *tensorboard.logdir()* should be in the local filesystem, otherwise it is in HDFS
