@@ -377,8 +377,8 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
     """
 
-    num_ps = experiment_utils.num_param_servers()
-    num_executors = experiment_utils.num_executors()
+    num_ps = util.num_param_servers()
+    num_executors = util.num_executors()
 
     assert num_ps == 0, "number of parameter servers should be 0"
     assert num_executors > 1, "number of workers (executors) should be greater than 1"
@@ -450,8 +450,8 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         HDFS path in your project where the experiment is stored
 
     """
-    num_ps = experiment_utils.num_param_servers()
-    num_executors = experiment_utils.num_executors()
+    num_ps = util.num_param_servers()
+    num_executors = util.num_executors()
 
     assert num_ps > 0, "number of parameter servers should be greater than 0"
     assert num_ps < num_executors, "num_ps cannot be greater than num_executors (i.e. num_executors == num_ps + num_workers)"
@@ -520,14 +520,14 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
     """
 
-    num_ps = experiment_utils.num_param_servers()
+    num_ps = util.num_param_servers()
     assert num_ps == 0, "number of parameter servers should be 0"
 
     global running
     if running:
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
-    num_workers = experiment_utils.num_executors()
+    num_workers = util.num_executors()
     if evaluator:
         assert num_workers > 2, "number of workers must be atleast 3 if evaluator role is required"
 

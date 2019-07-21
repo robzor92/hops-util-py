@@ -359,31 +359,6 @@ def _version_resources(versioned_resources, rundir):
             raise Exception('Could not find resource in specified path: ' + hdfs_resource)
     return ', '.join(versioned_paths)
 
-
-
-def num_executors():
-    """
-    Get the number of executors configured for Jupyter
-
-    Returns:
-        Number of configured executors for Jupyter
-    """
-    sc = _find_spark().sparkContext
-    return int(sc._conf.get("spark.dynamicAllocation.maxExecutors"))
-
-def num_param_servers():
-    """
-    Get the number of parameter servers configured for Jupyter
-
-    Returns:
-        Number of configured parameter servers for Jupyter
-    """
-    sc = _find_spark().sparkContext
-    try:
-        return int(sc._conf.get("spark.tensorflow.num.ps"))
-    except:
-        return 0
-
 def grid_params(dict):
     """
     Generate all possible combinations (cartesian product) of the hyperparameter values
