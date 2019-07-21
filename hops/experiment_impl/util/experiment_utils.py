@@ -45,7 +45,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
     elif type(retval) is not dict:
         try:
             metric = int(retval)
-            retval = {'metric': metric}
+            retval = {'metric': retval}
         except:
             raise ValueError('Metric to maximize or minimize is not a number')
 
@@ -92,8 +92,7 @@ def _store_local_tensorboard(local_tb, hdfs_exec_logdir):
     for entry in tb_contents:
         pydoop.hdfs.put(local_tb + '/' + entry, hdfs_exec_logdir)
 
-# Search for .metric file in max two levels
-def _build_hyperparameter_json(logdir):
+def _build_summary_json(logdir):
 
     hyperparameters = []
     return_files = []
@@ -110,9 +109,15 @@ def _build_hyperparameter_json(logdir):
 
         hp_arr = _convert_param_to_arr(hyperparameter_combination)
         metric_arr = _convert_return_file_to_arr(return_file)
+        metric_arr = _move_output_files(metric_arr)
         hyperparameters.append({'metrics': metric_arr, 'hyperparameters': hp_arr})
 
     return json.dumps({'results': hyperparameters})
+
+# Files attached as outputs on local disk needs to be uploaded to experiment logdir, if not in local tensorboard.logdir()
+def _move_output_files(metric_arr):
+    pass
+
 
 def _get_experiments_dir():
     """
@@ -515,9 +520,10 @@ def _setup_experiment(versioned_resources, logdir, app_id, run_id):
 
 def _finalize_experiment(experiment_json, hp, metric, app_id, run_id, state, duration, logdir):
 
-    hp_combs = _build_hyperparameter_json(logdir)
-    if hp_combs:
-        hdfs.dump(hp_combs, logdir + '/.summary')
+    outputs = _build_summary_json(logdir)
+
+    if outputs:
+        hdfs.dump(outputs, logdir + '/.summary')
 
     experiment_json = _finalize_experiment_json(experiment_json, hp, metric, state, duration)
 
