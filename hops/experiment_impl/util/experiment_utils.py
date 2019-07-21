@@ -32,6 +32,9 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
     Returns:
 
     """
+
+    if not retval:
+        return
     # Validation
     if not optimization_key and type(retval) is dict and len(retval.keys()) > 1:
         raise Exception('Missing optimization_key argument, when returning multiple values in a dict the optimization_key argument must be set.')
@@ -48,24 +51,14 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
 
 
     return_file = hdfs_exec_logdir + '/.return'
-    if type(retval) is dict:
-        hdfs.dump(json.dumps(retval), return_file)
+    hdfs.dump(json.dumps(retval), return_file)
 
-    # Get the metric from dict from dict or directly returned value
-    if optimization_key and type(retval) is dict:
-        metric = retval[optimization_key]
-    elif type(retval) is dict and retval(retval.keys()) == 1:
+    if retval.keys() == 1:
         metric = retval[retval.keys()[0]]
     else:
-        metric = retval
-
-    try:
-        metric = int(metric)
-    except:
-        raise ValueError('Metric to maximize or minimize is not a number')
+        metric = retval[optimization_key]
 
     metric_file = hdfs_exec_logdir + '/.metric'
-
     hdfs.dump(metric, metric_file)
 
 def _cleanup(local_logdir_bool, local_tb_path, hdfs_exec_logdir, gpu_thread, tb_hdfs_file):
