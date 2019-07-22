@@ -38,9 +38,10 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
                     hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
                     retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  value.split('/')[-1]
                 elif os.path.exists(os.getcwd() + '/' + value):
+                    value = os.getcwd() + '/' + value
                     pydoop.hdfs.put(value, hdfs_exec_logdir)
                     hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
-                    retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  (os.getcwd() + '/' + value).split('/')[-1]
+                    retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  value.split('/')[-1]
                 elif hdfs.exists(value):
                     path = hdfs.abs_path(value)
                     path = path[len(hdfs.abs_path(hdfs.project_path())):]
