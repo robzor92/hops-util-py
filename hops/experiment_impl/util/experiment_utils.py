@@ -26,7 +26,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
 
     """
 
-    if type(retval) is dict
+    if type(retval) is dict:
         for metric_key in retval.keys():
             value = retval[metric_key]
             if os.path.exists(value):
