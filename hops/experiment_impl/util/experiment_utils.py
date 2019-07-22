@@ -32,7 +32,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
     if type(retval) is dict:
         for metric_key in retval.keys():
             value = str(retval[metric_key])
-            if value.contains('/'):
+            if '/' in value:
                 if os.path.exists(value):
                     pydoop.hdfs.put(value, hdfs_exec_logdir)
                     retval[metric_key] = '/Experiments/' + value.split('/')[-1]
