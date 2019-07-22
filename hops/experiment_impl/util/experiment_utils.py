@@ -26,6 +26,17 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
 
     """
 
+    if type(retval) is dict
+        for metric_key in retval.keys():
+            value = retval[metric_key]
+            if os.path.exists(value):
+                pydoop.hdfs.put(value, hdfs_exec_logdir)
+                retval[metric_key] = hdfs_exec_logdir + '/' + value.split('/')[-1]
+            elif hdfs.exists(retval[metric_key]):
+                path = hdfs.abs_path(retval[metric_key])
+                path = path[len(hdfs.abs_path(hdfs.project_path())):]
+                retval[metric_key] = path
+
     if not retval:
         return
     # Validation
@@ -106,24 +117,6 @@ def _build_summary_json(logdir):
         hyperparameters.append({'metrics': metric_arr, 'hyperparameters': hp_arr})
 
     return json.dumps({'results': hyperparameters})
-
-def _move_output_files(metric_arr, logdir):
-    new_arr = []
-
-    # {'key' : 'somekey', 'value': 'somevalue'}
-    for entry in metric_arr:
-        value = entry['value']
-        if os.path.exists(value):
-            pydoop.hdfs.put(value, logdir)
-            entry['value'] = logdir + '/' + value.split('/')[-1]
-        elif hdfs.exists(new_arr['value']):
-            path = hdfs.abs_path(new_arr['value'])
-            path = path[len(hdfs.abs_path(hdfs.project_path())):]
-            entry['value'] = path
-
-        new_arr.append({'key' : entry['key'], 'value': entry['value']})
-
-    return new_arr
 
 def _get_experiments_dir():
     """
