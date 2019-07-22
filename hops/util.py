@@ -5,21 +5,11 @@ Miscellaneous utility functions for user applications.
 """
 
 import os
-import signal
-from ctypes import cdll
-import itertools
-import socket
-import json
 import ssl
 import jks
 from pathlib import Path
-import fnmatch
-
-from hops import hdfs
 from hops import constants
 from hops import tls
-from hops import devices
-
 #! Needed for hops library backwards compatability
 try:
     import requests
