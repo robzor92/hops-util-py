@@ -26,19 +26,22 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
 
     """
 
+    if not retval:
+        return
+
     if type(retval) is dict:
         for metric_key in retval.keys():
             value = str(retval[metric_key])
-            if os.path.exists(value):
-                pydoop.hdfs.put(value, hdfs_exec_logdir)
-                retval[metric_key] = '/Experiments/' + value.split('/')[-1]
-            elif hdfs.exists(value):
-                path = hdfs.abs_path(value)
-                path = path[len(hdfs.abs_path(hdfs.project_path())):]
-                retval[metric_key] = path
-
-    if not retval:
-        return
+            if value.contains('/'):
+                if os.path.exists(value):
+                    pydoop.hdfs.put(value, hdfs_exec_logdir)
+                    retval[metric_key] = '/Experiments/' + value.split('/')[-1]
+                elif hdfs.exists(value):
+                    path = hdfs.abs_path(value)
+                    path = path[len(hdfs.abs_path(hdfs.project_path())):]
+                    retval[metric_key] = path
+                else:
+                    raise Exception('Could not find file or directory or path ' + str(value))
     # Validation
     if not optimization_key and type(retval) is dict and len(retval.keys()) > 1:
         raise Exception('Missing optimization_key argument, when returning multiple values in a dict the optimization_key argument must be set.')
