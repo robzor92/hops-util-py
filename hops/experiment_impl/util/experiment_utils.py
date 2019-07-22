@@ -102,15 +102,28 @@ def _build_summary_json(logdir):
 
         hp_arr = _convert_param_to_arr(hyperparameter_combination)
         metric_arr = _convert_return_file_to_arr(return_file)
-        metric_arr = _move_output_files(metric_arr)
+        metric_arr = _move_output_files(metric_arr, logdir)
         hyperparameters.append({'metrics': metric_arr, 'hyperparameters': hp_arr})
 
     return json.dumps({'results': hyperparameters})
 
-# Files attached as outputs on local disk needs to be uploaded to experiment logdir, if not in local tensorboard.logdir()
-def _move_output_files(metric_arr):
-    pass
+def _move_output_files(metric_arr, logdir):
+    new_arr = []
 
+    # {'key' : 'somekey', 'value': 'somevalue'}
+    for entry in metric_arr:
+        value = entry['value']
+        if os.path.exists(value):
+            pydoop.hdfs.put(value, logdir)
+            entry['value'] = logdir + '/' + value.split('/')[-1]
+        elif hdfs.exists(new_arr['value']):
+            path = hdfs.abs_path(new_arr['value'])
+            path = path[len(hdfs.abs_path(hdfs.project_path())):]
+            entry['value'] = path
+
+        new_arr.append({'key' : entry['key'], 'value': entry['value']})
+
+    return new_arr
 
 def _get_experiments_dir():
     """

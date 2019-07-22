@@ -16,8 +16,6 @@ try:
 except:
     pass
 
-import pydoop.hdfs
-
 try:
     import tensorflow
 except:
