@@ -113,7 +113,6 @@ def _build_summary_json(logdir):
 
         hp_arr = _convert_param_to_arr(hyperparameter_combination)
         metric_arr = _convert_return_file_to_arr(return_file)
-        metric_arr = _move_output_files(metric_arr, logdir)
         hyperparameters.append({'metrics': metric_arr, 'hyperparameters': hp_arr})
 
     return json.dumps({'results': hyperparameters})
