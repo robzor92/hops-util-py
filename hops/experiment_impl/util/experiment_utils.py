@@ -28,11 +28,11 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
 
     if type(retval) is dict:
         for metric_key in retval.keys():
-            value = retval[metric_key]
+            value = str(retval[metric_key])
             if os.path.exists(value):
                 pydoop.hdfs.put(value, hdfs_exec_logdir)
                 retval[metric_key] = hdfs_exec_logdir + '/' + value.split('/')[-1]
-            elif hdfs.exists(retval[metric_key]):
+            elif hdfs.exists(value):
                 path = hdfs.abs_path(retval[metric_key])
                 path = path[len(hdfs.abs_path(hdfs.project_path())):]
                 retval[metric_key] = path
