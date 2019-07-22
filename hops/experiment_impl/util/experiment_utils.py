@@ -35,7 +35,8 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
             if '/' in value:
                 if os.path.exists(value):
                     pydoop.hdfs.put(value, hdfs_exec_logdir)
-                    retval[metric_key] = '/Experiments/' + value.split('/')[-1]
+                    hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
+                    retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + value.split('/')[-1]
                 elif hdfs.exists(value):
                     path = hdfs.abs_path(value)
                     path = path[len(hdfs.abs_path(hdfs.project_path())):]
