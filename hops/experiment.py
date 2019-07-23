@@ -92,7 +92,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         logdir, hp, metric = launcher._run(sc, map_fun, run_id, args_dict, local_logdir)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        experiment_utils._finalize_experiment(experiment_json, hp, metric, app_id, run_id, 'FINISHED', duration, logdir)
+        experiment_utils._finalize_experiment(experiment_json, metric, app_id, run_id, 'FINISHED', duration, logdir)
         return logdir, hp, metric
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
