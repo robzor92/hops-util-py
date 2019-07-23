@@ -35,13 +35,15 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
             if '/' in value or os.path.exists(os.getcwd() + '/' + value):
                 if os.path.exists(value): # absolute path
                     pydoop.hdfs.put(value, hdfs_exec_logdir)
+                    os.remove(value)
                     hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
                     retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  value.split('/')[-1]
                 elif os.path.exists(os.getcwd() + '/' + value): # relative path
-                    value = os.getcwd() + '/' + value
+                    output_file = os.getcwd() + '/' + value
                     pydoop.hdfs.put(value, hdfs_exec_logdir)
+                    os.remove(output_file)
                     hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
-                    retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  value.split('/')[-1]
+                    retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  output_file.split('/')[-1]
                 else:
                     raise Exception('Could not find file or directory or path ' + str(value))
     # Validation
