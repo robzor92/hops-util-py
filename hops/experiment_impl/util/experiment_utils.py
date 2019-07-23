@@ -72,6 +72,48 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
     metric_file = hdfs_exec_logdir + '/.metric'
     hdfs.dump(str(metric), metric_file)
 
+def _handle_return(retval, hdfs_exec_logdir):
+    """
+
+    Args:
+        val:
+        hdfs_exec_logdir:
+
+    Returns:
+
+    """
+
+    if not retval:
+        return
+
+    if type(retval) is dict:
+        for metric_key in retval.keys():
+            value = str(retval[metric_key])
+            if '/' in value or os.path.exists(os.getcwd() + '/' + value):
+                if os.path.exists(value): # absolute path
+                    pydoop.hdfs.put(value, hdfs_exec_logdir)
+                    os.remove(value)
+                    hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
+                    retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  value.split('/')[-1]
+                elif os.path.exists(os.getcwd() + '/' + value): # relative path
+                    output_file = os.getcwd() + '/' + value
+                    pydoop.hdfs.put(value, hdfs_exec_logdir)
+                    os.remove(output_file)
+                    hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
+                    retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  output_file.split('/')[-1]
+                else:
+                    raise Exception('Could not find file or directory or path ' + str(value))
+    # Validation
+    if type(retval) is not dict:
+        try:
+            metric = int(retval)
+            retval = {'metric': retval}
+        except:
+            raise ValueError('Metric to maximize or minimize is not a number: {}'.format(retval))
+
+    return_file = hdfs_exec_logdir + '/.return'
+    hdfs.dump(json.dumps(retval), return_file)
+
 def _cleanup(local_logdir_bool, local_tb_path, hdfs_exec_logdir, gpu_thread, tb_hdfs_file):
     try:
         if local_logdir_bool:
@@ -184,10 +226,6 @@ def _create_experiment_subdirectories(app_id, run_id, param_string, type, sub_ty
 
     # create the new directory
     pyhdfs_handle.create_directory(hdfs_exec_logdir)
-
-    # update logfile
-    logfile = hdfs_exec_logdir + '/' + 'logfile'
-    os.environ['EXEC_LOGFILE'] = logfile
 
     return hdfs_exec_logdir, hdfs_experiment_dir
 
