@@ -355,7 +355,7 @@ def _publish_experiment(app_id, run_id, json_data, xattr):
 
 
 
-def _populate_experiment(model_name, function, type, hyperparameter_space, versioned_resources, description):
+def _populate_experiment(model_name, function, type, hyperparameter_space, versioned_resources, description, app_id, direction):
     """
     Args:
          :sc:
@@ -370,9 +370,10 @@ def _populate_experiment(model_name, function, type, hyperparameter_space, versi
     Returns:
 
     """
-    return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type})
+    return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type,
+                       'appId': app_id, 'direction': direction, 'hyperparameter': hyperparameter_space})
 
-def _finalize_experiment_json(experiment_json, hyperparameter, metric, state, duration, app_id, direction):
+def _finalize_experiment_json(experiment_json, metric, state, duration):
     """
     Args:
         :experiment_json:
@@ -384,11 +385,8 @@ def _finalize_experiment_json(experiment_json, hyperparameter, metric, state, du
     """
     experiment_json = json.loads(experiment_json)
     experiment_json['metric'] = metric
-    hyperparameter['hyperparameter'] = hyperparameter
     experiment_json['state'] = state
     experiment_json['duration'] = duration
-    experiment_json['appId'] = app_id
-    experiment_json['direction'] = direction
 
     return json.dumps(experiment_json)
 
