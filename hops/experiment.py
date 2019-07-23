@@ -322,7 +322,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = experiment_utils._populate_experiment(name, 'grid_search', 'PARALLEL_EXPERIMENTS', json.dumps(args_dict), versioned_path, description, None, direction)
+        experiment_json = experiment_utils._populate_experiment(name, 'grid_search', 'PARALLEL_EXPERIMENTS', json.dumps(args_dict), versioned_path, description, None, direction, optimization_key)
 
         experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
