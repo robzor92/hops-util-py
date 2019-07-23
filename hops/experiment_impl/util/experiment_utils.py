@@ -91,12 +91,16 @@ def _handle_return(retval, hdfs_exec_logdir):
             value = str(retval[metric_key])
             if '/' in value or os.path.exists(os.getcwd() + '/' + value):
                 if os.path.exists(value): # absolute path
+                    if hdfs.exists(hdfs_exec_logdir + '/' + value.split('/')[-1]):
+                        hdfs.delete(hdfs_exec_logdir + '/' + value.split('/')[-1])
                     pydoop.hdfs.put(value, hdfs_exec_logdir)
                     os.remove(value)
                     hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
                     retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  value.split('/')[-1]
                 elif os.path.exists(os.getcwd() + '/' + value): # relative path
                     output_file = os.getcwd() + '/' + value
+                    if hdfs.exists(hdfs_exec_logdir + '/' + value):
+                        hdfs.delete(hdfs_exec_logdir + '/' + value)
                     pydoop.hdfs.put(value, hdfs_exec_logdir)
                     os.remove(output_file)
                     hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
