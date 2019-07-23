@@ -45,7 +45,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
                     hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
                     retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  output_file.split('/')[-1]
                 elif hdfs.exists(hdfs.project_path() + '/' + value):
-                    hdfs.cp(hdfs.project_path() + '/' + value, hdfs_exec_logdir + '/' + value, overwrite=True)
+                    hdfs.cp(hdfs.project_path() + '/' + value, hdfs_exec_logdir + '/' + value.split('/')[-1], overwrite=True)
                 else:
                     raise Exception('Could not find file or directory on path ' + str(value))
     # Validation
