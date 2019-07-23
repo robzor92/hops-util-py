@@ -67,7 +67,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
     try:
         hdfs.dump(json.dumps(retval), return_file)
     except:
-        raise Exception('{1}  2}'.format(json.dumps(retval), return_file))
+        raise Exception('{0}  {1}'.format(json.dumps(retval), return_file))
     if len(retval.keys()) == 1:
         metric = retval[list(retval.keys())[0]]
     else:
