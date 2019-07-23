@@ -65,7 +65,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
 
     return_file = hdfs_exec_logdir + '/.return'
     hdfs.dump(json.dumps(retval), return_file)
-    
+
     if len(retval.keys()) == 1:
         metric = retval[list(retval.keys())[0]]
     else:
@@ -372,7 +372,7 @@ def _populate_experiment(model_name, function, type, hyperparameter_space, versi
     """
     return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type})
 
-def _finalize_experiment_json(experiment_json, hyperparameter, metric, state, duration, app_id):
+def _finalize_experiment_json(experiment_json, hyperparameter, metric, state, duration, app_id, direction):
     """
     Args:
         :experiment_json:
@@ -384,11 +384,11 @@ def _finalize_experiment_json(experiment_json, hyperparameter, metric, state, du
     """
     experiment_json = json.loads(experiment_json)
     experiment_json['metric'] = metric
+    hyperparameter['hyperparameter'] = hyperparameter
     experiment_json['state'] = state
     experiment_json['duration'] = duration
     experiment_json['appId'] = app_id
-
-    #experiment_json['hyperparameter'] = hyperparameter
+    experiment_json['direction'] = direction
 
     return json.dumps(experiment_json)
 
