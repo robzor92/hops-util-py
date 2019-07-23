@@ -72,7 +72,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
     metric_file = hdfs_exec_logdir + '/.metric'
     hdfs.dump(str(metric), metric_file)
 
-def _handle_return(retval, hdfs_exec_logdir):
+def _handle_return_simple(retval, hdfs_exec_logdir):
     """
 
     Args:
