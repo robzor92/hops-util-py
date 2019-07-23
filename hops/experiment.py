@@ -92,7 +92,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         logdir, hp, metric = launcher._run(sc, map_fun, run_id, args_dict, local_logdir)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        experiment_utils._finalize_experiment(experiment_json, metric, app_id, run_id, 'FINISHED', duration, logdir)
+        experiment_utils._finalize_experiment(experiment_json, hp, metric, app_id, run_id, 'FINISHED', duration, logdir)
         return logdir, hp, metric
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
@@ -322,7 +322,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = experiment_utils._populate_experiment(name, 'grid_search', 'PARALLEL_EXPERIMENTS', json.dumps(args_dict), versioned_path, description, None, direction, None)
+        experiment_json = experiment_utils._populate_experiment(name, 'grid_search', 'PARALLEL_EXPERIMENTS', json.dumps(args_dict), versioned_path, description, None, direction)
 
         experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
@@ -400,7 +400,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = experiment_utils._populate_experiment(name, 'collective_all_reduce', 'DISTRIBUTED_TRAINING', None, versioned_path, description, app_id, None, None)
+        experiment_json = experiment_utils._populate_experiment(name, 'collective_all_reduce', 'DISTRIBUTED_TRAINING', None, versioned_path, description, app_id, None)
 
         experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
@@ -473,7 +473,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = experiment_utils._populate_experiment(name, 'parameter_server', 'DISTRIBUTED_TRAINING', None, versioned_path, description, app_id, None, None)
+        experiment_json = experiment_utils._populate_experiment(name, 'parameter_server', 'DISTRIBUTED_TRAINING', None, versioned_path, description, app_id, None)
 
         experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
@@ -542,7 +542,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = experiment_utils._populate_experiment(name, 'mirrored', 'DISTRIBUTED_TRAINING', None, versioned_path, description, app_id, None, None)
+        experiment_json = experiment_utils._populate_experiment(name, 'mirrored', 'DISTRIBUTED_TRAINING', None, versioned_path, description, app_id, None)
 
         experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
 
