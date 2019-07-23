@@ -651,7 +651,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
                     argIndex += 1
                 param_string = param_string[:-1]
 
-                val = json.loads(_get_return_file(param_string, app_id, generation_id, run_id))
+                val = _get_return_file(param_string, app_id, generation_id, run_id)
                 hdfs_exec_logdir, hdfs_appid_logdir = experiment_utils._create_experiment_subdirectories(app_id, run_id, param_string, 'differential_evolution', sub_type='generation.' + str(generation_id))
                 pydoop.hdfs.dump('', os.environ['EXEC_LOGFILE'], user=hopshdfs.project_user())
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir_bool)
@@ -660,7 +660,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
                 print('-------------------------------------------------------')
                 print('Started running task ' + param_string + '\n')
                 if val:
-                    print('Reading returned metric from previous run: ' + str(val))
+                    val = json.loads(val)
                 task_start = time.time()
                 if not val:
                     val = map_fun(*args)
