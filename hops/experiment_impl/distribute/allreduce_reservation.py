@@ -189,7 +189,7 @@ class Server(MessageSocket):
     server_sock.listen(10)
 
     # hostname may not be resolvable but IP address probably will be
-    host = util.experiment_utils()
+    host = experiment_utils._get_ip_address()
     port = server_sock.getsockname()[1]
     addr = (host,port)
 
