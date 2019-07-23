@@ -371,7 +371,7 @@ def _populate_experiment(model_name, function, type, hp, versioned_resources, de
 
     """
     return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type,
-                       'appId': app_id, 'direction': direction, 'optimization_key': optimization_key})
+                       'appId': app_id, 'direction': direction, 'optimizationKey': optimization_key})
 
 def _finalize_experiment_json(experiment_json, metric, state, duration):
     """
