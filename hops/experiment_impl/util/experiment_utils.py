@@ -64,6 +64,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
 
 
     return_file = hdfs_exec_logdir + '/.return'
+    raise Exception(return_file)
     hdfs.dump(json.dumps(retval), return_file)
 
     if len(retval.keys()) == 1:
