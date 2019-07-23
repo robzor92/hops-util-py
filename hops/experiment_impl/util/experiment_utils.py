@@ -256,10 +256,11 @@ def _convert_to_dict(best_param):
 
 def _convert_param_to_arr(best_param):
     best_param_arr=[]
-    best_param = best_param.split('&')
-    for hp in best_param:
-        hp = hp.split('=')
-        best_param_arr.append({'key': hp[0], 'value': hp[1]})
+    if '=' in best_param:
+        best_param = best_param.split('&')
+        for hp in best_param:
+            hp = hp.split('=')
+            best_param_arr.append({'key': hp[0], 'value': hp[1]})
 
     return best_param_arr
 
