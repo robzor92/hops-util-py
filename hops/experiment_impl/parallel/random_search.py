@@ -3,8 +3,7 @@ Random Search implementation
 """
 
 from hops.experiment_impl.util import experiment_utils
-from hops.experiment_impl.tensorboard import tensorboard
-from hops import devices
+from hops import devices, tensorboard
 
 import threading
 import six
