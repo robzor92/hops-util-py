@@ -92,7 +92,7 @@ def _handle_return(retval, hdfs_exec_logdir):
             if '/' in value or os.path.exists(os.getcwd() + '/' + value):
                 if os.path.exists(value): # absolute path
                     if hdfs.exists(hdfs_exec_logdir + '/' + value.split('/')[-1]):
-                        hdfs.delete(hdfs_exec_logdir + '/' + value.split('/')[-1])
+                        hdfs.delete(hdfs_exec_logdir + '/' + value.split('/')[-1], recursive=False)
                     pydoop.hdfs.put(value, hdfs_exec_logdir)
                     os.remove(value)
                     hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
@@ -100,7 +100,7 @@ def _handle_return(retval, hdfs_exec_logdir):
                 elif os.path.exists(os.getcwd() + '/' + value): # relative path
                     output_file = os.getcwd() + '/' + value
                     if hdfs.exists(hdfs_exec_logdir + '/' + value):
-                        hdfs.delete(hdfs_exec_logdir + '/' + value)
+                        hdfs.delete(hdfs_exec_logdir + '/' + value, recursive=False)
                     pydoop.hdfs.put(value, hdfs_exec_logdir)
                     os.remove(output_file)
                     hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
