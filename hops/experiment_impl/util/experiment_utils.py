@@ -355,7 +355,7 @@ def _publish_experiment(app_id, run_id, json_data, xattr):
 
 
 
-def _populate_experiment(model_name, function, type, hyperparameter_space, versioned_resources, description, app_id, direction):
+def _populate_experiment(model_name, function, type, hyperparameter_space, versioned_resources, description, app_id, direction, optimization_key):
     """
     Args:
          :sc:
