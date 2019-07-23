@@ -45,7 +45,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
                     hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
                     retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  output_file.split('/')[-1]
                 else:
-                    raise Exception('Could not find file or directory or path ' + str(value))
+                    raise Exception('Could not find file or directory on path ' + str(value))
     # Validation
     if not optimization_key and type(retval) is dict and len(retval.keys()) > 1:
         raise Exception('Missing optimization_key argument, when returning multiple values in a dict the optimization_key argument must be set.')
@@ -219,14 +219,18 @@ def _create_experiment_subdirectories(app_id, run_id, param_string, type, sub_ty
     # determine directory structure based on arguments
     if sub_type:
         hdfs_exec_logdir = hdfs_experiment_dir + "/" + str(sub_type) + '/' + str(param_string)
+        if pyhdfs_handle.exists(hdfs_exec_logdir):
+            hdfs.delete(hdfs_exec_logdir, recursive=True)
     elif not param_string and not sub_type:
+        if pyhdfs_handle.exists(hdfs_experiment_dir):
+            hdfs.delete(hdfs_experiment_dir, recursive=True)
         hdfs_exec_logdir = hdfs_experiment_dir + '/'
     else:
         hdfs_exec_logdir = hdfs_experiment_dir + '/' + str(param_string)
+        if pyhdfs_handle.exists(hdfs_exec_logdir):
+            hdfs.delete(hdfs_exec_logdir, recursive=True)
 
     # Need to remove directory if it exists (might be a task retry)
-    if pyhdfs_handle.exists(hdfs_exec_logdir):
-        hdfs.delete(hdfs_exec_logdir, recursive=True)
 
     # create the new directory
     pyhdfs_handle.create_directory(hdfs_exec_logdir)
