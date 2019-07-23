@@ -366,7 +366,7 @@ def _populate_experiment(model_name, function, type, hyperparameter_space, versi
     """
     return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type})
 
-def _finalize_experiment_json(experiment_json, hyperparameter, metric, state, duration):
+def _finalize_experiment_json(experiment_json, hyperparameter, metric, state, duration, app_id):
     """
     Args:
         :experiment_json:
@@ -380,6 +380,7 @@ def _finalize_experiment_json(experiment_json, hyperparameter, metric, state, du
     experiment_json['metric'] = metric
     experiment_json['state'] = state
     experiment_json['duration'] = duration
+    experiment_json['appId'] = app_id
 
     #experiment_json['hyperparameter'] = hyperparameter
 
@@ -573,7 +574,7 @@ def _finalize_experiment(experiment_json, hp, metric, app_id, run_id, state, dur
     if outputs:
         hdfs.dump(outputs, logdir + '/.summary')
 
-    experiment_json = _finalize_experiment_json(experiment_json, hp, metric, state, duration)
+    experiment_json = _finalize_experiment_json(experiment_json, hp, metric, state, duration, app_id)
 
     _publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
 
