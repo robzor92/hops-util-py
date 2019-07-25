@@ -72,13 +72,13 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
             int(opt_val)
         except:
             raise ValueError('Metric to maximize or minimize is not a number: {}'.format(retval))
-         retval = {'metric': opt_val}
+        retval = {'metric': opt_val}
 
 
 
     elif type(retval) is not dict:
 
-            
+
     return_file = hdfs_exec_logdir + '/.return'
     hdfs.dump(json.dumps(retval), return_file)
 
