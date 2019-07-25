@@ -58,20 +58,20 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
         try:
             int(opt_val)
         except:
-            raise ValueError('Metric to maximize or minimize is not a number: {}'.format(retval))
+            raise ValueError('Metric to maximize or minimize is not a number: {}'.format(opt_val))
         retval[optimization_key] = opt_val
     elif len(retval.keys()) == 1:
         opt_val = str(retval[list(retval.keys())[0]])
         try:
             int(opt_val)
         except:
-            raise ValueError('Metric to maximize or minimize is not a number: {}'.format(retval))
+            raise ValueError('Metric to maximize or minimize is not a number: {}'.format(opt_val))
         retval[list(retval.keys())[0]] = opt_val
     else:
         try:
             int(opt_val)
         except:
-            raise ValueError('Metric to maximize or minimize is not a number: {}'.format(retval))
+            raise ValueError('Metric to maximize or minimize is not a number: {}'.format(opt_val))
         retval = {'metric': opt_val}
 
     return_file = hdfs_exec_logdir + '/.return'
