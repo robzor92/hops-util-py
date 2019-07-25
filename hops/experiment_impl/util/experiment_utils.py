@@ -55,26 +55,14 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
 
     if len(retval.keys()) > 1:
         opt_val = str(retval[optimization_key])
-        try:
-            int(opt_val)
-        except Exception as err:
-            print(err)
-            raise ValueError('Metric to maximize or minimize is not a number: {}'.format(opt_val))
+        opt_val = _validate_optimization_value(opt_val)
         retval[optimization_key] = opt_val
     elif len(retval.keys()) == 1:
         opt_val = str(retval[list(retval.keys())[0]])
-        try:
-            int(opt_val)
-        except Exception as err:
-            print(err)
-            raise ValueError('Metric to maximize or minimize is not a number: {}'.format(opt_val))
+        opt_val = _validate_optimization_value(opt_val)
         retval[list(retval.keys())[0]] = opt_val
     else:
-        try:
-            int(opt_val)
-        except Exception as err:
-            print(err)
-            raise ValueError('Metric to maximize or minimize is not a number: {}'.format(opt_val))
+        opt_val = _validate_optimization_value(opt_val)
         retval = {'metric': opt_val}
 
     return_file = hdfs_exec_logdir + '/.return'
@@ -82,6 +70,20 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
 
     metric_file = hdfs_exec_logdir + '/.metric'
     hdfs.dump(opt_val, metric_file)
+
+def _validate_optimization_value(opt_val):
+        try:
+            int(opt_val)
+            return opt_val
+        except:
+            pass
+        try:
+            float(opt_val)
+            return opt_val
+        except:
+            pass
+        raise ValueError('Metric to maximize or minimize is not a number: {}'.format(opt_val))
+
 
 def _handle_return_simple(retval, hdfs_exec_logdir):
     """
