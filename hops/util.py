@@ -55,9 +55,6 @@ def send_request_with_session(method, resource, data=None, headers=None):
     Returns:
         HTTPS response
     """
-
-    print(data)
-
     if not os.path.exists("catrust.pem"):
         _convert_jks_to_pem()
 
