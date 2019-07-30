@@ -12,6 +12,8 @@ from hops import constants
 from hops import devices
 from hops import util
 from hops import hdfs
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.SecurityWarning)
 
 import pydoop.hdfs
 
@@ -384,10 +386,7 @@ def _publish_experiment(app_id, run_id, json_data, xattr):
                    app_id + "_" + str(run_id) + "?xattr=" + xattr
 
     resp = util.send_request_with_session('POST', resource_url, data=json_data, headers=headers)
-    print(resp)
-
-
-
+    #print(resp)
 
 def _populate_experiment(model_name, function, type, hp, versioned_resources, description, app_id, direction, optimization_key):
     """
