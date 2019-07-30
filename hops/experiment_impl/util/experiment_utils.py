@@ -387,7 +387,7 @@ def _attach_experiment_xattr(app_id, run_id, json_data, xattr):
                    app_id + "_" + str(run_id) + "?xattr=" + xattr
 
     resp = util.send_request_with_session('POST', resource_url, data=json_data, headers=headers)
-    #print(resp)
+    print(resp)
 
 def _attach_model_xattr(ml_id, model, xattr):
     """
@@ -403,7 +403,6 @@ def _attach_model_xattr(ml_id, model, xattr):
         None
 
     """
-    headers = {'Content-type': 'application/json'}
     resource_url = constants.DELIMITERS.SLASH_DELIMITER + \
                    constants.REST_CONFIG.HOPSWORKS_REST_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    constants.REST_CONFIG.HOPSWORKS_PROJECT_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
@@ -411,7 +410,9 @@ def _attach_model_xattr(ml_id, model, xattr):
                    constants.REST_CONFIG.HOPSWORKS_EXPERIMENTS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    ml_id + "?xattr=" + xattr + "&model=" + model
 
-    resp = util.send_request_with_session('POST', resource_url, headers=headers)
+    resp = util.send_request_with_session('POST', resource_url)
+
+    print(resp)
 
 def _populate_experiment(model_name, function, type, hp, versioned_resources, description, app_id, direction, optimization_key):
     """
