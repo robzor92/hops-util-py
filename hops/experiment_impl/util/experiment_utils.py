@@ -411,7 +411,7 @@ def _attach_model_xattr(ml_id, model, xattr):
                    constants.REST_CONFIG.HOPSWORKS_EXPERIMENTS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    ml_id + "?xattr=" + xattr + "&model=" + model
 
-    resp = util.send_request_with_session('POST', resource_url, data=json_data, headers=headers)
+    resp = util.send_request_with_session('POST', resource_url, headers=headers)
 
 def _populate_experiment(model_name, function, type, hp, versioned_resources, description, app_id, direction, optimization_key):
     """
