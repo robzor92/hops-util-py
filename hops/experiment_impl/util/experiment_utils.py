@@ -105,10 +105,8 @@ def _cast_number_to_string(val):
 
     if is_number:
         return str(val)
-    else
+    else:
         return val
-
-
 
 def _handle_return_simple(retval, hdfs_exec_logdir):
     """
