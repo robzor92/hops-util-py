@@ -682,3 +682,13 @@ def _find_index(host_port, cluster_spec):
         else:
             index = index + 1
     return -1
+
+def _start_run(app_id, run_id, running):
+    running = True
+    os.environ['ML_ID'] = str(app_id) + '_' + str(run_id)
+
+def _end_run(run_id, running, sc):
+    os.environ['ML_ID'] = ""
+    run_id += 1
+    running = False
+    sc.setJobGroup("", "")

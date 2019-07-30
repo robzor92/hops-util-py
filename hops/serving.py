@@ -4,6 +4,7 @@ in the project.
 """
 
 from hops import hdfs, constants, util, exceptions, kafka
+from hops.experiment_impl.util import experiment_utils
 import os
 import json
 import re
@@ -423,9 +424,11 @@ def export(model_path, model_name, model_version=1, overwrite=False):
 
     # Export the model files
     if os.path.exists(model_path):
-        return _export_local_model(model_path, model_dir_hdfs, overwrite)
+        export_dir=_export_local_model(model_path, model_dir_hdfs, overwrite)
     else:
-        return _export_hdfs_model(model_path, model_dir_hdfs, overwrite)
+        export_dir=_export_hdfs_model(model_path, model_dir_hdfs, overwrite)
+
+    experiment_utils._attach_model_xattr()
 
 
 def _export_local_model(local_model_path, model_dir_hdfs, overwrite):

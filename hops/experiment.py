@@ -535,7 +535,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         global app_id
         global experiment_json
         global run_id
-        running = True
+        experiment_utils._start_run(app_id, run_id, running)
 
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
@@ -556,10 +556,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        #cleanup spark jobs
-        run_id +=1
-        running = False
-        sc.setJobGroup("", "")
+        experiment_utils._end_run(run_id, running, sc)
 
 def _exception_handler(duration):
     """
