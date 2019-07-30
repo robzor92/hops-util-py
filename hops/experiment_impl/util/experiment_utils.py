@@ -363,7 +363,7 @@ def _time_diff(task_start, task_end):
 def _microseconds_to_millis(time):
     return int(round(time * 1000))
 
-def _publish_experiment(app_id, run_id, json_data, xattr):
+def _attach_experiment_xattr(app_id, run_id, json_data, xattr):
     """
     Utility method for putting JSON data into elastic search
 
@@ -387,6 +387,30 @@ def _publish_experiment(app_id, run_id, json_data, xattr):
 
     resp = util.send_request_with_session('POST', resource_url, data=json_data, headers=headers)
     #print(resp)
+
+def _attach_model_xattr(app_id, run_id, model, xattr):
+    """
+    Utility method for putting JSON data into elastic search
+
+    Args:
+        :project: the project of the user/app
+        :appid: the YARN appid
+        :elastic_id: the id in elastic
+        :json_data: the data to put
+
+    Returns:
+        None
+
+    """
+    headers = {'Content-type': 'application/json'}
+    resource_url = constants.DELIMITERS.SLASH_DELIMITER + \
+                   constants.REST_CONFIG.HOPSWORKS_REST_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
+                   constants.REST_CONFIG.HOPSWORKS_PROJECT_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
+                   hdfs.project_id() + constants.DELIMITERS.SLASH_DELIMITER + \
+                   constants.REST_CONFIG.HOPSWORKS_EXPERIMENTS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
+                   app_id + "_" + str(run_id) + "?xattr=" + xattr + "&model=" + model
+
+    resp = util.send_request_with_session('POST', resource_url, data=json_data, headers=headers)
 
 def _populate_experiment(model_name, function, type, hp, versioned_resources, description, app_id, direction, optimization_key):
     """
@@ -613,7 +637,7 @@ def _finalize_experiment(experiment_json, hp, metric, app_id, run_id, state, dur
 
     experiment_json = _finalize_experiment_json(experiment_json, metric, state, duration)
 
-    _publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+    _attach_experiment_xattr(app_id, run_id, experiment_json, 'REPLACE')
 
 def _find_task_and_index(host_port, cluster_spec):
     """

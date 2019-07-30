@@ -87,7 +87,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         else:
             experiment_json = experiment_utils._populate_experiment(name, 'launcher', 'EXPERIMENT', None, versioned_path, description, app_id, None, None)
 
-        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
         logdir, hp, metric = launcher._run(sc, map_fun, run_id, args_dict, local_logdir)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
@@ -163,7 +163,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         experiment_utils._version_resources(versioned_resources, experiment_utils._get_logdir(app_id, run_id))
 
-        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
         logdir, best_param, best_metric = r_search_impl._run(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir, optimization_key=optimization_key)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
@@ -243,7 +243,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
         experiment_json = experiment_utils._populate_experiment(name, 'differential_evolution', 'PARALLEL_EXPERIMENTS', json.dumps(boundary_dict), versioned_path, description, app_id, direction, optimization_key)
 
-        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
         logdir, best_param, best_metric = diff_evo_impl._run(objective_function, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name, optimization_key=optimization_key)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
@@ -324,7 +324,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         experiment_json = experiment_utils._populate_experiment(name, 'grid_search', 'PARALLEL_EXPERIMENTS', json.dumps(args_dict), versioned_path, description, None, direction, optimization_key)
 
-        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
         grid_params = experiment_utils.grid_params(args_dict)
 
@@ -402,7 +402,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
         experiment_json = experiment_utils._populate_experiment(name, 'collective_all_reduce', 'DISTRIBUTED_TRAINING', None, versioned_path, description, app_id, None, None)
 
-        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
         retval, logdir = allreduce_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
@@ -475,7 +475,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
         experiment_json = experiment_utils._populate_experiment(name, 'parameter_server', 'DISTRIBUTED_TRAINING', None, versioned_path, description, app_id, None, None)
 
-        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
         retval, logdir = ps_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
@@ -544,7 +544,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         experiment_json = experiment_utils._populate_experiment(name, 'mirrored', 'DISTRIBUTED_TRAINING', None, versioned_path, description, app_id, None, None)
 
-        experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'CREATE')
+        experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
         retval, logdir = mirrored_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
@@ -575,7 +575,7 @@ def _exception_handler(duration):
             experiment_json['state'] = "FAILED"
             experiment_json['duration'] = duration
             experiment_json = json.dumps(experiment_json)
-            experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+            experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'REPLACE')
     except Exception as err:
         print(err)
         pass
@@ -593,7 +593,7 @@ def _exit_handler():
             experiment_json = json.loads(experiment_json)
             experiment_json['state'] = "KILLED"
             experiment_json = json.dumps(experiment_json)
-            experiment_utils._publish_experiment(app_id, run_id, experiment_json, 'REPLACE')
+            experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'REPLACE')
     except Exception as err:
         print(err)
         pass
