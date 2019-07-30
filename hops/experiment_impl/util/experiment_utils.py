@@ -65,6 +65,11 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
         opt_val = _validate_optimization_value(retval)
         retval = {'metric': str(opt_val)}
 
+    # Make sure all digits are strings
+    for key in retval.keys():
+        retval[key] = _cast_number_to_string(retval[key])
+
+
     return_file = hdfs_exec_logdir + '/.return'
     hdfs.dump(json.dumps(retval), return_file)
 
@@ -83,6 +88,25 @@ def _validate_optimization_value(opt_val):
         except:
             pass
         raise ValueError('Metric to maximize or minimize is not a number: {}'.format(opt_val))
+
+def _cast_number_to_string(val):
+    is_number=False
+    try:
+        int(val)
+        is_number=True
+    except:
+        pass
+    try:
+        float(val)
+        is_number=True
+    except:
+        pass
+
+    if is_number:
+        return str(val)
+    else
+        return val
+
 
 
 def _handle_return_simple(retval, hdfs_exec_logdir):
