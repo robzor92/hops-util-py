@@ -74,7 +74,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         global app_id
         global experiment_json
         global run_id
-        running = True
+        experiment_utils._start_run(app_id, run_id, running)
 
         sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
@@ -98,10 +98,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        #cleanup spark jobs
-        run_id +=1
-        running = False
-        sc.setJobGroup("", "")
+        experiment_utils._end_run(run_id, running, sc)
 
 def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
     """
