@@ -718,10 +718,10 @@ def _get_best_logdir(root_logdir, direction):
 
             if val > max_val:
                 max_val = val
-                max_logdir = file[:-7]
+                max_logdir = file[:-8]
             elif val < min_val:
                 min_val = val
-                min_logdir = file[:-7]
+                min_logdir = file[:-8]
 
     if direction == 'max':
         return max_logdir
