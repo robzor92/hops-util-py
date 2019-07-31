@@ -212,6 +212,9 @@ class DifferentialEvolution:
 
             new_gen_best_param = self._parse_back(population[self._scores.index(new_gen_best)])
 
+            # need to return directory with /gen/bes_param for serving
+            raise Exception(new_gen_best_param)
+
             index = 0
             for name in self._param_names:
                 new_gen_best_param[index] = name + "=" + str(new_gen_best_param[index])
