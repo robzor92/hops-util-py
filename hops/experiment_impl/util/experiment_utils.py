@@ -56,11 +56,11 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
         raise Exception('Returned dict is empty, must contain atleast 1 metric to maximize or minimize.')
 
     # Validate that optimization_key is a number
-    if len(retval.keys()) > 1:
+    if type(retval) is dict and len(retval.keys()) > 1:
         opt_val = retval[optimization_key]
         opt_val = _validate_optimization_value(opt_val)
         retval[optimization_key] = opt_val
-    elif len(retval.keys()) == 1:
+    elif type(retval) is dict and len(retval.keys()) == 1:
         opt_val = retval[list(retval.keys())[0]]
         opt_val = _validate_optimization_value(opt_val)
         retval[list(retval.keys())[0]] = opt_val
