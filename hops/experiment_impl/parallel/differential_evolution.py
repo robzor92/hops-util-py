@@ -705,10 +705,10 @@ def _get_return_file(param_string, app_id, generation_id, run_id):
 def _get_best_logdir(root_logdir, direction):
     files = hopshdfs.ls(root_logdir, recursive=True)
 
-    min_val = sys.maxint
+    min_val = sys.float_info.max
     min_logdir = None
 
-    max_val = -sys.maxint - 1
+    max_val = sys.float_info.min
     max_logdir = None
 
     for file in files:
