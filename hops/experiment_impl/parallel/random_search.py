@@ -79,7 +79,7 @@ def _run(sc, map_fun, run_id, args_dict, samples, direction='max', local_logdir=
 
     print('Finished Experiment \n')
 
-    return exp_dir, param_combination, best_val
+    return exp_dir + '/' + param_combination, param_combination, best_val
 
 def _remove_duplicates(random_dict, samples):
     hp_names = random_dict.keys()

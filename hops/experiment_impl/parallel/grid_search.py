@@ -67,7 +67,7 @@ def _run(sc, map_fun, run_id, args_dict, direction='max', local_logdir=False, na
 
     print('Finished Experiment \n')
 
-    return hdfs_dir, param_combination, best_val
+    return hdfs_dir + '/' + param_combination, param_combination, best_val
 
 def _write_result(runid_dir, string):
     """

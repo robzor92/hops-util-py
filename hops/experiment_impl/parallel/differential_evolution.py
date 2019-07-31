@@ -570,6 +570,8 @@ def _evolutionary_launch(spark, map_fun, args_dict, name="no-name"):
         :args_dict: (optional) A dictionary containing hyperparameter values to insert as arguments for each TensorFlow job
     """
 
+    global run_id
+
     sc = spark.sparkContext
     app_id = str(sc.applicationId)
 
@@ -590,7 +592,7 @@ def _evolutionary_launch(spark, map_fun, args_dict, name="no-name"):
 
     generation_id += 1
 
-    return experiment_utils._get_experiments_dir() + '/' + app_id
+    return experiment_utils._get_experiments_dir() + '/' + str(app_id) + "_" + str(run_id)
 
 
 #Helper to put Spark required parameter iter in function signature
