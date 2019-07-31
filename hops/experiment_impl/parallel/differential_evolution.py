@@ -18,6 +18,7 @@ import six
 import time
 import copy
 import json
+import sys
 
 objective_function=None
 spark=None
