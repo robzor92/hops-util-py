@@ -693,7 +693,6 @@ def _start_run(app_id, run_id, running):
     _set_ml_id(app_id, run_id)
 
 def _end_run(run_id, running, sc):
-    os.environ['ML_ID'] = ""
     run_id += 1
     running = False
     sc.setJobGroup("", "")
