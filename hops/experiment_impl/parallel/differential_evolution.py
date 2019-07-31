@@ -716,12 +716,12 @@ def _get_best_logdir(root_logdir, direction):
             val = hopshdfs.load(file)
             val = float(val)
 
-        if val > max_val:
-            max_val = val
-            max_logdir = file[:-7]
-        elif val < min_val:
-            min_val = val
-            min_logdir = file[:-7]
+            if val > max_val:
+                max_val = val
+                max_logdir = file[:-7]
+            elif val < min_val:
+                min_val = val
+                min_logdir = file[:-7]
 
     if direction == 'max':
         return max_logdir
