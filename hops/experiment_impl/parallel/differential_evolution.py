@@ -702,7 +702,7 @@ def _get_return_file(param_string, app_id, generation_id, run_id):
     return None
 
 def _get_best_logdir(root_logdir, direction):
-    files = hdfs.ls(root_logdir, recursive=True)
+    files = hopshdfs.ls(root_logdir, recursive=True)
 
     min_val = sys.maxint
     min_logdir = None
@@ -712,7 +712,7 @@ def _get_best_logdir(root_logdir, direction):
 
     for file in files:
         if file.endswith("/.metric"):
-            val = hdfs.load(file)
+            val = hopshdfs.load(file)
             val = float(val)
 
         if val > max_val:
