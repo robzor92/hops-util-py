@@ -212,9 +212,6 @@ class DifferentialEvolution:
 
             new_gen_best_param = self._parse_back(population[self._scores.index(new_gen_best)])
 
-            # need to return directory with /gen/bes_param for serving
-            raise Exception(new_gen_best_param)
-
             index = 0
             for name in self._param_names:
                 new_gen_best_param[index] = name + "=" + str(new_gen_best_param[index])
@@ -560,9 +557,11 @@ def _run(function, search_dict, direction = 'max', generations=4, popsize=6, mut
         param_string = param_string + hp + '&'
     param_string = param_string[:-1]
 
+    best_exp_logdir = _get_best_logdir(str(root_dir), direction)
+
     print('Finished Experiment \n')
 
-    return str(root_dir), param_string, best_metric
+    return best_exp_logdir, param_string, best_metric
 
 def _evolutionary_launch(spark, map_fun, args_dict, name="no-name"):
     """ Run the wrapper function with each hyperparameter combination as specified by the dictionary
@@ -701,3 +700,33 @@ def _get_return_file(param_string, app_id, generation_id, run_id):
             return return_file_contents
 
     return None
+
+def _get_best_logdir(root_logdir, direction):
+    files = hdfs.ls(root_logdir, recursive=True)
+
+    min_val = sys.maxint
+    min_logdir = None
+
+    max_val = -sys.maxint - 1
+    max_logdir = None
+
+    for file in files:
+        if file.endswith("/.metric"):
+        val = hdfs.load(file)
+        val = float(val)
+
+        if val > max_val:
+            max_val = val
+            max_logdir = file[:-7]
+        elif val < min_val:
+            min_val = val
+            min_logdir = file[:-7]
+
+    if direction == 'max':
+        return max_logdir
+    else:
+        return min_logdir
+
+
+
+
