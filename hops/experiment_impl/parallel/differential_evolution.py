@@ -50,7 +50,7 @@ def _get_all_accuracies(tensorboard_hdfs_logdir, args_dict, number_params):
     population_dict = diff_evo.get_dict()
     global run_id
     for i in range(number_params):
-        path_to_log= tensorboard_hdfs_logdir + "_" + str(run_id) + "/generation." + str(generation_id - 1) + "/"
+        path_to_log= tensorboard_hdfs_logdir + "/generation." + str(generation_id - 1) + "/"
         for k in population_dict:
             path_to_log+=k+'='+str(args_dict[k][i])+ '&'
         path_to_log = path_to_log[:(len(path_to_log) -1)]
