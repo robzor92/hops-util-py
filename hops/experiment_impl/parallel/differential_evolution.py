@@ -712,8 +712,8 @@ def _get_best_logdir(root_logdir, direction):
 
     for file in files:
         if file.endswith("/.metric"):
-        val = hdfs.load(file)
-        val = float(val)
+            val = hdfs.load(file)
+            val = float(val)
 
         if val > max_val:
             max_val = val
