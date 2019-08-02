@@ -28,25 +28,8 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
 
     """
 
-    if type(retval) is dict:
-        for metric_key in retval.keys():
-            value = str(retval[metric_key])
-            if '/' in value or os.path.exists(os.getcwd() + '/' + value):
-                if os.path.exists(value): # absolute path
-                    pydoop.hdfs.put(value, hdfs_exec_logdir)
-                    os.remove(value)
-                    hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
-                    retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  value.split('/')[-1]
-                elif os.path.exists(os.getcwd() + '/' + value): # relative path
-                    output_file = os.getcwd() + '/' + value
-                    pydoop.hdfs.put(output_file, hdfs_exec_logdir)
-                    os.remove(output_file)
-                    hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
-                    retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  output_file.split('/')[-1]
-                elif hdfs.exists(hdfs.project_path() + '/' + value):
-                    hdfs.cp(hdfs.project_path() + '/' + value, hdfs_exec_logdir + '/' + value.split('/')[-1], overwrite=True)
-                else:
-                    raise Exception('Could not find file or directory on path ' + str(value))
+    _upload_file_output(retval, hdfs_exec_logdir)
+
     # Validation
     if not optimization_key and type(retval) is dict and len(retval.keys()) > 1:
         raise Exception('Missing optimization_key argument, when returning multiple values in a dict the optimization_key argument must be set.')
@@ -110,20 +93,7 @@ def _cast_number_to_string(val):
     else:
         return val
 
-def _handle_return_simple(retval, hdfs_exec_logdir):
-    """
-
-    Args:
-        val:
-        hdfs_exec_logdir:
-
-    Returns:
-
-    """
-
-    if not retval:
-        return
-
+def _upload_file_output(retval, hdfs_exec_logdir):
     if type(retval) is dict:
         for metric_key in retval.keys():
             value = str(retval[metric_key])
@@ -145,6 +115,24 @@ def _handle_return_simple(retval, hdfs_exec_logdir):
                     retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  output_file.split('/')[-1]
                 else:
                     raise Exception('Could not find file or directory or path ' + str(value))
+
+
+def _handle_return_simple(retval, hdfs_exec_logdir):
+    """
+
+    Args:
+        val:
+        hdfs_exec_logdir:
+
+    Returns:
+
+    """
+
+    if not retval:
+        return
+
+    _upload_file_output(retval, hdfs_exec_logdir)
+
     # Validation
     if type(retval) is not dict:
         try:
