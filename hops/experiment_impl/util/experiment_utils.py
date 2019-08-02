@@ -151,7 +151,6 @@ def _cleanup(local_logdir_bool, local_tb_path, hdfs_exec_logdir, gpu_thread, tb_
     except Exception as err:
         print('Exception occurred while uploading local logdir to hdfs: {}'.format(err))
     finally:
-        os.environ['ML_ID']=""
         if devices.get_num_gpus() > 0 and gpu_thread.isAlive():
             gpu_thread.do_run = False
             gpu_thread.join(20)
