@@ -474,7 +474,7 @@ def _export_hdfs_model(hdfs_model_path, model_dir_hdfs, overwrite):
                 last_index = model_name.rfind(constants.DELIMITERS.SLASH_DELIMITER)
                 model_name = model_name[last_index + 1:]
             dest_path = model_dir_hdfs + constants.DELIMITERS.SLASH_DELIMITER + model_name
-            hdfs.cp(file_source_path, dest_path)
+            hdfs.cp(file_source_path, dest_path, overwrite=overwrite)
     elif hdfs.isfile(hdfs_model_path):
         model_name = hdfs_model_path
         if constants.DELIMITERS.SLASH_DELIMITER in hdfs_model_path:
