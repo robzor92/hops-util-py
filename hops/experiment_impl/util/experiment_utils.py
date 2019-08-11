@@ -374,6 +374,7 @@ def _attach_experiment_xattr(app_id, run_id, json_data, xattr):
                    app_id + "_" + str(run_id) + "?xattr=" + xattr
 
     resp = util.send_request_with_session('POST', resource_url, data=json_data, headers=headers)
+    print(resource_url)
     print(resp)
 
 def _attach_model_xattr(ml_id, model, xattr):
