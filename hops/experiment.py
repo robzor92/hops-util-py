@@ -29,7 +29,7 @@ experiment_json = None
 running = False
 driver_tensorboard_hdfs_path = None
 
-def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versioned_resources=None, description=None):
+def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
     """
 
     *Experiment* or *Parallel Experiment*
@@ -39,14 +39,32 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
     Example usage:
 
-    >>> from hops import experiment, tensorboard
+    Example usage:
+
+    >>> from hops import experiment
     >>> def train_nn():
-    >>>    pass
-           import tensorflow
-    >>>    logdir = tensorboard.logdir()
-    >>>    # code for preprocessing, training and exporting model
-    >>>    # optionally return a value for the experiment which is registered in Experiments service
+    >>>    # Do all imports in the function
+    >>>    import tensorflow
+    >>>    # Put all code inside the wrapper function
+    >>>    accuracy, loss = network.evaluate(learning_rate, layers, dropout)
     >>> experiment.launch(train_nn)
+
+    Returning multiple outputs, including images and logs:
+
+    >>> from hops import experiment
+    >>> def train_nn():
+    >>>    # Do all imports in the function
+    >>>    import tensorflow
+    >>>    # Put all code inside the wrapper function
+    >>>    from PIL import Image
+    >>>    f = open('logfile.txt', 'w')
+    >>>    f.write('Starting training...')
+    >>>    accuracy, loss = network.evaluate(learning_rate, layers, dropout)
+    >>>    img = Image.new(.....)
+    >>>    img.save('diagram.png')
+    >>>    return {'accuracy': accuracy, 'loss': loss, 'logfile': 'logfile.txt', 'diagram': 'diagram.png'}
+    >>> # Important! Remember: optimization_key must be set when returning multiple outputs
+    >>> experiment.launch(train_nn, optimization_key='accuracy')
 
     Args:
         :map_fun: The function to run
@@ -111,24 +129,46 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
     Example usage:
 
+    Example usage:
+
     >>> from hops import experiment
     >>> boundary_dict = {'learning_rate': [0.1, 0.3], 'layers': [2, 9], 'dropout': [0.1,0.9]}
     >>> def train_nn(learning_rate, layers, dropout):
+    >>>    # Do all imports in the function
     >>>    import tensorflow
-    >>>    # code for preprocessing, training and exporting model
-    >>>    # mandatory return a value for the experiment which is registered in Experiments service
+    >>>    # Put all code inside the wrapper function
     >>>    return network.evaluate(learning_rate, layers, dropout)
-    >>> experiment.random_search(train_nn, boundary_dict, samples=14, direction='max')
+    >>> experiment.differential_evolution(train_nn, boundary_dict, direction='max')
+
+    Returning multiple outputs, including images and logs:
+
+    >>> from hops import experiment
+    >>> boundary_dict = {'learning_rate': [0.1, 0.3], 'layers': [2, 9], 'dropout': [0.1,0.9]}
+    >>> def train_nn(learning_rate, layers, dropout):
+    >>>    # Do all imports in the function
+    >>>    import tensorflow
+    >>>    # Put all code inside the wrapper function
+    >>>    from PIL import Image
+    >>>    f = open('logfile.txt', 'w')
+    >>>    f.write('Starting training...')
+    >>>    accuracy, loss = network.evaluate(learning_rate, layers, dropout)
+    >>>    img = Image.new(.....)
+    >>>    img.save('diagram.png')
+    >>>    return {'accuracy': accuracy, 'loss': loss, 'logfile': 'logfile.txt', 'diagram': 'diagram.png'}
+    >>> # Important! Remember: optimization_key must be set when returning multiple outputs
+    >>> experiment.differential_evolution(train_nn, boundary_dict, direction='max', optimization_key='accuracy')
+
 
     Args:
         :map_fun: The function to run
         :boundary_dict: dict containing hyperparameter name and corresponding boundaries, each experiment randomize a value in the boundary range.
         :direction: If set to 'max' the highest value returned will correspond to the best solution, if set to 'min' the opposite is true
-        :samples: the number of random samples to evaluate for each hyperparameter given the boundaries
+        :samples: the number of random samples to evaluate for each hyperparameter given the boundaries, for example samples=3 would result in 3 hyperparameter combinations to evaluate
         :name: name of the experiment
         :local_logdir: True if *tensorboard.logdir()* should be in the local filesystem, otherwise it is in HDFS
         :versioned_resources: A list of HDFS paths of resources to version with this experiment
         :description: A longer description for the experiment
+        :optimization_key: When returning a dict, the key name of the metric to maximize or minimize in the dict should be set as this value
 
     Returns:
         HDFS path in your project where the experiment is stored
@@ -190,13 +230,29 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
     Example usage:
 
     >>> from hops import experiment
-    >>> boundary_dict = {'learning_rate':[0.01, 0.2], 'dropout': [0.1, 0.9]}
-    >>> def train_nn(learning_rate, dropout):
+    >>> boundary_dict = {'learning_rate': [0.1, 0.3], 'layers': [2, 9], 'dropout': [0.1,0.9]}
+    >>> def train_nn(learning_rate, layers, dropout):
     >>>    import tensorflow
-    >>>    # code for preprocessing, training and exporting model
-    >>>    # mandatory return a value for the experiment which is registered in Experiments service
-    >>>    return network.evaluate(learning_rate, dropout)
+    >>>    return network.evaluate(learning_rate, layers, dropout)
     >>> experiment.differential_evolution(train_nn, boundary_dict, direction='max')
+
+    Returning multiple outputs, including images and logs:
+
+    >>> from hops import experiment
+    >>> boundary_dict = {'learning_rate': [0.1, 0.3], 'layers': [2, 9], 'dropout': [0.1,0.9]}
+    >>> def train_nn(learning_rate, layers, dropout):
+    >>>    # Do all imports in the function
+    >>>    import tensorflow
+    >>>    # Put all code inside the wrapper function
+    >>>    from PIL import Image
+    >>>    f = open('logfile.txt', 'w')
+    >>>    f.write('Starting training...')
+    >>>    accuracy, loss = network.evaluate(learning_rate, layers, dropout)
+    >>>    img = Image.new(.....)
+    >>>    img.save('diagram.png')
+    >>>    return {'accuracy': accuracy, 'loss': loss, 'logfile': 'logfile.txt', 'diagram': 'diagram.png'}
+    >>> # Important! Remember: optimization_key must be set when returning multiple outputs
+    >>> experiment.differential_evolution(train_nn, boundary_dict, direction='max', optimization_key='accuracy')
 
     Args:
         :objective_function: the function to run, must return a metric
@@ -264,27 +320,38 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
     """
     *Parallel Experiment*
 
-    Run multiple experiments and test a grid of hyperparameters for a neural network to maximize e.g. a Neural Network's accuracy.
+    Run grid search evolution to explore a predefined set of hyperparameter combinations.
+    The function is treated as a blackbox that returns a metric for some given hyperparameter combination.
+    The returned metric is used to evaluate how 'good' the hyperparameter combination was.
 
-    The following example will run *train_nn* with 6 different hyperparameter combinations
+    Example usage:
 
     >>> from hops import experiment
-    >>> grid_dict = {'learning_rate':[0.1, 0.3], 'dropout': [0.4, 0.6, 0.1]}
-    >>> def train_nn(learning_rate, dropout):
+    >>> grid_dict = {'learning_rate': [0.1, 0.3], 'layers': [2, 9], 'dropout': [0.1,0.9]}
+    >>> def train_nn(learning_rate, layers, dropout):
+    >>>    # Do all imports in the function
     >>>    import tensorflow
-    >>>    # code for preprocessing, training and exporting model
-    >>>    # mandatory return a value for the experiment which is registered in Experiments service
-    >>>    return network.evaluate(learning_rate, dropout)
+    >>>    # Put all code inside the wrapper function
+    >>>    return network.evaluate(learning_rate, layers, dropout)
     >>> experiment.grid_search(train_nn, grid_dict, direction='max')
 
-    The following values will be injected in the function and run and evaluated.
+    Returning multiple outputs, including images and logs:
 
-        - (learning_rate=0.1, dropout=0.4)
-        - (learning_rate=0.1, dropout=0.6)
-        - (learning_rate=0.1, dropout=0.1)
-        - (learning_rate=0.3, dropout=0.4)
-        - (learning_rate=0.3, dropout=0.6)
-        - (learning_rate=0.3, dropout=0.1)
+    >>> from hops import experiment
+    >>> grid_dict = {'learning_rate': [0.1, 0.3], 'layers': [2, 9], 'dropout': [0.1,0.9]}
+    >>> def train_nn(learning_rate, layers, dropout):
+    >>>    # Do all imports in the function
+    >>>    import tensorflow
+    >>>    # Put all code inside the wrapper function
+    >>>    from PIL import Image
+    >>>    f = open('logfile.txt', 'w')
+    >>>    f.write('Starting training...')
+    >>>    accuracy, loss = network.evaluate(learning_rate, layers, dropout)
+    >>>    img = Image.new(.....)
+    >>>    img.save('diagram.png')
+    >>>    return {'accuracy': accuracy, 'loss': loss, 'logfile': 'logfile.txt', 'diagram': 'diagram.png'}
+    >>> # Important! Remember: optimization_key must be set when returning multiple outputs
+    >>> experiment.grid_search(train_nn, grid_dict, direction='max', optimization_key='accuracy')
 
     Args:
         :map_fun: the function to run, must return a metric
@@ -354,7 +421,9 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
     >>> from hops import experiment
     >>> def distributed_training():
+    >>>    # Do all imports in the function
     >>>    import tensorflow
+    >>>    # Put all code inside the wrapper function
     >>>    from hops import tensorboard
     >>>    from hops import devices
     >>>    logdir = tensorboard.logdir()
@@ -428,7 +497,9 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
     >>> from hops import experiment
     >>> def distributed_training():
+    >>>    # Do all imports in the function
     >>>    import tensorflow
+    >>>    # Put all code inside the wrapper function
     >>>    from hops import tensorboard
     >>>    from hops import devices
     >>>    logdir = tensorboard.logdir()
@@ -497,7 +568,9 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
     >>> from hops import experiment
     >>> def mirrored_training():
+    >>>    # Do all imports in the function
     >>>    import tensorflow
+    >>>    # Put all code inside the wrapper function
     >>>    from hops import tensorboard
     >>>    from hops import devices
     >>>    logdir = tensorboard.logdir()
