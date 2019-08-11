@@ -29,7 +29,7 @@ experiment_json = None
 running = False
 driver_tensorboard_hdfs_path = None
 
-def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
+def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versioned_resources=None, description=None):
     """
 
     *Experiment* or *Parallel Experiment*
@@ -63,8 +63,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
     >>>    img = Image.new(.....)
     >>>    img.save('diagram.png')
     >>>    return {'accuracy': accuracy, 'loss': loss, 'logfile': 'logfile.txt', 'diagram': 'diagram.png'}
-    >>> # Important! Remember: optimization_key must be set when returning multiple outputs
-    >>> experiment.launch(train_nn, optimization_key='accuracy')
+    >>> experiment.launch(train_nn)
 
     Args:
         :map_fun: The function to run
@@ -163,7 +162,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         :map_fun: The function to run
         :boundary_dict: dict containing hyperparameter name and corresponding boundaries, each experiment randomize a value in the boundary range.
         :direction: If set to 'max' the highest value returned will correspond to the best solution, if set to 'min' the opposite is true
-        :samples: the number of random samples to evaluate for each hyperparameter given the boundaries, for example samples=3 would result in 3 hyperparameter combinations to evaluate
+        :samples: the number of random samples to evaluate for each hyperparameter given the boundaries, for example samples=3 would result in 3 hyperparameter combinations in total to evaluate
         :name: name of the experiment
         :local_logdir: True if *tensorboard.logdir()* should be in the local filesystem, otherwise it is in HDFS
         :versioned_resources: A list of HDFS paths of resources to version with this experiment
@@ -475,7 +474,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
         experiment_utils._finalize_experiment(experiment_json, None, retval, app_id, run_id, 'FINISHED', duration, logdir)
 
-        return logdir
+        return logdir, retval
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
@@ -550,7 +549,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
         experiment_utils._finalize_experiment(experiment_json, None, retval, app_id, run_id, 'FINISHED', duration, logdir)
 
-        return logdir
+        return logdir, retval
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
@@ -621,7 +620,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         experiment_utils._finalize_experiment(experiment_json, None, retval, app_id, run_id, 'FINISHED', duration, logdir)
 
-        return logdir
+        return logdir, retval
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
