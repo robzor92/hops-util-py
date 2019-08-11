@@ -211,10 +211,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        #cleanup spark jobs
-        run_id +=1
-        running = False
-        sc.setJobGroup("", "")
+        experiment_utils._end_run(run_id, running, sc)
 
 def differential_evolution(objective_function, boundary_dict, direction = 'max', generations=4, population=6, mutation=0.5, crossover=0.7, cleanup_generations=False, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
     """
@@ -308,10 +305,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        #cleanup spark jobs
-        run_id +=1
-        running = False
-        sc.setJobGroup("", "")
+        experiment_utils._end_run(run_id, running, sc)
 
 def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
     """
@@ -401,10 +395,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        #cleanup spark jobs
-        run_id +=1
-        running = False
-        sc.setJobGroup("", "")
+        experiment_utils._end_run(run_id, running, sc)
 
 def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
     """
@@ -477,10 +468,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        #cleanup spark jobs
-        run_id +=1
-        running = False
-        sc.setJobGroup("", "")
+        experiment_utils._end_run(run_id, running, sc)
 
 def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
     """
@@ -552,10 +540,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        #cleanup spark jobs
-        run_id +=1
-        running = False
-        sc.setJobGroup("", "")
+        experiment_utils._end_run(run_id, running, sc)
 
 def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
     """
