@@ -399,7 +399,7 @@ def _attach_model_xattr(ml_id, model, xattr):
                    ml_id + "?xattr=" + xattr + "&model=" + model
 
     resp = util.send_request_with_session('POST', resource_url)
-
+    print(resource_url)
     print(resp)
 
 def _populate_experiment(model_name, function, type, hp, versioned_resources, description, app_id, direction, optimization_key):
@@ -675,12 +675,3 @@ def _find_index(host_port, cluster_spec):
 
 def _set_ml_id(app_id, run_id):
     os.environ['ML_ID'] = str(app_id) + '_' + str(run_id)
-
-def _start_run(app_id, run_id, running):
-    running = True
-    _set_ml_id(app_id, run_id)
-
-def _end_run(run_id, running, sc):
-    run_id = run_id + 1
-    running = False
-    sc.setJobGroup("", "")

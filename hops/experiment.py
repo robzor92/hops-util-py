@@ -27,7 +27,6 @@ run_id = 1
 app_id = None
 experiment_json = None
 running = False
-driver_tensorboard_hdfs_path = None
 
 def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versioned_resources=None, description=None):
     """
@@ -94,7 +93,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         global run_id
         app_id = str(sc.applicationId)
 
-        experiment_utils._start_run(app_id, run_id, running)
+        _start_run()
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -115,7 +114,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        experiment_utils._end_run(run_id, running, sc)
+        _end_run(sc)
 
 def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
     """
@@ -179,7 +178,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
     global running
     if running:
-        raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
+        raise RuntimeError("An experiment is currently running.")
 
     start = time.time()
     sc = util._find_spark().sparkContext
@@ -189,7 +188,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         global run_id
         app_id = str(sc.applicationId)
 
-        experiment_utils._start_run(app_id, run_id, running)
+        _start_run()
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -211,7 +210,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        experiment_utils._end_run(run_id, running, sc)
+        _end_run(sc)
 
 def differential_evolution(objective_function, boundary_dict, direction = 'max', generations=4, population=6, mutation=0.5, crossover=0.7, cleanup_generations=False, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
     """
@@ -272,7 +271,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
     global running
     if running:
-        raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
+        raise RuntimeError("An experiment is currently running.")
 
     start = time.time()
     sc = util._find_spark().sparkContext
@@ -282,7 +281,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         global run_id
         app_id = str(sc.applicationId)
 
-        experiment_utils._start_run(app_id, run_id, running)
+        _start_run()
 
         diff_evo_impl.run_id = run_id
 
@@ -305,7 +304,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        experiment_utils._end_run(run_id, running, sc)
+        _end_run(sc)
 
 def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
     """
@@ -363,7 +362,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
     global running
     if running:
-        raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
+        raise RuntimeError("An experiment is currently running.")
 
     start = time.time()
     sc = util._find_spark().sparkContext
@@ -373,7 +372,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         global run_id
         app_id = str(sc.applicationId)
 
-        experiment_utils._start_run(app_id, run_id, running)
+        _start_run()
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -395,7 +394,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        experiment_utils._end_run(run_id, running, sc)
+        _end_run(sc)
 
 def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
     """
@@ -440,7 +439,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
     global running
     if running:
-        raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
+        raise RuntimeError("An experiment is currently running.")
 
     start = time.time()
     sc = util._find_spark().sparkContext
@@ -450,7 +449,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         global run_id
         app_id = str(sc.applicationId)
 
-        experiment_utils._start_run(app_id, run_id, running)
+        _start_run()
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -468,7 +467,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        experiment_utils._end_run(run_id, running, sc)
+        _end_run(sc)
 
 def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
     """
@@ -512,7 +511,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
     global running
     if running:
-        raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
+        raise RuntimeError("An experiment is currently running.")
 
     start = time.time()
     sc = util._find_spark().sparkContext
@@ -522,7 +521,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         global run_id
         app_id = str(sc.applicationId)
 
-        experiment_utils._start_run(app_id, run_id, running)
+        _start_run()
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -540,7 +539,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        experiment_utils._end_run(run_id, running, sc)
+        _end_run(sc)
 
 def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
     """
@@ -576,7 +575,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
     global running
     if running:
-        raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
+        raise RuntimeError("An experiment is currently running.")
 
     num_workers = util.num_executors()
     if evaluator:
@@ -590,7 +589,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         global run_id
         app_id = str(sc.applicationId)
 
-        experiment_utils._start_run(app_id, run_id, running)
+        _start_run()
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -608,7 +607,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
     finally:
-        experiment_utils._end_run(run_id, running, sc)
+        _end_run(sc)
 
 def _exception_handler(duration):
     """
@@ -646,5 +645,20 @@ def _exit_handler():
     except Exception as err:
         print(err)
         pass
+
+def _start_run():
+    global running
+    global app_id
+    global run_id
+    running = True
+    experiment_utils._set_ml_id(app_id, run_id)
+
+def _end_run(sc):
+    global running
+    global app_id
+    global run_id
+    run_id = run_id + 1
+    running = False
+    sc.setJobGroup("", "")
 
 atexit.register(_exit_handler)
