@@ -87,6 +87,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
     start = time.time()
+    sc = util._find_spark().sparkContext
     try:
         global app_id
         global experiment_json
@@ -94,7 +95,6 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         app_id = str(sc.applicationId)
 
         experiment_utils._start_run(app_id, run_id, running)
-        sc = util._find_spark().sparkContext
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -182,6 +182,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
     start = time.time()
+    sc = util._find_spark().sparkContext
     try:
         global app_id
         global experiment_json
@@ -189,7 +190,6 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         app_id = str(sc.applicationId)
 
         experiment_utils._start_run(app_id, run_id, running)
-        sc = util._find_spark().sparkContext
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -278,6 +278,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
     start = time.time()
+    sc = util._find_spark().sparkContext
     try:
         global app_id
         global experiment_json
@@ -285,7 +286,6 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         app_id = str(sc.applicationId)
 
         experiment_utils._start_run(app_id, run_id, running)
-        sc = util._find_spark().sparkContext
 
         diff_evo_impl.run_id = run_id
 
@@ -372,6 +372,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
     start = time.time()
+    sc = util._find_spark().sparkContext
     try:
         global app_id
         global experiment_json
@@ -379,7 +380,6 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         app_id = str(sc.applicationId)
 
         experiment_utils._start_run(app_id, run_id, running)
-        sc = util._find_spark().sparkContext
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -452,6 +452,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
     start = time.time()
+    sc = util._find_spark().sparkContext
     try:
         global app_id
         global experiment_json
@@ -459,7 +460,6 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         app_id = str(sc.applicationId)
 
         experiment_utils._start_run(app_id, run_id, running)
-        sc = util._find_spark().sparkContext
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -527,6 +527,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         raise RuntimeError("An experiment is currently running. Please call experiment.end() to stop it.")
 
     start = time.time()
+    sc = util._find_spark().sparkContext
     try:
         global app_id
         global experiment_json
@@ -534,7 +535,6 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         app_id = str(sc.applicationId)
 
         experiment_utils._start_run(app_id, run_id, running)
-        sc = util._find_spark().sparkContext
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -598,6 +598,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         assert num_workers > 2, "number of workers must be atleast 3 if evaluator role is required"
 
     start = time.time()
+    sc = util._find_spark().sparkContext
     try:
         global app_id
         global experiment_json
@@ -605,7 +606,6 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         app_id = str(sc.applicationId)
 
         experiment_utils._start_run(app_id, run_id, running)
-        sc = util._find_spark().sparkContext
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
