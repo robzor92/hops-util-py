@@ -91,10 +91,10 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         global app_id
         global experiment_json
         global run_id
-        experiment_utils._start_run(app_id, run_id, running)
-
-        sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
+
+        experiment_utils._start_run(app_id, run_id, running)
+        sc = util._find_spark().sparkContext
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -186,12 +186,10 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         global app_id
         global experiment_json
         global run_id
-        running = True
-
-        sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
 
-        r_search_impl.run_id = run_id
+        experiment_utils._start_run(app_id, run_id, running)
+        sc = util._find_spark().sparkContext
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -284,10 +282,10 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
         global app_id
         global experiment_json
         global run_id
-        running = True
-        spark = util._find_spark()
-        sc = spark.sparkContext
         app_id = str(sc.applicationId)
+
+        experiment_utils._start_run(app_id, run_id, running)
+        sc = util._find_spark().sparkContext
 
         diff_evo_impl.run_id = run_id
 
@@ -378,10 +376,10 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         global app_id
         global experiment_json
         global run_id
-        running = True
-
-        sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
+
+        experiment_utils._start_run(app_id, run_id, running)
+        sc = util._find_spark().sparkContext
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -458,10 +456,10 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         global app_id
         global experiment_json
         global run_id
-        running = True
-
-        sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
+
+        experiment_utils._start_run(app_id, run_id, running)
+        sc = util._find_spark().sparkContext
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -533,10 +531,10 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         global app_id
         global experiment_json
         global run_id
-        running = True
-
-        sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
+
+        experiment_utils._start_run(app_id, run_id, running)
+        sc = util._find_spark().sparkContext
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
@@ -604,10 +602,10 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         global app_id
         global experiment_json
         global run_id
-        experiment_utils._start_run(app_id, run_id, running)
-
-        sc = util._find_spark().sparkContext
         app_id = str(sc.applicationId)
+
+        experiment_utils._start_run(app_id, run_id, running)
+        sc = util._find_spark().sparkContext
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
