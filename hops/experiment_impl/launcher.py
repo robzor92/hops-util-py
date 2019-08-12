@@ -51,8 +51,9 @@ def _run(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-name"
     if args_dict == None:
         path_to_return = experiment_utils._get_logdir(app_id, run_id) + '/.return'
         if hdfs.exists(path_to_return):
-            contents = json.loads(hdfs.load(path_to_return))
-            return experiment_utils._get_logdir(app_id, run_id), None, contents
+            return_json = hdfs.load(path_to_return)
+            return_dict = json.loads(return_json)
+            return experiment_utils._get_logdir(app_id, run_id), None, return_dict
     elif num_executions == 1 and not args_dict == None:
         arg_count = six.get_function_code(map_fun).co_argcount
         arg_names = six.get_function_code(map_fun).co_varnames
