@@ -42,10 +42,10 @@ def _run(sc, map_fun, run_id, args_dict, samples, direction='max', local_logdir=
 
         random_values = []
 
-        if type(lower_bound) == int and type(upper_bound) == int:
+        if type(lower_bound) is int and type(upper_bound) is int:
             for i in range(samples):
                 random_values.append(random.randint(lower_bound, upper_bound))
-        elif (type(lower_bound) == float or type(lower_bound) == int) and (type(upper_bound) == float or type(upper_bound) == int):
+        elif (type(lower_bound) is float or type(lower_bound) is int) and (type(upper_bound) is float or type(upper_bound) is int):
             for i in range(samples):
                 random_values.append(random.uniform(lower_bound, upper_bound))
         else:
