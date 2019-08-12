@@ -3,7 +3,7 @@ Simple experiment implementation
 """
 
 from hops.experiment_impl.util import experiment_utils
-from hops import devices, tensorboard
+from hops import devices, tensorboard, hdfs
 
 import pydoop.hdfs
 import threading
@@ -49,7 +49,7 @@ def _run(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-name"
 
     if args_dict == None:
         path_to_return = experiment_utils._get_logdir(app_id, run_id) + '/.return'
-        if hdfs.exists.exists(path_to_return):
+        if hdfs.exists(path_to_return):
             contents = json.loads(hdfs.load(path_to_return))
             return experiment_utils._get_logdir(app_id, run_id), None, json.dumps(contents)
     elif num_executions == 1 and not args_dict == None:
@@ -64,7 +64,7 @@ def _run(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-name"
             arg_count -= 1
             argIndex += 1
         param_string = param_string[:-1]
-        path_to_metric = experiment_utils._get_logdir(app_id, run_id) + '/' + param_string + '/.metric'
+        path_to_metric = experiment_utils._get_logdir(app_id, run_id) + '/' + param_string + '/.return'
         if pydoop.hdfs.path.exists(path_to_metric):
             with pydoop.hdfs.open(path_to_metric, "r") as fi:
                 metric = float(fi.read())
