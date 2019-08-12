@@ -52,7 +52,7 @@ def _run(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-name"
         path_to_return = experiment_utils._get_logdir(app_id, run_id) + '/.return'
         if hdfs.exists(path_to_return):
             contents = json.loads(hdfs.load(path_to_return))
-            return experiment_utils._get_logdir(app_id, run_id), None, json.dumps(contents)
+            return experiment_utils._get_logdir(app_id, run_id), None, contents
     elif num_executions == 1 and not args_dict == None:
         arg_count = six.get_function_code(map_fun).co_argcount
         arg_names = six.get_function_code(map_fun).co_varnames
@@ -66,11 +66,9 @@ def _run(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-name"
             argIndex += 1
         param_string = param_string[:-1]
         path_to_metric = experiment_utils._get_logdir(app_id, run_id) + '/' + param_string + '/.return'
-        if pydoop.hdfs.path.exists(path_to_metric):
-            with pydoop.hdfs.open(path_to_metric, "r") as fi:
-                metric = float(fi.read())
-                fi.close()
-                return experiment_utils._get_logdir(app_id, run_id), param_string, metric
+        if hdfs.exists(path_to_return):
+            contents = json.loads(hdfs.load(path_to_return))
+            return experiment_utils._get_logdir(app_id, run_id), param_string, contents
         else:
             return experiment_utils._get_logdir(app_id, run_id), param_string, None
 
