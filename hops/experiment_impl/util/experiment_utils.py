@@ -566,7 +566,7 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
     min_val = ''
 
     min_return_dict = {}
-    max_return_dict {}
+    max_return_dict = {}
 
     results = []
 
