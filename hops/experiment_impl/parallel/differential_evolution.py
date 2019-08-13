@@ -141,7 +141,7 @@ class DifferentialEvolution:
     _ordered_population_dict = []
     _param_names = []
 
-    def __init__(self, objective_function, parbounds, types, ordered_dict, direction = 'max', generations=10, popsize=10, mutation=0.5, crossover=0.7, name="no-name"):
+    def __init__(self, objective_function, parbounds, types, ordered_dict, direction = 'max', generations=10, population=10, mutation=0.5, crossover=0.7, name="no-name"):
         """
 
         Args:
@@ -151,7 +151,7 @@ class DifferentialEvolution:
             :ordered_dict:
             :direction:
             :generations:
-            :popsize:
+            :population:
             :mutation:
             :crossover:
             :name:
@@ -161,7 +161,7 @@ class DifferentialEvolution:
         self.direction = direction
         self.types = types
         self.generations = generations
-        self.n = popsize
+        self.n = population
         self.F = mutation
         self.CR = crossover
         self._ordered_population_dict = ordered_dict
@@ -463,7 +463,7 @@ class DifferentialEvolution:
     def get_dict(self):
         return self._ordered_population_dict
 
-def _run(function, search_dict, direction = 'max', generations=4, popsize=6, mutation=0.5, crossover=0.7, cleanup_generations=False, local_logdir=False, name="no-name", optimization_key=None):
+def _run(function, search_dict, direction = 'max', generations=4, population=6, mutation=0.5, crossover=0.7, cleanup_generations=False, local_logdir=False, name="no-name", optimization_key=None):
     """
 
     Args:
@@ -472,7 +472,7 @@ def _run(function, search_dict, direction = 'max', generations=4, popsize=6, mut
         :search_dict:
         :direction:
         :generations:
-        :popsize:
+        :population:
         :mutation:
         :crossover:
         :cleanup_generations:
@@ -512,7 +512,7 @@ def _run(function, search_dict, direction = 'max', generations=4, popsize=6, mut
             raise ValueError('Boundary list must contain exactly two elements, [lower_bound, upper_bound] for float/int '
                              'or [category1, category2] in the case of strings')
 
-    assert popsize > 3, 'population should be greater than 3'
+    assert population > 3, 'population should be greater than 3'
     assert generations > 1, 'generations should be greater than 1'
 
     argIndex = 0
@@ -543,7 +543,7 @@ def _run(function, search_dict, direction = 'max', generations=4, popsize=6, mut
                                      ordered_dict,
                                      direction=direction,
                                      generations=generations,
-                                     popsize=popsize,
+                                     population=population,
                                      crossover=crossover,
                                      mutation=mutation,
                                      name=name)

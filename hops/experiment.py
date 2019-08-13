@@ -291,7 +291,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
         experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
-        logdir, best_param, best_metric = diff_evo_impl._run(objective_function, boundary_dict, direction=direction, generations=generations, popsize=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name, optimization_key=optimization_key)
+        logdir, best_param, best_metric = diff_evo_impl._run(objective_function, boundary_dict, direction=direction, generations=generations, population=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name, optimization_key=optimization_key)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         experiment_utils._finalize_experiment(experiment_json, best_param, best_metric, app_id, run_id, 'FINISHED', duration, experiment_utils._get_logdir(app_id, run_id))
