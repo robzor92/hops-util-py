@@ -594,6 +594,8 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
 
         path_to_return = hdfs_appid_dir + '/' + param_string + '/.return'
 
+        assert hdfs.exists(path_to_return), 'Could not find .return file on path: {}'.format(path_to_return)
+
         with hdfs.open_file(path_to_return, flags="r") as fi:
             return_dict = json.loads(fi.read())
             fi.close()
