@@ -389,7 +389,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         best_param_dict = experiment_utils._convert_to_dict(best_param)
 
-        return logdir + '/' + best_param, best_param_dict, best_metric
+        return logdir, best_param_dict, best_metric
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
