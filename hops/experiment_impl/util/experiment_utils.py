@@ -598,16 +598,16 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
             return_dict = json.loads(fi.read())
             fi.close()
 
+            metric = float(return_dict[optimization_key])
+
             if first:
                 max_hp = param_string
-                max_val = return_dict[optimization_key]
+                max_val = metric
                 max_return_dict = return_dict
                 min_hp = param_string
-                min_val = return_dict[optimization_key]
+                min_val = metric
                 min_return_dict = return_dict
                 first = False
-
-            metric = float(return_dict[optimization_key])
 
             if metric > max_val:
                 max_val = metric
