@@ -544,7 +544,7 @@ def _on_executor_exit(signame):
             raise Exception('prctl failed with error code %s' % result)
     return set_parent_exit_signal
 
-def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir, optimization_key='metric'):
+def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir, optimization_key):
     """
 
     Args:
@@ -558,6 +558,9 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
     Returns:
 
     """
+
+    if not optimization_key:
+        optimization_key = 'metric'
 
     max_hp = ''
     max_val = ''
