@@ -382,14 +382,14 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         grid_params = experiment_utils.grid_params(args_dict)
 
-        logdir, best_param, best_metric = grid_search_impl._run(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name, optimization_key=optimization_key)
+        logdir, best_param, best_metric, return_dict = grid_search_impl._run(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name, optimization_key=optimization_key)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         experiment_utils._finalize_experiment(experiment_json, best_param, best_metric, app_id, run_id, 'FINISHED', duration, experiment_utils._get_logdir(app_id, run_id))
 
         best_param_dict = experiment_utils._convert_to_dict(best_param)
 
-        return logdir, best_param_dict, best_metric
+        return logdir, best_param_dict, return_dict
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise

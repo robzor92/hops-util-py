@@ -56,18 +56,21 @@ def _run(sc, map_fun, run_id, args_dict, direction='max', local_logdir=False, na
 
     param_combination = ""
     best_val = ""
+    return_dict = {}
 
     if direction == 'max':
-        param_combination = max_return_dict
+        param_combination = max_hp
         best_val = str(max_val)
+        return_dict = max_return_dict
     elif direction == 'min':
-        param_combination = min_return_dict
+        param_combination = max_hp
         best_val = str(min_val)
-
+        return_dict
+        return_dict = min_return_dict
 
     print('Finished Experiment \n')
 
-    return hdfs_dir + '/' + param_combination, param_combination, best_val
+    return hdfs_dir + '/' + param_combination, param_combination, best_val, return_dict
 
 def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir, optimization_key):
     """
