@@ -607,7 +607,7 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
                 min_return_dict = return_dict
                 first = False
 
-            metric = return_dict[optimization_key]
+            metric = float(return_dict[optimization_key])
 
             if metric > max_val:
                 max_val = metric
