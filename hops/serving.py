@@ -428,7 +428,9 @@ def export(model_path, model_name, model_version=1, overwrite=False):
     else:
         export_dir=_export_hdfs_model(model_path, model_dir_hdfs, overwrite)
 
-    experiment_utils._attach_model_xattr(os.environ['ML_ID'], str(model_name) + '_' + str(model_version), 'CREATE')
+    # Attach modelName_modelVersion to experiment directory
+    if 'ML_ID' in os.environ:
+        experiment_utils._attach_model_xattr(os.environ['ML_ID'], str(model_name) + '_' + str(model_version), 'CREATE')
 
 
 def _export_local_model(local_model_path, model_dir_hdfs, overwrite):
