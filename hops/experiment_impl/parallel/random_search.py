@@ -76,9 +76,8 @@ def _run(sc, map_fun, run_id, args_dict, samples, direction='max', local_logdir=
         best_val = str(max_val)
         return_dict = max_return_dict
     elif direction == 'min':
-        param_combination = max_hp
+        param_combination = min_hp
         best_val = str(min_val)
-        return_dict
         return_dict = min_return_dict
 
     print('Finished Experiment \n')
