@@ -65,7 +65,7 @@ def _run(sc, map_fun, run_id, args_dict, samples, direction='max', local_logdir=
     arg_names = six.get_function_code(map_fun).co_varnames
     exp_dir = experiment_utils._get_logdir(app_id, run_id)
 
-    max_val, max_hp, min_val, min_hp, avg, max_return_dict, min_return_dict = experiment_utils._get_best(args_dict, new_samples, arg_names, arg_count, exp_dir, optimization_key)
+    max_val, max_hp, min_val, min_hp, avg, max_return_dict, min_return_dict = experiment_utils._get_best(random_dict, new_samples, arg_names, arg_count, exp_dir, optimization_key)
 
     param_combination = ""
     best_val = ""
