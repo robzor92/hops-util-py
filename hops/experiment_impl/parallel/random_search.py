@@ -65,21 +65,25 @@ def _run(sc, map_fun, run_id, args_dict, samples, direction='max', local_logdir=
     arg_names = six.get_function_code(map_fun).co_varnames
     exp_dir = experiment_utils._get_logdir(app_id, run_id)
 
-    max_val, max_hp, min_val, min_hp, avg = experiment_utils._get_best(random_dict, new_samples, arg_names, arg_count, exp_dir)
+    max_val, max_hp, min_val, min_hp, avg, max_return_dict, min_return_dict = experiment_utils._get_best(args_dict, num_executions, arg_names, arg_count, hdfs_dir, optimization_key)
 
     param_combination = ""
     best_val = ""
+    return_dict = {}
 
     if direction == 'max':
         param_combination = max_hp
         best_val = str(max_val)
+        return_dict = max_return_dict
     elif direction == 'min':
-        param_combination = min_hp
+        param_combination = max_hp
         best_val = str(min_val)
+        return_dict
+        return_dict = min_return_dict
 
     print('Finished Experiment \n')
 
-    return exp_dir + '/' + param_combination, param_combination, best_val
+    return exp_dir + '/' + param_combination, param_combination, best_val, return_dict
 
 def _remove_duplicates(random_dict, samples):
     hp_names = random_dict.keys()

@@ -198,14 +198,14 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
-        logdir, best_param, best_metric = r_search_impl._run(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir, optimization_key=optimization_key)
+        logdir, best_param, best_metric, return_dict = r_search_impl._run(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir, optimization_key=optimization_key)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         experiment_utils._finalize_experiment(experiment_json, best_param, best_metric, app_id, run_id, 'FINISHED', duration, experiment_utils._get_logdir(app_id, run_id))
 
         best_param_dict = experiment_utils._convert_to_dict(best_param)
 
-        return logdir, best_param_dict, best_metric
+        return logdir, best_param_dict, return_dict
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise

@@ -50,9 +50,9 @@ def _run(sc, map_fun, run_id, args_dict, direction='max', local_logdir=False, na
 
     arg_count = six.get_function_code(map_fun).co_argcount
     arg_names = six.get_function_code(map_fun).co_varnames
-    hdfs_dir = experiment_utils._get_logdir(app_id, run_id)
+    exp_dir = experiment_utils._get_logdir(app_id, run_id)
 
-    max_val, max_hp, min_val, min_hp, avg, max_return_dict, min_return_dict = experiment_utils._get_best(args_dict, num_executions, arg_names, arg_count, hdfs_dir, optimization_key)
+    max_val, max_hp, min_val, min_hp, avg, max_return_dict, min_return_dict = experiment_utils._get_best(args_dict, num_executions, arg_names, arg_count, exp_dir, optimization_key)
 
     param_combination = ""
     best_val = ""
@@ -70,7 +70,7 @@ def _run(sc, map_fun, run_id, args_dict, direction='max', local_logdir=False, na
 
     print('Finished Experiment \n')
 
-    return hdfs_dir + '/' + param_combination, param_combination, best_val, return_dict
+    return exp_dir + '/' + param_combination, param_combination, best_val, return_dict
 
 def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir, optimization_key):
     """
