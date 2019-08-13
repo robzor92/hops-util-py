@@ -600,7 +600,7 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
 
             # handle case when dict with 1 key is returned
             if optimization_key == 'metric' and len(return_dict.keys()) == 1:
-                optimization_key = return_dict.keys()[0]
+                optimization_key = list(return_dict.keys())[0]
 
             metric = float(return_dict[optimization_key])
 
