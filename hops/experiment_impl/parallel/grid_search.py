@@ -52,7 +52,7 @@ def _run(sc, map_fun, run_id, args_dict, direction='max', local_logdir=False, na
     arg_names = six.get_function_code(map_fun).co_varnames
     hdfs_dir = experiment_utils._get_logdir(app_id, run_id)
 
-    max_val, max_hp, min_val, min_hp, avg = experiment_utils._get_best(args_dict, num_executions, arg_names, arg_count, hdfs_dir)
+    max_val, max_hp, min_val, min_hp, avg = experiment_utils._get_best(args_dict, num_executions, arg_names, arg_count, hdfs_dir, optimization_key)
 
     param_combination = ""
     best_val = ""
@@ -68,26 +68,6 @@ def _run(sc, map_fun, run_id, args_dict, direction='max', local_logdir=False, na
     print('Finished Experiment \n')
 
     return hdfs_dir + '/' + param_combination, param_combination, best_val
-
-def _write_result(runid_dir, string):
-    """
-
-    Args:
-        runid_dir:
-        string:
-
-    Returns:
-
-    """
-    metric_file = runid_dir + '/summary'
-    fs_handle = hopshdfs.get_fs()
-    try:
-        fd = fs_handle.open_file(metric_file, mode='w')
-    except:
-        fd = fs_handle.open_file(metric_file, flags='w')
-    fd.write(string.encode())
-    fd.flush()
-    fd.close()
 
 def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir, optimization_key):
     """

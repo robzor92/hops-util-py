@@ -544,7 +544,7 @@ def _on_executor_exit(signame):
             raise Exception('prctl failed with error code %s' % result)
     return set_parent_exit_signal
 
-def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir):
+def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir, optimization_key):
     """
 
     Args:
@@ -586,28 +586,28 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir)
 
         param_string = param_string[:-1]
 
-        path_to_metric = hdfs_appid_dir + '/' + param_string + '/.metric'
+        path_to_metric = hdfs_appid_dir + '/' + param_string + '/.return'
 
         with hdfs.open_file(path_to_metric, flags="r") as fi:
-            metric = float(fi.read())
+            return_dict = float(fi.read())
             fi.close()
 
             if first:
                 max_hp = param_string
-                max_val = metric
+                max_val = return_dict
                 min_hp = param_string
-                min_val = metric
+                min_val = return_dict
                 first = False
 
             if metric > max_val:
-                max_val = metric
+                max_val = return_dict
                 max_hp = param_string
             if metric <  min_val:
-                min_val = metric
+                min_val = return_dict
                 min_hp = param_string
 
 
-        results.append(metric)
+        results.append(return_dict[optimization_key])
 
     avg = sum(results)/float(len(results))
 
