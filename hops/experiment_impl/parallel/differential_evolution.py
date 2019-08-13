@@ -558,11 +558,11 @@ def _run(function, search_dict, direction = 'max', generations=4, population=6, 
         param_string = param_string + hp + '&'
     param_string = param_string[:-1]
 
-    best_exp_logdir = _get_best_logdir(str(root_dir), direction)
+    best_exp_logdir, return_dict = _get_best(str(root_dir), direction)
 
     print('Finished Experiment \n')
 
-    return best_exp_logdir, param_string, best_metric
+    return best_exp_logdir, param_string, best_metric, return_dict
 
 def _evolutionary_launch(spark, map_fun, args_dict, name="no-name"):
     """ Run the wrapper function with each hyperparameter combination as specified by the dictionary
@@ -702,7 +702,7 @@ def _get_return_file(param_string, app_id, generation_id, run_id):
 
     return None
 
-def _get_best_logdir(root_logdir, direction):
+def _get_best(root_logdir, direction):
 
     min_val = sys.float_info.max
     min_logdir = None
@@ -727,10 +727,20 @@ def _get_best_logdir(root_logdir, direction):
                         min_val = val
                         min_logdir = file[:-8]
 
+
+
     if direction == 'max':
-        return max_logdir
+        return_dict = {}
+        with hdfs.open_file(max_logdir + '/.return', flags="r") as fi:
+            return_dict = json.loads(fi.read())
+            fi.close()
+        return max_logdir, return_dict
     else:
-        return min_logdir
+        return_dict = {}
+        with hdfs.open_file(min_logdir + '/.return', flags="r") as fi:
+            return_dict = json.loads(fi.read())
+            fi.close()
+        return min_logdir, return_dict
 
 
 
