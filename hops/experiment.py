@@ -205,7 +205,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         best_param_dict = experiment_utils._convert_to_dict(best_param)
 
-        return logdir + '/' + best_param, best_param_dict, best_metric
+        return logdir, best_param_dict, best_metric
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
@@ -298,7 +298,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
         best_param_dict = experiment_utils._convert_to_dict(best_param)
 
-        return logdir + '/' + best_param, best_param_dict, best_metric
+        return logdir, best_param_dict, best_metric
 
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
