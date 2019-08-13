@@ -597,7 +597,8 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
         with hdfs.open_file(path_to_return, flags="r") as fi:
             return_dict = json.loads(fi.read())
             fi.close()
-            
+
+            # handle case when dict with 1 key is returned
             if optimization_key == 'metric' and len(return_dict.keys()) == 1:
                 optimization_key = return_dict.keys()[0]
 
