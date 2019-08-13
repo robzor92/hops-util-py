@@ -565,6 +565,9 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
     min_hp = ''
     min_val = ''
 
+    min_return_dict = {}
+    max_return_dict {}
+
     results = []
 
     first = True
@@ -594,24 +597,28 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
 
             if first:
                 max_hp = param_string
-                max_val = return_dict
+                max_val = return_dict[optimization_key]
+                max_return_dict = return_dict
                 min_hp = param_string
-                min_val = return_dict
+                min_val = return_dict[optimization_key]
+                min_return_dict = return_dict
                 first = False
 
             if metric > max_val:
-                max_val = return_dict
+                max_val = return_dict[optimization_key]
                 max_hp = param_string
+                max_return_dict = return_dict
             if metric <  min_val:
-                min_val = return_dict
+                min_val = return_dict[optimization_key]
                 min_hp = param_string
+                min_return_dict = return_dict
 
 
         results.append(return_dict[optimization_key])
 
     avg = sum(results)/float(len(results))
 
-    return max_val, max_hp, min_val, min_hp, avg
+    return max_val, max_hp, min_val, min_hp, avg, max_return_dict, min_return_dict
 
 def _setup_experiment(versioned_resources, logdir, app_id, run_id):
     versioned_path = _version_resources(versioned_resources, logdir)

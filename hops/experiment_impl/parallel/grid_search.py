@@ -52,16 +52,16 @@ def _run(sc, map_fun, run_id, args_dict, direction='max', local_logdir=False, na
     arg_names = six.get_function_code(map_fun).co_varnames
     hdfs_dir = experiment_utils._get_logdir(app_id, run_id)
 
-    max_val, max_hp, min_val, min_hp, avg = experiment_utils._get_best(args_dict, num_executions, arg_names, arg_count, hdfs_dir, optimization_key)
+    max_val, max_hp, min_val, min_hp, avg, max_return_dict, min_return_dict = experiment_utils._get_best(args_dict, num_executions, arg_names, arg_count, hdfs_dir, optimization_key)
 
     param_combination = ""
     best_val = ""
 
     if direction == 'max':
-        param_combination = max_hp
+        param_combination = max_return_dict
         best_val = str(max_val)
     elif direction == 'min':
-        param_combination = min_hp
+        param_combination = min_return_dict
         best_val = str(min_val)
 
 
