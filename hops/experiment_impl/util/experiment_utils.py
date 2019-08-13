@@ -607,17 +607,18 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
                 min_return_dict = return_dict
                 first = False
 
+            metric = return_dict[optimization_key]
+
             if metric > max_val:
-                max_val = return_dict[optimization_key]
+                max_val = metric
                 max_hp = param_string
                 max_return_dict = return_dict
             if metric <  min_val:
-                min_val = return_dict[optimization_key]
+                min_val = metric
                 min_hp = param_string
                 min_return_dict = return_dict
 
-
-        results.append(return_dict[optimization_key])
+        results.append(metric)
 
     avg = sum(results)/float(len(results))
 
