@@ -589,7 +589,7 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
         path_to_metric = hdfs_appid_dir + '/' + param_string + '/.return'
 
         with hdfs.open_file(path_to_metric, flags="r") as fi:
-            return_dict = float(fi.read())
+            return_dict = fi.read()
             fi.close()
 
             if first:
