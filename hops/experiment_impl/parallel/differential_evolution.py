@@ -731,13 +731,13 @@ def _get_best(root_logdir, direction):
 
     if direction == 'max':
         return_dict = {}
-        with hdfs.open_file(max_logdir + '/.return', flags="r") as fi:
+        with hopshdfs.open_file(max_logdir + '/.return', flags="r") as fi:
             return_dict = json.loads(fi.read())
             fi.close()
         return max_logdir, return_dict
     else:
         return_dict = {}
-        with hdfs.open_file(min_logdir + '/.return', flags="r") as fi:
+        with hopshdfs.open_file(min_logdir + '/.return', flags="r") as fi:
             return_dict = json.loads(fi.read())
             fi.close()
         return min_logdir, return_dict
