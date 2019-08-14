@@ -33,6 +33,10 @@ def _run(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=Fals
 
     num_executions = util.num_executors()
 
+    # This is needed to keep PS from blocking due to evaluator not returning
+    if evaluator:
+        num_executions = num_executions - 1
+
     #Each TF task should be run on 1 executor
     nodeRDD = sc.parallelize(range(num_executions), num_executions)
 
@@ -40,6 +44,7 @@ def _run(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=Fals
     sc.setJobGroup("ParameterServerStrategy", "{} | Distributed Training".format(name))
 
     server = parameter_server_reservation.Server(num_executions)
+
     server_addr = server.start()
 
     num_ps = util.num_param_servers()
