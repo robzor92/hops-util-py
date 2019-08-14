@@ -50,16 +50,16 @@ def _run(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=Fals
 
     logdir = experiment_utils._get_logdir(app_id, run_id)
 
+    print('Finished Experiment \n')
+
     path_to_return = logdir + '/.return'
     if pydoop.hdfs.path.exists(path_to_return):
         with pydoop.hdfs.open(path_to_return, "r") as fi:
-            metric = float(fi.read())
+            contents = fi.read()
             fi.close()
-            return metric, logdir
+            return logdir, json.loads(contents)
 
-    print('Finished Experiment \n')
-
-    return None, logdir
+    return logdir, None
 
 def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, evaluator):
     """
