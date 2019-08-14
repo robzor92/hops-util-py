@@ -478,7 +478,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         logdir, return_dict = allreduce_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        experiment_utils._finalize_experiment(experiment_json, retval, app_id, run_id, 'FINISHED', duration, logdir)
+        experiment_utils._finalize_experiment(experiment_json, None, app_id, run_id, 'FINISHED', duration, logdir)
 
         return logdir, return_dict
     except:
@@ -550,7 +550,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         logdir, return_dict = ps_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        experiment_utils._finalize_experiment(experiment_json, retval, app_id, run_id, 'FINISHED', duration, logdir)
+        experiment_utils._finalize_experiment(experiment_json, None, app_id, run_id, 'FINISHED', duration, logdir)
 
         return logdir, return_dict
     except:
@@ -618,7 +618,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         logdir, return_dict = mirrored_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        experiment_utils._finalize_experiment(experiment_json, retval, app_id, run_id, 'FINISHED', duration, logdir)
+        experiment_utils._finalize_experiment(experiment_json, None, app_id, run_id, 'FINISHED', duration, logdir)
 
         return logdir, return_dict
     except:
