@@ -105,11 +105,11 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
         experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
-        logdir, hp, metric = launcher._run(sc, map_fun, run_id, args_dict, local_logdir)
+        logdir, return_dict = launcher._run(sc, map_fun, run_id, args_dict, local_logdir)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         experiment_utils._finalize_experiment(experiment_json, hp, metric, app_id, run_id, 'FINISHED', duration, logdir)
-        return logdir, hp, metric
+        return logdir, return_dict
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
