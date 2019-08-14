@@ -475,12 +475,12 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
         experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
-        retval, logdir = allreduce_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
+        logdir, return_dict = allreduce_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         experiment_utils._finalize_experiment(experiment_json, retval, app_id, run_id, 'FINISHED', duration, logdir)
 
-        return logdir, retval
+        return logdir, return_dict
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
@@ -547,12 +547,12 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
         experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
-        retval, logdir = ps_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
+        logdir, return_dict = ps_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         experiment_utils._finalize_experiment(experiment_json, retval, app_id, run_id, 'FINISHED', duration, logdir)
 
-        return logdir, retval
+        return logdir, return_dict
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
@@ -615,12 +615,12 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
-        retval, logdir = mirrored_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
+        logdir, return_dict = mirrored_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
         experiment_utils._finalize_experiment(experiment_json, retval, app_id, run_id, 'FINISHED', duration, logdir)
 
-        return logdir, retval
+        return logdir, return_dict
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
         raise
