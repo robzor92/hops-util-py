@@ -36,10 +36,6 @@ def _run(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=Fals
     #Each TF task should be run on 1 executor
     nodeRDD = sc.parallelize(range(num_executions), num_executions)
 
-    # This is needed to keep PS from blocking due to evaluator not returning
-    if evaluator:
-        num_executions = num_executions - 1
-
     #Make SparkUI intuitive by grouping jobs
     sc.setJobGroup("ParameterServerStrategy", "{} | Distributed Training".format(name))
 
@@ -54,9 +50,9 @@ def _run(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=Fals
 
     logdir = experiment_utils._get_logdir(app_id, run_id)
 
-    path_to_metric = logdir + '/.metric'
-    if pydoop.hdfs.path.exists(path_to_metric):
-        with pydoop.hdfs.open(path_to_metric, "r") as fi:
+    path_to_return = logdir + '/.return'
+    if pydoop.hdfs.path.exists(path_to_return):
+        with pydoop.hdfs.open(path_to_return, "r") as fi:
             metric = float(fi.read())
             fi.close()
             return metric, logdir
@@ -174,7 +170,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
         except:
             raise
         finally:
-            if role == "worker" or role == "chief":
+            if role == "worker" or role == "chief" or role == "evaluator":
                 client.register_worker_finished()
             client.close()
             if role == "chief":
