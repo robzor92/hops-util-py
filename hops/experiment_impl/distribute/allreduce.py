@@ -142,9 +142,10 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
             task_start = time.time()
 
             retval = map_fun()
-            if is_chief:
-                if retval:
-                    experiment_utils._handle_return_simple(retval, logdir)
+
+            if retval:
+                experiment_utils._handle_return_simple(retval, logdir)
+
             task_end = time.time()
             time_str = 'Finished task - took ' + experiment_utils._time_diff(task_start, task_end)
             print('\n' + time_str)
