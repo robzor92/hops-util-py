@@ -190,9 +190,15 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         _start_run()
 
+        readable_optimization_key = None
+        if not optimization_key:
+            readable_optimization_key = 'metric'
+        else:
+            readable_optimization_key = optimization_key
+
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = experiment_utils._populate_experiment(name, 'random_search', 'PARALLEL_EXPERIMENTS', json.dumps(boundary_dict), versioned_path, description, app_id, direction, optimization_key)
+        experiment_json = experiment_utils._populate_experiment(name, 'random_search', 'PARALLEL_EXPERIMENTS', json.dumps(boundary_dict), versioned_path, description, app_id, direction, readable_optimization_key)
 
         experiment_utils._version_resources(versioned_resources, experiment_utils._get_logdir(app_id, run_id))
 
@@ -283,11 +289,17 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
         _start_run()
 
+        readable_optimization_key = None
+        if not optimization_key:
+            readable_optimization_key = 'metric'
+        else:
+            readable_optimization_key = optimization_key
+
         diff_evo_impl.run_id = run_id
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = experiment_utils._populate_experiment(name, 'differential_evolution', 'PARALLEL_EXPERIMENTS', json.dumps(boundary_dict), versioned_path, description, app_id, direction, optimization_key)
+        experiment_json = experiment_utils._populate_experiment(name, 'differential_evolution', 'PARALLEL_EXPERIMENTS', json.dumps(boundary_dict), versioned_path, description, app_id, direction, readable_optimization_key)
 
         experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
@@ -374,9 +386,15 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         _start_run()
 
+        readable_optimization_key = None
+        if not optimization_key:
+            readable_optimization_key = 'metric'
+        else:
+            readable_optimization_key = optimization_key
+
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = experiment_utils._populate_experiment(name, 'grid_search', 'PARALLEL_EXPERIMENTS', json.dumps(args_dict), versioned_path, description, None, direction, optimization_key)
+        experiment_json = experiment_utils._populate_experiment(name, 'grid_search', 'PARALLEL_EXPERIMENTS', json.dumps(args_dict), versioned_path, description, app_id, direction, readable_optimization_key)
 
         experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
