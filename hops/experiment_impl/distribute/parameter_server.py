@@ -126,14 +126,15 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
 
             evaluator_node = None
             if evaluator:
-                evaluator_node = cluster_spec["cluster"]["worker"][0]
+                last_worker_index = len(cluster_spec["cluster"]["worker"])-1
+                evaluator_node = cluster_spec["cluster"]["worker"][last_worker_index]
                 cluster_spec["cluster"]["evaluator"] = [evaluator_node]
-                del cluster_spec["cluster"]["worker"][0]
+                del cluster_spec["cluster"]["worker"][last_worker_index]
                 if evaluator_node == host_port:
                     role = "evaluator"
                     cluster_spec["task"] = {"type": "evaluator", "index": 0}
 
-            print('TF_CONFIG: {} '.format(cluster))
+            print('TF_CONFIG: {} '.format(cluster_spec))
             os.environ["TF_CONFIG"] = json.dumps(cluster_spec)
 
             if role == "chief":
