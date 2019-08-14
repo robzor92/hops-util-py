@@ -142,7 +142,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
             task_start = time.time()
 
             retval = map_fun()
-            if retval:
+            if retval and is_chief:
                 experiment_utils._handle_return_simple(retval, experiment_utils._get_logdir(app_id, run_id))
 
             task_end = time.time()
