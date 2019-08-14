@@ -33,12 +33,12 @@ def _run(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=Fals
 
     num_executions = util.num_executors()
 
+    #Each TF task should be run on 1 executor
+    nodeRDD = sc.parallelize(range(num_executions), num_executions)
+
     # This is needed to keep PS from blocking due to evaluator not returning
     if evaluator:
         num_executions = num_executions - 1
-
-    #Each TF task should be run on 1 executor
-    nodeRDD = sc.parallelize(range(num_executions), num_executions)
 
     #Make SparkUI intuitive by grouping jobs
     sc.setJobGroup("ParameterServerStrategy", "{} | Distributed Training".format(name))
