@@ -114,9 +114,10 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
 
             evaluator_node = None
             if evaluator:
-                evaluator_node = cluster["cluster"]["worker"][0]
+                last_worker_index = len(cluster["cluster"]["worker"])-1
+                evaluator_node = cluster["cluster"]["worker"][last_worker_index]
                 cluster["cluster"]["evaluator"] = [evaluator_node]
-                del cluster["cluster"]["worker"][0]
+                del cluster["cluster"]["worker"][last_worker_index]
                 if evaluator_node == host_port:
                     cluster["task"] = {"type": "evaluator", "index": 0}
 
