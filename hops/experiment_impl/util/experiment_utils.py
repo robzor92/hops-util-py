@@ -636,7 +636,7 @@ def _setup_experiment(versioned_resources, logdir, app_id, run_id):
     hdfs.mkdir(_get_logdir(app_id, run_id))
     return versioned_path
 
-def _finalize_experiment(experiment_json, hp, metric, app_id, run_id, state, duration, logdir):
+def _finalize_experiment(experiment_json, metric, app_id, run_id, state, duration, logdir):
 
     outputs = _build_summary_json(logdir)
 
