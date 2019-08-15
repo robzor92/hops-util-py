@@ -28,7 +28,7 @@ app_id = None
 experiment_json = None
 running = False
 
-def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versioned_resources=None, description=None):
+def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versioned_resources=None, description=None, metric_key=None):
     """
 
     *Experiment* or *Parallel Experiment*
@@ -107,6 +107,8 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
         logdir, return_dict = launcher._run(sc, map_fun, run_id, args_dict, local_logdir)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
+
+        metric = experiment_utils._get_metric(metric_key, return_dict)
 
         experiment_utils._finalize_experiment(experiment_json, metric, app_id, run_id, 'FINISHED', duration, logdir)
         return logdir, return_dict

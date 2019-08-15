@@ -693,3 +693,11 @@ def _find_index(host_port, cluster_spec):
 
 def _set_ml_id(app_id, run_id):
     os.environ['ML_ID'] = str(app_id) + '_' + str(run_id)
+
+def _get_metric(return_dict, metric_key):
+    if return_dict:
+        assert metric_key in return_dict.keys(), 'Supplied metric_key {} is not in returned dict {}'.format(metric_key, return_dict)
+        return str(return_dict[metric_key])
+    else
+        return None
+
