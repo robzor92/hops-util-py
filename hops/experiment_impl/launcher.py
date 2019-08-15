@@ -115,8 +115,8 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                     argcount -= 1
                     argIndex += 1
                 param_string = param_string[:-1]
-                tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_exec_logdir, executor_num, local_logdir=local_logdir)
-
+                hdfs_exec_logdir, hdfs_appid_logdir = experiment_utils._create_experiment_subdirectories(app_id, run_id, param_string, 'grid_search')
+                tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
                 print(gpu_str)
                 print('-------------------------------------------------------')
