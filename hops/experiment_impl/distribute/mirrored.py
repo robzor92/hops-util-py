@@ -85,6 +85,8 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
         for i in iter:
             executor_num = i
 
+        experiment_utils._set_ml_id(app_id, run_id)
+
         t = threading.Thread(target=devices._print_periodic_gpu_utilization)
         if devices.get_num_gpus() > 0:
             t.start()

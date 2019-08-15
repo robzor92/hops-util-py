@@ -626,7 +626,8 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
         for i in iter:
             executor_num = i
 
-        tb_pid = 0
+        experiment_utils._set_ml_id(app_id, run_id)
+
         tb_hdfs_path = ''
         hdfs_exec_logdir = ''
 
