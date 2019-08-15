@@ -698,6 +698,6 @@ def _get_metric(return_dict, metric_key):
     if return_dict:
         assert metric_key in return_dict.keys(), 'Supplied metric_key {} is not in returned dict {}'.format(metric_key, return_dict)
         return str(return_dict[metric_key])
-    else
+    else:
         return None
 
