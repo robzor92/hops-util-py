@@ -137,7 +137,7 @@ def _handle_return_simple(retval, hdfs_exec_logdir):
     # Validation
     if type(retval) is not dict:
         try:
-            metric = int(retval)
+            _validate_optimization_value(retval)
             retval = {'metric': retval}
         except:
             raise ValueError('Metric to maximize or minimize is not a number: {}'.format(retval))
