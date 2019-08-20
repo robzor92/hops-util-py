@@ -143,6 +143,9 @@ def _handle_return_simple(retval, hdfs_exec_logdir):
             raise ValueError('Metric to maximize or minimize is not a number: {}'.format(retval))
 
     return_file = hdfs_exec_logdir + '/.return'
+    for key in retval.keys():
+        retval[key] = _cast_number_to_string(retval[key])
+        
     hdfs.dump(json.dumps(retval), return_file)
 
 def _cleanup(local_logdir_bool, local_tb_path, hdfs_exec_logdir, gpu_thread, tb_hdfs_file):
