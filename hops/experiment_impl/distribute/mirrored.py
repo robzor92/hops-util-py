@@ -128,7 +128,8 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
             if num_executors > 1:
                 os.environ["TF_CONFIG"] = json.dumps(cluster)
 
-            is_chief = (task_index == -1 or num_executors == 1) and not evaluator_node == host_port
+            is_chief = (cluster["task"]["type"] == "chief")
+
             is_evaluator = evaluator_node == host_port
 
             if is_chief:
