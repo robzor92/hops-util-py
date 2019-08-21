@@ -207,7 +207,10 @@ def num_executors():
         Number of configured executors for Jupyter
     """
     sc = _find_spark().sparkContext
-    return int(sc._conf.get("spark.dynamicAllocation.maxExecutors"))
+    try:
+        return int(sc._conf.get("spark.dynamicAllocation.maxExecutors"))
+    except:
+        raise RuntimeError('Failed to find spark.dynamicAllocation.maxExecutors property, please select your mode as either Experiment, Parallel Experiments or Distributed Training.')
 
 def num_param_servers():
     """
