@@ -135,6 +135,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
                 logdir = experiment_utils._get_logdir(app_id, run_id)
                 tb_hdfs_path, tb_pid = tensorboard._register(logdir, logdir, executor_num, local_logdir=local_logdir)
             elif is_evaluator:
+                tensorboard._reset_global()
                 logdir = experiment_utils._get_logdir(app_id, run_id)
                 tensorboard.events_logdir = logdir
             else:
