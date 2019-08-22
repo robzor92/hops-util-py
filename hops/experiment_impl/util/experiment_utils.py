@@ -422,8 +422,8 @@ def _populate_experiment(model_name, function, type, hp, versioned_resources, de
 
     """
     jobName=None
-    if constants.JOB_NAME_ENV_VAR in os.environ:
-        jobName = os.environ[constants.JOB_NAME_ENV_VAR]
+    if constants.ENV_VARIABLES.JOB_NAME_ENV_VAR in os.environ:
+        jobName = os.environ[constants.ENV_VARIABLES.JOB_NAME_ENV_VAR]
 
     return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type,
                        'appId': app_id, 'direction': direction, 'optimizationKey': optimization_key, 'jobName': jobName})
