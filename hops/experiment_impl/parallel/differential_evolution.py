@@ -713,7 +713,7 @@ def _get_best(root_logdir, direction):
 
     generation_folders = hopshdfs.ls(root_logdir)
     generation_folders.sort()
-    raise Exception(generation_folders)
+
     for generation in generation_folders:
         for individual in hopshdfs.ls(generation):
             invidual_files = hopshdfs.ls(individual, recursive=True)
