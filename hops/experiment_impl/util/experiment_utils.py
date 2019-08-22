@@ -421,8 +421,12 @@ def _populate_experiment(model_name, function, type, hp, versioned_resources, de
     Returns:
 
     """
+    jobName=None
+    if constants.JOB_NAME_ENV_VAR in os.environ:
+        jobName = os.environ[constants.JOB_NAME_ENV_VAR]
+
     return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type,
-                       'appId': app_id, 'direction': direction, 'optimizationKey': optimization_key})
+                       'appId': app_id, 'direction': direction, 'optimizationKey': optimization_key, 'jobName': jobName})
 
 def _finalize_experiment_json(experiment_json, metric, state, duration):
     """
