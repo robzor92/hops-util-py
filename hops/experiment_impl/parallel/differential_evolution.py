@@ -722,10 +722,14 @@ def _get_best(root_logdir, direction):
                     val = hopshdfs.load(file)
                     val = float(val)
 
+                    print(file)
+
                     if val > max_val:
+                        print('updating max val {} to {} '.format(max_val, val)
                         max_val = val
                         max_logdir = file[:-8]
                     elif val < min_val:
+                        print('updating min val {} to {} '.format(min_val, val)
                         min_val = val
                         min_logdir = file[:-8]
 
