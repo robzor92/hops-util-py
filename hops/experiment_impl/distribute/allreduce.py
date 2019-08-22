@@ -129,7 +129,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
 
             is_chief = (cluster["task"]["type"] == "chief")
 
-            is_evaluator = evaluator_node == host_port
+            is_evaluator = (cluster["task"]["type"] == "evaluator")
 
             if is_chief:
                 logdir = experiment_utils._get_logdir(app_id, run_id)
@@ -137,6 +137,8 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
             elif is_evaluator:
                 logdir = experiment_utils._get_logdir(app_id, run_id)
                 tensorboard.events_logdir = logdir
+            else:
+                tensorboard._reset_global()
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
 
             print(gpu_str)
