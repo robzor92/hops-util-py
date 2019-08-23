@@ -445,7 +445,7 @@ def _populate_experiment(model_name, function, type, hp, versioned_resources, de
     return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type,
                        'appId': app_id, 'direction': direction, 'optimizationKey': optimization_key, 'jobName': jobName})
 
-def _finalize_experiment_json(experiment_json, metric, state, duration):
+def _finalize_experiment_json(experiment_json, metric, state, duration, bestLogdir):
     """
     Args:
         :experiment_json:
@@ -456,6 +456,7 @@ def _finalize_experiment_json(experiment_json, metric, state, duration):
 
     """
     experiment_json = json.loads(experiment_json)
+    experiment_json['bestDir'] = bestLogdir[len(hdfs.project_path()):]
     experiment_json['metric'] = metric
     experiment_json['state'] = state
     experiment_json['duration'] = duration
@@ -660,14 +661,14 @@ def _setup_experiment(versioned_resources, logdir, app_id, run_id):
     hdfs.mkdir(_get_logdir(app_id, run_id))
     return versioned_path
 
-def _finalize_experiment(experiment_json, metric, app_id, run_id, state, duration, logdir):
+def _finalize_experiment(experiment_json, metric, app_id, run_id, state, duration, logdir, bestLogdir):
 
     outputs = _build_summary_json(logdir)
 
     if outputs:
         hdfs.dump(outputs, logdir + '/.summary')
 
-    experiment_json = _finalize_experiment_json(experiment_json, metric, state, duration)
+    experiment_json = _finalize_experiment_json(experiment_json, metric, state, duration, bestLogdir)
 
     _attach_experiment_xattr(app_id, run_id, experiment_json, 'REPLACE')
 

@@ -39,7 +39,7 @@ def _register(hdfs_exec_dir, endpoint_dir, exec_num, local_logdir=False):
     global tb_pid
 
     if tb_pid != 0:
-        subprocess.Popen(["kill", str(tb_pid)])
+        subprocess.Popen(["kill", "-9", str(tb_pid)])
 
     _reset_global()
 
