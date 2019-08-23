@@ -9,6 +9,7 @@ import itertools
 import socket
 import json
 import shutil
+import subprocess
 
 from hops import constants
 from hops import devices
