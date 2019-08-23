@@ -145,11 +145,8 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
                 logdir = experiment_utils._get_logdir(app_id, run_id)
                 tb_hdfs_path, tb_pid = tensorboard._register(logdir, logdir, executor_num, local_logdir=local_logdir)
             elif role == "evaluator":
-                tensorboard._reset_global()
                 logdir = experiment_utils._get_logdir(app_id, run_id)
                 tensorboard.events_logdir = logdir
-            else:
-                tensorboard._reset_global()
                 
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
             print(gpu_str)
@@ -175,10 +172,8 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
         except:
             raise
         finally:
-            if role == "worker" or role == "chief" or role == "evaluator":
+            if role != "ps":
                 client.register_worker_finished()
             client.close()
-            if role == "chief":
-                experiment_utils._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, logdir, t, tb_hdfs_path)
-
+            experiment_utils._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, logdir, t, tb_hdfs_path)
     return _wrapper_fun
