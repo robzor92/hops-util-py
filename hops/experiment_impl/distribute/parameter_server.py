@@ -177,5 +177,5 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
             if role != "ps":
                 client.register_worker_finished()
             client.close()
-            experiment_utils._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, logdir, t, tb_hdfs_path)
+            experiment_utils._cleanup(tensorboard, t)
     return _wrapper_fun

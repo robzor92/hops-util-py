@@ -677,7 +677,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
         except:
             raise
         finally:
-            experiment_utils._cleanup(tensorboard.local_logdir_bool, tensorboard.local_logdir_path, hdfs_exec_logdir, t, tb_hdfs_path)
+            experiment_utils._cleanup(tensorboard, t)
 
     return _wrapper_fun
 
