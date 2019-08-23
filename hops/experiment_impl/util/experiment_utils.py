@@ -151,15 +151,21 @@ def _handle_return_simple(retval, hdfs_exec_logdir):
     hdfs.dump(json.dumps(retval), return_file)
 
 def _cleanup(local_logdir_bool, local_tb_path, hdfs_exec_logdir, gpu_thread, tb_hdfs_file):
+
+    try:
+        if tensorboard.tb_pid != 0:
+            subprocess.Popen(["kill", str(tensorboard.tb_pid)])
+    except:
+        pass
+    finally:
+        tensorboard._reset_global()
+
     try:
         if local_logdir_bool and hdfs_exec_logdir:
             _store_local_tensorboard(local_tb_path, hdfs_exec_logdir)
     except Exception as err:
         print('Exception occurred while uploading local logdir to hdfs: {}'.format(err))
     finally:
-        if devices.get_num_gpus() > 0 and gpu_thread.isAlive():
-            gpu_thread.do_run = False
-            gpu_thread.join(20)
         handle = hdfs.get()
         try:
             if tb_hdfs_file and handle.exists(tb_hdfs_file):
