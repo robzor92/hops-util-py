@@ -110,7 +110,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
         metric = experiment_utils._get_metric(return_dict, metric_key)
 
-        experiment_utils._finalize_experiment(experiment_json, metric, app_id, run_id, 'FINISHED', duration, logdir, None)
+        experiment_utils._finalize_experiment(experiment_json, metric, app_id, run_id, 'FINISHED', duration, logdir, None, None)
         return logdir, return_dict
     except:
         _exception_handler(experiment_utils._microseconds_to_millis(time.time() - start))
@@ -192,15 +192,9 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
 
         _start_run()
 
-        readable_optimization_key = None
-        if not optimization_key:
-            readable_optimization_key = 'metric'
-        else:
-            readable_optimization_key = optimization_key
-
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = experiment_utils._populate_experiment(name, 'random_search', 'PARALLEL_EXPERIMENTS', json.dumps(boundary_dict), versioned_path, description, app_id, direction, readable_optimization_key)
+        experiment_json = experiment_utils._populate_experiment(name, 'random_search', 'PARALLEL_EXPERIMENTS', json.dumps(boundary_dict), versioned_path, description, app_id, direction, optimization_key)
 
         experiment_utils._version_resources(versioned_resources, experiment_utils._get_logdir(app_id, run_id))
 
@@ -209,7 +203,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
         logdir, best_param, best_metric, return_dict = r_search_impl._run(sc, map_fun, run_id, boundary_dict, samples, direction=direction, local_logdir=local_logdir, optimization_key=optimization_key)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        experiment_utils._finalize_experiment(experiment_json, best_metric, app_id, run_id, 'FINISHED', duration, experiment_utils._get_logdir(app_id, run_id), logdir)
+        experiment_utils._finalize_experiment(experiment_json, best_metric, app_id, run_id, 'FINISHED', duration, experiment_utils._get_logdir(app_id, run_id), logdir, experiment_utils._get_readable_optimization_key(optimization_key, return_dict)
 
         best_param_dict = experiment_utils._convert_to_dict(best_param)
 
@@ -291,24 +285,18 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
 
         _start_run()
 
-        readable_optimization_key = None
-        if not optimization_key:
-            readable_optimization_key = 'metric'
-        else:
-            readable_optimization_key = optimization_key
-
         diff_evo_impl.run_id = run_id
 
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = experiment_utils._populate_experiment(name, 'differential_evolution', 'PARALLEL_EXPERIMENTS', json.dumps(boundary_dict), versioned_path, description, app_id, direction, readable_optimization_key)
+        experiment_json = experiment_utils._populate_experiment(name, 'differential_evolution', 'PARALLEL_EXPERIMENTS', json.dumps(boundary_dict), versioned_path, description, app_id, direction, optimization_key)
 
         experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
         logdir, best_param, best_metric, return_dict = diff_evo_impl._run(objective_function, boundary_dict, direction=direction, generations=generations, population=population, mutation=mutation, crossover=crossover, cleanup_generations=cleanup_generations, local_logdir=local_logdir, name=name, optimization_key=optimization_key)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        experiment_utils._finalize_experiment(experiment_json, best_metric, app_id, run_id, 'FINISHED', duration, experiment_utils._get_logdir(app_id, run_id), logdir)
+        experiment_utils._finalize_experiment(experiment_json, best_metric, app_id, run_id, 'FINISHED', duration, experiment_utils._get_logdir(app_id, run_id), logdir, experiment_utils._get_readable_optimization_key(optimization_key, return_dict)
 
         best_param_dict = experiment_utils._convert_to_dict(best_param)
 
@@ -388,15 +376,9 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
 
         _start_run()
 
-        readable_optimization_key = None
-        if not optimization_key:
-            readable_optimization_key = 'metric'
-        else:
-            readable_optimization_key = optimization_key
-
         versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
 
-        experiment_json = experiment_utils._populate_experiment(name, 'grid_search', 'PARALLEL_EXPERIMENTS', json.dumps(args_dict), versioned_path, description, app_id, direction, readable_optimization_key)
+        experiment_json = experiment_utils._populate_experiment(name, 'grid_search', 'PARALLEL_EXPERIMENTS', json.dumps(args_dict), versioned_path, description, app_id, direction, optimization_key)
 
         experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
@@ -405,7 +387,7 @@ def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdi
         logdir, best_param, best_metric, return_dict = grid_search_impl._run(sc, map_fun, run_id, grid_params, direction=direction, local_logdir=local_logdir, name=name, optimization_key=optimization_key)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        experiment_utils._finalize_experiment(experiment_json, best_metric, app_id, run_id, 'FINISHED', duration, experiment_utils._get_logdir(app_id, run_id), logdir)
+        experiment_utils._finalize_experiment(experiment_json, best_metric, app_id, run_id, 'FINISHED', duration, experiment_utils._get_logdir(app_id, run_id), logdir, experiment_utils._get_readable_optimization_key(optimization_key, return_dict))
 
         best_param_dict = experiment_utils._convert_to_dict(best_param)
 
@@ -480,7 +462,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         logdir, return_dict = allreduce_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        experiment_utils._finalize_experiment(experiment_json, None, app_id, run_id, 'FINISHED', duration, logdir, None)
+        experiment_utils._finalize_experiment(experiment_json, None, app_id, run_id, 'FINISHED', duration, logdir, None, None)
 
         return logdir, return_dict
     except:
@@ -552,7 +534,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         logdir, return_dict = ps_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        experiment_utils._finalize_experiment(experiment_json, None, app_id, run_id, 'FINISHED', duration, logdir, None)
+        experiment_utils._finalize_experiment(experiment_json, None, app_id, run_id, 'FINISHED', duration, logdir, None, None)
 
         return logdir, return_dict
     except:
@@ -620,7 +602,7 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         logdir, return_dict = mirrored_impl._run(sc, map_fun, run_id, local_logdir=local_logdir, name=name, evaluator=evaluator)
         duration = experiment_utils._microseconds_to_millis(time.time() - start)
 
-        experiment_utils._finalize_experiment(experiment_json, None, app_id, run_id, 'FINISHED', duration, logdir, None)
+        experiment_utils._finalize_experiment(experiment_json, None, app_id, run_id, 'FINISHED', duration, logdir, None, None)
 
         return logdir, return_dict
     except:

@@ -65,6 +65,15 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
     metric_file = hdfs_exec_logdir + '/.metric'
     hdfs.dump(str(opt_val), metric_file)
 
+def _get_readable_optimization_key(optimization_key, return_dict):
+    readable_optimization_key = None
+    if not optimization_key and len(return_dict.keys()) == 1:
+        readable_optimization_key = list(return_dict.keys())[0]
+    else:
+        readable_optimization_key = optimization_key
+    return readable_optimization_key
+
+
 def _validate_optimization_value(opt_val):
         try:
             int(opt_val)
@@ -445,7 +454,7 @@ def _populate_experiment(model_name, function, type, hp, versioned_resources, de
     return json.dumps({'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type,
                        'appId': app_id, 'direction': direction, 'optimizationKey': optimization_key, 'jobName': jobName})
 
-def _finalize_experiment_json(experiment_json, metric, state, duration, bestLogdir):
+def _finalize_experiment_json(experiment_json, metric, state, duration, bestLogdir, optimization_key):
     """
     Args:
         :experiment_json:
@@ -458,6 +467,7 @@ def _finalize_experiment_json(experiment_json, metric, state, duration, bestLogd
     experiment_json = json.loads(experiment_json)
     if bestLogdir:
         experiment_json['bestDir'] = bestLogdir[len(hdfs.project_path()):]
+    experiment_json['optimizationKey'] = optimization_key
     experiment_json['metric'] = metric
     experiment_json['state'] = state
     experiment_json['duration'] = duration
@@ -662,14 +672,14 @@ def _setup_experiment(versioned_resources, logdir, app_id, run_id):
     hdfs.mkdir(_get_logdir(app_id, run_id))
     return versioned_path
 
-def _finalize_experiment(experiment_json, metric, app_id, run_id, state, duration, logdir, bestLogdir):
+def _finalize_experiment(experiment_json, metric, app_id, run_id, state, duration, logdir, bestLogdir, optimization_key):
 
     outputs = _build_summary_json(logdir)
 
     if outputs:
         hdfs.dump(outputs, logdir + '/.summary')
 
-    experiment_json = _finalize_experiment_json(experiment_json, metric, state, duration, bestLogdir)
+    experiment_json = _finalize_experiment_json(experiment_json, metric, state, duration, bestLogdir, optimization_key)
 
     _attach_experiment_xattr(app_id, run_id, experiment_json, 'REPLACE')
 
