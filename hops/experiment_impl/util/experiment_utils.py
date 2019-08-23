@@ -456,7 +456,8 @@ def _finalize_experiment_json(experiment_json, metric, state, duration, bestLogd
 
     """
     experiment_json = json.loads(experiment_json)
-    experiment_json['bestDir'] = bestLogdir[len(hdfs.project_path()):]
+    if bestLogdir:
+        experiment_json['bestDir'] = bestLogdir[len(hdfs.project_path()):]
     experiment_json['metric'] = metric
     experiment_json['state'] = state
     experiment_json['duration'] = duration
