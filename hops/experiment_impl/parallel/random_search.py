@@ -55,7 +55,7 @@ def _run(sc, map_fun, run_id, args_dict, samples, direction='max', local_logdir=
 
     random_dict, new_samples = _remove_duplicates(random_dict, samples)
 
-    sc.setJobGroup("Random Search", "{} | Hyperparameter Optimization".format(name))
+    sc.setJobGroup(os.environ['ML_ID'], "{} | Random Search".format(name))
     #Each TF task should be run on 1 executor
     nodeRDD = sc.parallelize(range(new_samples), new_samples)
 

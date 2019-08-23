@@ -39,7 +39,7 @@ def _run(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-name"
                 raise ValueError('Length of each function argument list must be equal')
             num_executions = len(arg_lists[i])
 
-    sc.setJobGroup("Launcher", "{} | Running experiment".format(name))
+    sc.setJobGroup(os.environ['ML_ID'], "{} | Launcher experiment".format(name))
     #Each TF task should be run on 1 executor
     nodeRDD = sc.parallelize(range(num_executions), num_executions)
 

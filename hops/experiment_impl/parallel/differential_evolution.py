@@ -590,7 +590,7 @@ def _evolutionary_launch(spark, map_fun, args_dict, name="no-name"):
     global run_id
 
     #Make SparkUI intuitive by grouping jobs
-    sc.setJobGroup("Differential Evolution ", "{} | Hyperparameter Optimization, Generation: {}".format(name, generation_id))
+    sc.setJobGroup(os.environ['ML_ID'], "{} | Differential Evolution, Generation: {}".format(name, generation_id))
     nodeRDD.foreachPartition(_prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key))
 
     generation_id += 1

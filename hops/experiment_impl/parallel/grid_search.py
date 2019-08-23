@@ -43,7 +43,7 @@ def _run(sc, map_fun, run_id, args_dict, direction='max', local_logdir=False, na
     nodeRDD = sc.parallelize(range(num_executions), num_executions)
 
     #Make SparkUI intuitive by grouping jobs
-    sc.setJobGroup("Grid Search", "{} | Hyperparameter Optimization".format(name))
+    sc.setJobGroup(os.environ['ML_ID'], "{} | Grid Search".format(name))
 
     #Force execution on executor, since GPU is located on executor
     nodeRDD.foreachPartition(_prepare_func(app_id, run_id, map_fun, args_dict, local_logdir, optimization_key))

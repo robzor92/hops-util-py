@@ -37,7 +37,7 @@ def _run(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=Fals
     nodeRDD = sc.parallelize(range(num_executions), num_executions)
 
     #Make SparkUI intuitive by grouping jobs
-    sc.setJobGroup("CollectiveAllReduceStrategy", "{} | Distributed Training".format(name))
+    sc.setJobGroup(os.environ['ML_ID'], "{} | CollectiveAllReduceStrategy - Distributed Training".format(name))
 
     server = allreduce_reservation.Server(num_executions)
     server_addr = server.start()
