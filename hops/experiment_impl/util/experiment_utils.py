@@ -8,6 +8,8 @@ from ctypes import cdll
 import itertools
 import socket
 import json
+import shutil
+
 from hops import constants
 from hops import devices
 from hops import util
@@ -165,7 +167,7 @@ def _cleanup(local_logdir_bool, local_tb_path, hdfs_exec_logdir, gpu_thread, tb_
         except:
             pass
 
-def _store_local_tensorboard(local_tb, hdfs_exec_logdir):
+def _store_local_tensorboard(local_tb_path, hdfs_exec_logdir):
     """
 
     Args:
@@ -175,9 +177,15 @@ def _store_local_tensorboard(local_tb, hdfs_exec_logdir):
     Returns:
 
     """
-    tb_contents = os.listdir(local_tb)
-    for entry in tb_contents:
-        pydoop.hdfs.put(local_tb + '/' + entry, hdfs_exec_logdir)
+    if os.path.exists(local_tb_path):
+        tb_contents = os.listdir(local_tb_path)
+        for entry in tb_contents:
+            pydoop.hdfs.put(local_tb_path + '/' + entry, hdfs_exec_logdir)
+
+        try:
+            shutil.rmtree(local_tb_path)
+        except:
+            pass
 
 def _build_summary_json(logdir):
 
