@@ -152,7 +152,7 @@ def _handle_return_simple(retval, hdfs_exec_logdir):
 
 def _cleanup(local_logdir_bool, local_tb_path, hdfs_exec_logdir, gpu_thread, tb_hdfs_file):
     try:
-        if local_logdir_bool:
+        if local_logdir_bool and hdfs_exec_logdir:
             _store_local_tensorboard(local_tb_path, hdfs_exec_logdir)
     except Exception as err:
         print('Exception occurred while uploading local logdir to hdfs: {}'.format(err))
