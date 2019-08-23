@@ -166,7 +166,6 @@ def _cleanup(tensorboard, gpu_thread):
             _store_local_tensorboard(tensorboard.local_logdir_path, tensorboard.events_logdir)
     except Exception as err:
         print('Exception occurred while uploading local logdir to hdfs: {}'.format(err))
-    finally:
 
     # Get rid of TensorBoard endpoint file
     try:
