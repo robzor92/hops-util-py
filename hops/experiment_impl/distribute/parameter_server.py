@@ -97,6 +97,8 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
             t.start()
 
         role = None
+        logdir = None
+        tb_hdfs_path = None
 
         client = parameter_server_reservation.Client(server_addr)
 

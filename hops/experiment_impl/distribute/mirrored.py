@@ -92,6 +92,8 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
             t.start()
 
         is_chief = False
+        logdir = None
+        tb_hdfs_path = None
         try:
             host = experiment_utils._get_ip_address()
 
