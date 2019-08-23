@@ -181,7 +181,6 @@ def _store_local_tensorboard(local_tb_path, hdfs_exec_logdir):
         tb_contents = os.listdir(local_tb_path)
         for entry in tb_contents:
             pydoop.hdfs.put(local_tb_path + '/' + entry, hdfs_exec_logdir)
-
         try:
             shutil.rmtree(local_tb_path)
         except:
