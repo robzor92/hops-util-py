@@ -156,7 +156,7 @@ def _cleanup(tensorboard, gpu_thread):
     # Kill running TB
     try:
         if tensorboard.tb_pid != 0:
-            subprocess.Popen(["kill", str(tensorboard.tb_pid)])
+            subprocess.Popen(["kill", "-9", str(tensorboard.tb_pid)])
     except:
         pass
 
