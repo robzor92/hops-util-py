@@ -9,6 +9,7 @@ import threading
 import six
 import time
 import random
+import os
 
 def _run(sc, map_fun, run_id, args_dict, samples, direction='max', local_logdir=False, name="no-name", optimization_key=None):
     """
