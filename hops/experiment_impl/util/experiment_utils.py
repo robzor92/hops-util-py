@@ -153,25 +153,30 @@ def _handle_return_simple(retval, hdfs_exec_logdir):
 
 def _cleanup(tensorboard, gpu_thread):
 
+    # Kill running TB
     try:
         if tensorboard.tb_pid != 0:
             subprocess.Popen(["kill", str(tensorboard.tb_pid)])
     except:
         pass
 
+    # Store local TB in hdfs
     try:
         if tensorboard.local_logdir_bool and tensorboard.events_logdir:
             _store_local_tensorboard(tensorboard.local_logdir_path, tensorboard.events_logdir)
     except Exception as err:
         print('Exception occurred while uploading local logdir to hdfs: {}'.format(err))
     finally:
-        tensorboard._reset_global()
+
+    # Get rid of TensorBoard endpoint file
+    try:
         handle = hdfs.get()
-        try:
-            if tensorboard.endpoint and handle.exists(tensorboard.endpoint):
-                handle.delete(tensorboard.endpoint)
-        except:
-            pass
+        if tensorboard.endpoint and handle.exists(tensorboard.endpoint):
+            handle.delete(tensorboard.endpoint)
+    except:
+        pass
+    finally:
+        tensorboard._reset_global()
 
 def _store_local_tensorboard(local_tb_path, hdfs_exec_logdir):
     """
