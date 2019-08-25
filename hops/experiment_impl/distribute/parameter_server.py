@@ -164,7 +164,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
             else:
                 retval = map_fun()
 
-            if retval and is_chief:
+            if retval and role == "chief":
                 experiment_utils._handle_return_simple(retval, experiment_utils._get_logdir(app_id, run_id))
 
             task_end = time.time()
