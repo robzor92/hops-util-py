@@ -224,7 +224,7 @@ def _build_summary_json(logdir):
         metric_arr = _convert_return_file_to_arr(return_file)
         hyperparameters.append({'metrics': metric_arr, 'hyperparameters': hp_arr})
 
-    return json.dumps({'results': hyperparameters})
+    return json.dumps({'combinations': hyperparameters})
 
 def _get_experiments_dir():
     """
