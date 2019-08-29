@@ -432,7 +432,7 @@ def _attach_model_link_xattr(ml_id, model, xattr):
     print(resource_url)
     print(resp)
 
-def _attach_model_xattr(data, xattr):
+def _attach_model_xattr(json_data, xattr):
     """
     Utility method for putting JSON data into elastic search
 
