@@ -407,7 +407,7 @@ def _attach_experiment_xattr(app_id, run_id, json_data, xattr):
     print(resource_url)
     print(resp)
 
-def _attach_model_xattr(ml_id, model, xattr):
+def _attach_model_link_xattr(ml_id, model, xattr):
     """
     Utility method for putting JSON data into elastic search
 
@@ -429,6 +429,31 @@ def _attach_model_xattr(ml_id, model, xattr):
                    ml_id + "?xattr=" + xattr + "&model=" + model
 
     resp = util.send_request_with_session('POST', resource_url)
+    print(resource_url)
+    print(resp)
+
+def _attach_model_xattr(data, xattr):
+    """
+    Utility method for putting JSON data into elastic search
+
+    Args:
+        :project: the project of the user/app
+        :appid: the YARN appid
+        :elastic_id: the id in elastic
+        :json_data: the data to put
+
+    Returns:
+        None
+
+    """
+    resource_url = constants.DELIMITERS.SLASH_DELIMITER + \
+                   constants.REST_CONFIG.HOPSWORKS_REST_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
+                   constants.REST_CONFIG.HOPSWORKS_PROJECT_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
+                   hdfs.project_id() + constants.DELIMITERS.SLASH_DELIMITER + \
+                   constants.REST_CONFIG.HOPSWORKS_MODELS_RESOURCE + + constants.DELIMITERS.SLASH_DELIMITER +
+                    "?xattr=" + xattr
+
+    resp = util.send_request_with_session('POST', resource_url, data=json_data, headers=headers)
     print(resource_url)
     print(resp)
 
