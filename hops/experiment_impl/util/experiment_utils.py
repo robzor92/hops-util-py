@@ -451,8 +451,7 @@ def _attach_model_xattr(json_data, xattr):
                    constants.REST_CONFIG.HOPSWORKS_REST_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    constants.REST_CONFIG.HOPSWORKS_PROJECT_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    hdfs.project_id() + constants.DELIMITERS.SLASH_DELIMITER + \
-                   constants.REST_CONFIG.HOPSWORKS_MODELS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
-                    "?xattr=" + xattr
+                   constants.REST_CONFIG.HOPSWORKS_MODELS_RESOURCE + "?xattr=" + xattr
 
     resp = util.send_request_with_session('POST', resource_url, data=json_data, headers=headers)
     print(resource_url)
