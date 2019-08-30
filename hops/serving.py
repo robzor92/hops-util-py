@@ -398,6 +398,8 @@ def export(model_path, model_name, model_version=1, overwrite=False, parameters=
     Raises:
         :ValueError: if there was an error with the exportation of the model due to invalid user input
     """
+        
+    assert hdfs.exists(hdfs.project_path() + "Models"), "Your project is missing a dataset named Models, please create it."
 
     if not hdfs.exists(model_path) and not os.path.exists(model_path):
         raise ValueError("the provided model_path: {} , does not exist in HDFS or on the local filesystem".format(

@@ -233,8 +233,7 @@ def _get_experiments_dir():
     Returns:
         The folder where the experiments are writing results
     """
-    pyhdfs_handle = hdfs.get()
-    assert pyhdfs_handle.exists(hdfs.project_path() + "Experiments"), "Your project is missing an Experiments dataset, please create it."
+    assert hdfs.exists(hdfs.project_path() + "Experiments"), "Your project is missing a dataset named Experiments, please create it."
     return hdfs.project_path() + "Experiments"
 
 def _get_logdir(app_id, run_id):
