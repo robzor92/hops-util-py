@@ -441,6 +441,7 @@ def convert_dict_to_list(input_dict):
     output_list = []
     for key in input_dict.keys():
         output_list.append({'key': key, 'value': input_dict[key]})
+    return output_list
 
 
 def _export_local_model(local_model_path, model_dir_hdfs, overwrite):
