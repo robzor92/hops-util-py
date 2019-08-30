@@ -411,18 +411,18 @@ def export(model_path, model_name, model_version=1, overwrite=False, parameters=
                      constants.DELIMITERS.SLASH_DELIMITER + str(model_name) + \
                      constants.DELIMITERS.SLASH_DELIMITER + str(model_version) + \
                      constants.DELIMITERS.SLASH_DELIMITER
+
     if not hdfs.exists(model_dir_hdfs):
         hdfs.mkdir(model_dir_hdfs)
 
-    if (not overwrite) and hdfs.exists(model_dir_hdfs) and hdfs.isfile(model_dir_hdfs):
+    if not overwrite and hdfs.exists(model_dir_hdfs):
         raise ValueError("Could not create model directory: {}, the path already exists and is a file, "
                          "set flag overwrite=True "
                          "to remove the file and create the correct directory structure".format(model_dir_hdfs))
 
-    if overwrite and hdfs.exists(model_dir_hdfs) and hdfs.isfile(model_dir_hdfs):
+    if overwrite and hdfs.exists(model_dir_hdfs):
         hdfs.delete(model_dir_hdfs)
         hdfs.mkdir(model_dir_hdfs)
-
 
     # Export the model files
     if os.path.exists(model_path):
