@@ -440,7 +440,7 @@ def export(model_path, model_name, model_version=1, overwrite=False, parameters=
 def convert_dict_to_list(input_dict):
     output_list = []
     for key in input_dict.keys():
-        output_list.append({key: input_dict[key]})
+        output_list.append({'key': key, 'value': input_dict[key]})
 
 
 def _export_local_model(local_model_path, model_dir_hdfs, overwrite):
