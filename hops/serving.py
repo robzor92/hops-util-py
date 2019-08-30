@@ -398,7 +398,7 @@ def export(model_path, model_name, model_version=1, overwrite=False, parameters=
     Raises:
         :ValueError: if there was an error with the exportation of the model due to invalid user input
     """
-        
+
     assert hdfs.exists(hdfs.project_path() + "Models"), "Your project is missing a dataset named Models, please create it."
 
     if not hdfs.exists(model_path) and not os.path.exists(model_path):
@@ -435,7 +435,7 @@ def export(model_path, model_name, model_version=1, overwrite=False, parameters=
         # Attach link from experiment to model
         experiment_utils._attach_model_link_xattr(os.environ['ML_ID'], str(model_name) + '_' + str(model_version), 'CREATE')
         # Attach model metadata to models version folder
-        experiment_utils._attach_model_xattr(model_name + "_" + str(model_version), json.dumps({'name': model_name, 'version': model_version, 'parameters': parameters, 'metrics': metrics, 'experimentId': os.environ['ML_ID']}), 'CREATE')
+        experiment_utils._attach_model_xattr(model_name + "_" + str(model_version), json.dumps({'name': model_name, 'version': model_version, 'parameters': parameters, 'outputs': outputs, 'experimentId': os.environ['ML_ID']}), 'CREATE')
 
 
 def _export_local_model(local_model_path, model_dir_hdfs, overwrite):
