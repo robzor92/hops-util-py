@@ -207,7 +207,7 @@ def _store_local_tensorboard(local_tb_path, hdfs_exec_logdir):
 
 def _build_summary_json(logdir):
 
-    hyperparameters = []
+    combinations = []
     return_files = []
 
     for experiment_dir in hdfs.ls(logdir):
@@ -222,9 +222,9 @@ def _build_summary_json(logdir):
 
         hp_arr = _convert_param_to_arr(hyperparameter_combination)
         metric_arr = _convert_return_file_to_arr(return_file)
-        hyperparameters.append({'metrics': metric_arr, 'hyperparameters': hp_arr})
+        combinations.append({'parameters': hp_arr, 'metrics': metric_arr})
 
-    return json.dumps({'combinations': hyperparameters})
+    return json.dumps({'combinations': parameters})
 
 def _get_experiments_dir():
     """
