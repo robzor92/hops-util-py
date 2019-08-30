@@ -352,7 +352,7 @@ def _create_or_update_serving_rest(model_path, model_name, serving_type, model_v
                                                                 error_code, error_msg, user_msg))
 
 
-def export(model_path, model_name, model_version=1, overwrite=False, parameters=None, metrics=None):
+def export(model_path, model_name, model_version=1, overwrite=False, parameters=None, outputs=None):
     """
     Copies a trained model to the Models directory in the project and creates the directory structure of:
 
