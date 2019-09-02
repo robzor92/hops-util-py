@@ -352,7 +352,7 @@ def _create_or_update_serving_rest(model_path, model_name, serving_type, model_v
                                                                 error_code, error_msg, user_msg))
 
 
-def export(model_path, model_name, model_version=1, overwrite=False, parameters=None, outputs=None):
+def export(model_path, model_name, model_version=1, overwrite=False, parameters=None, metrics=None):
     """
     Copies a trained model to the Models directory in the project and creates the directory structure of:
 
@@ -435,7 +435,7 @@ def export(model_path, model_name, model_version=1, overwrite=False, parameters=
         # Attach link from experiment to model
         experiment_utils._attach_model_link_xattr(os.environ['ML_ID'], str(model_name) + '_' + str(model_version), 'CREATE')
         # Attach model metadata to models version folder
-        experiment_utils._attach_model_xattr(model_name + "_" + str(model_version), json.dumps({'name': model_name, 'version': model_version, 'parameters': convert_dict_to_list(parameters), 'outputs': convert_dict_to_list(outputs), 'experimentId': os.environ['ML_ID']}), 'CREATE')
+        experiment_utils._attach_model_xattr(model_name + "_" + str(model_version), json.dumps({'name': model_name, 'version': model_version, 'parameters': convert_dict_to_list(parameters), 'metrics': convert_dict_to_list(metrics), 'experimentId': os.environ['ML_ID']}), 'CREATE')
 
 def convert_dict_to_list(input_dict):
     output_list = []
