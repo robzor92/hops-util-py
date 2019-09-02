@@ -226,6 +226,13 @@ def _build_summary_json(logdir):
 
     return json.dumps({'combinations': combinations})
 
+def _convert_dict_to_list(input_dict):
+    output_list = []
+    if input_dict:
+        for key in input_dict.keys():
+            output_list.append({'key': key, 'value': input_dict[key]})
+    return output_list
+
 def _get_experiments_dir():
     """
     Gets the root folder where the experiments are writing their results

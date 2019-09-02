@@ -421,7 +421,7 @@ def export(model_path, model_name, model_version=1, overwrite=False, parameters=
     if overwrite and hdfs.exists(model_dir_hdfs):
        hdfs.delete(model_dir_hdfs, recursive=True)
        hdfs.mkdir(model_dir_hdfs)
-                         
+
     # At this point we can create the version directory if it does not exists
     if not hdfs.exists(model_dir_hdfs):
        hdfs.mkdir(model_dir_hdfs)
@@ -437,14 +437,7 @@ def export(model_path, model_name, model_version=1, overwrite=False, parameters=
         # Attach link from experiment to model
         experiment_utils._attach_model_link_xattr(os.environ['ML_ID'], str(model_name) + '_' + str(model_version), 'CREATE')
         # Attach model metadata to models version folder
-        experiment_utils._attach_model_xattr(model_name + "_" + str(model_version), json.dumps({'name': model_name, 'version': model_version, 'parameters': convert_dict_to_list(parameters), 'metrics': convert_dict_to_list(metrics), 'experimentId': os.environ['ML_ID']}), 'CREATE')
-
-def convert_dict_to_list(input_dict):
-    output_list = []
-    for key in input_dict.keys():
-        output_list.append({'key': key, 'value': input_dict[key]})
-    return output_list
-
+        experiment_utils._attach_model_xattr(model_name + "_" + str(model_version), json.dumps({'name': model_name, 'version': model_version, 'parameters': experiment_utils._convert_dict_to_list(parameters), 'metrics': experiment_utils._convert_dict_to_list(metrics), 'experimentId': os.environ['ML_ID']}), 'CREATE')
 
 def _export_local_model(local_model_path, model_dir_hdfs, overwrite):
     """
