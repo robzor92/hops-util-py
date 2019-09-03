@@ -399,11 +399,14 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
         :ValueError: if there was an error with the exportation of the model due to invalid user input
     """
 
-    assert hdfs.exists(hdfs.project_path() + "Models"), "Your project is missing a dataset named Models, please create it."
+    project_path = hdfs.project_path()
+
+    assert hdfs.exists(project_path + "Models"), "Your project is missing a dataset named Models, please create it."
 
     if not hdfs.exists(model_path) and not os.path.exists(model_path):
         raise ValueError("the provided model_path: {} , does not exist in HDFS or on the local filesystem".format(
             model_path))
+
 
     model_dir_hdfs = project_path + constants.MODEL_SERVING.MODELS_DATASET + \
                      constants.DELIMITERS.SLASH_DELIMITER + str(model_name)
@@ -415,13 +418,13 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
         model_version_directories = hdfs.ls(model_dir_hdfs)
         for version_dir in model_version_directories:
             try:
-                version_list.append(int(version_dir))
+                if hdfs.isdir(version_dir):
+                    version_list.append(int(version_dir))
             except:
                 pass
         model_version = max(version_list) + 1
 
     # Path to directory in HDFS to put the model files
-    project_path = hdfs.project_path()
     model_version_dir_hdfs = model_dir_hdfs + constants.DELIMITERS.SLASH_DELIMITER + str(model_version)
 
     # If version directory already exists and we are not overwriting it then fail
