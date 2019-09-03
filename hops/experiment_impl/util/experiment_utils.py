@@ -227,11 +227,11 @@ def _build_summary_json(logdir):
     return json.dumps({'combinations': combinations})
 
 def _convert_dict_to_list(input_dict):
-    for key in input_dict.keys():
-        input_dict[key] = _cast_number_to_string(input_dict[key])
-        
+
     output_list = []
     if input_dict:
+        for key in input_dict.keys():
+            input_dict[key] = _cast_number_to_string(input_dict[key])
         for key in input_dict.keys():
             output_list.append({'key': key, 'value': input_dict[key]})
     return output_list

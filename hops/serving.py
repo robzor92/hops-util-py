@@ -352,7 +352,7 @@ def _create_or_update_serving_rest(model_path, model_name, serving_type, model_v
                                                                 error_code, error_msg, user_msg))
 
 
-def export(model_path, model_name, model_version=1, overwrite=False, parameters=None, metrics=None):
+def export(model_path, model_name, model_version=None, overwrite=False, parameters=None, metrics=None):
     """
     Copies a trained model to the Models directory in the project and creates the directory structure of:
 
@@ -405,6 +405,12 @@ def export(model_path, model_name, model_version=1, overwrite=False, parameters=
         raise ValueError("the provided model_path: {} , does not exist in HDFS or on the local filesystem".format(
             model_path))
 
+    # User did not specify model_version, pick the current highest version + 1, set to 1 if no model exists
+    if not model_version:
+        pass
+
+
+
     # Path to directory in HDFS to put the model files
     project_path = hdfs.project_path()
     model_dir_hdfs = project_path + constants.MODEL_SERVING.MODELS_DATASET + \
@@ -417,7 +423,7 @@ def export(model_path, model_name, model_version=1, overwrite=False, parameters=
                          "set flag overwrite=True "
                          "to remove the version directory and create the correct directory structure".format(model_dir_hdfs))
 
-    # Overwrite version directory by deleting all content
+    # Overwrite version directory by deleting all content (this is needed for Provenance to register Model as deleted)
     if overwrite and hdfs.exists(model_dir_hdfs):
        hdfs.delete(model_dir_hdfs, recursive=True)
        hdfs.mkdir(model_dir_hdfs)
