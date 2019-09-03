@@ -405,38 +405,45 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
         raise ValueError("the provided model_path: {} , does not exist in HDFS or on the local filesystem".format(
             model_path))
 
+    model_dir_hdfs = project_path + constants.MODEL_SERVING.MODELS_DATASET + \
+                     constants.DELIMITERS.SLASH_DELIMITER + str(model_name)
+
     # User did not specify model_version, pick the current highest version + 1, set to 1 if no model exists
     if not model_version:
-        pass
-
-
+        model_version = 1
+        version_list = []
+        model_version_directories = hdfs.ls(model_dir_hdfs)
+        for version_dir in model_version_directories:
+            try:
+                version_list.append(int(version_dir))
+            except:
+                pass
+        model_version = max(version_list) + 1
 
     # Path to directory in HDFS to put the model files
     project_path = hdfs.project_path()
-    model_dir_hdfs = project_path + constants.MODEL_SERVING.MODELS_DATASET + \
-                     constants.DELIMITERS.SLASH_DELIMITER + str(model_name) + \
-                     constants.DELIMITERS.SLASH_DELIMITER + str(model_version)
+    model_version_dir_hdfs = model_dir_hdfs + constants.DELIMITERS.SLASH_DELIMITER + str(model_version)
 
     # If version directory already exists and we are not overwriting it then fail
-    if not overwrite and hdfs.exists(model_dir_hdfs):
+    if not overwrite and hdfs.exists(model_version_dir_hdfs):
         raise ValueError("Could not create model directory: {}, the path already exists, "
                          "set flag overwrite=True "
                          "to remove the version directory and create the correct directory structure".format(model_dir_hdfs))
 
     # Overwrite version directory by deleting all content (this is needed for Provenance to register Model as deleted)
-    if overwrite and hdfs.exists(model_dir_hdfs):
-       hdfs.delete(model_dir_hdfs, recursive=True)
-       hdfs.mkdir(model_dir_hdfs)
+    if overwrite and hdfs.exists(model_version_dir_hdfs):
+       hdfs.delete(model_version_dir_hdfs, recursive=True)
+       hdfs.mkdir(model_version_dir_hdfs)
 
     # At this point we can create the version directory if it does not exists
-    if not hdfs.exists(model_dir_hdfs):
-       hdfs.mkdir(model_dir_hdfs)
+    if not hdfs.exists(model_version_dir_hdfs):
+       hdfs.mkdir(model_version_dir_hdfs)
 
     # Export the model files
     if os.path.exists(model_path):
-        export_dir=_export_local_model(model_path, model_dir_hdfs, overwrite)
+        export_dir=_export_local_model(model_path, model_version_dir_hdfs, overwrite)
     else:
-        export_dir=_export_hdfs_model(model_path, model_dir_hdfs, overwrite)
+        export_dir=_export_hdfs_model(model_path, model_version_dir_hdfs, overwrite)
 
     # Attach modelName_modelVersion to experiment directory
     if 'ML_ID' in os.environ:
