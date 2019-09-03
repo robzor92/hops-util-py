@@ -412,9 +412,8 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
                      constants.DELIMITERS.SLASH_DELIMITER + str(model_name) + constants.DELIMITERS.SLASH_DELIMITER
 
     # User did not specify model_version, pick the current highest version + 1, set to 1 if no model exists
+    version_list = []
     if not model_version and hdfs.exists(model_dir_hdfs):
-        model_version = 1
-        version_list = []
         model_version_directories = hdfs.ls(model_dir_hdfs)
         for version_dir in model_version_directories:
             try:
@@ -422,7 +421,10 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
                     version_list.append(int(version_dir[len(model_dir_hdfs):]))
             except:
                 pass
+    if len(version_list) > 0:
         model_version = max(version_list) + 1
+    else:
+        model_version = 1
 
     # Path to directory in HDFS to put the model files
     model_version_dir_hdfs = model_dir_hdfs + str(model_version)
