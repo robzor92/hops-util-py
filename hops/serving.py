@@ -407,6 +407,8 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
         raise ValueError("the provided model_path: {} , does not exist in HDFS or on the local filesystem".format(
             model_path))
 
+    if parameters and metrics:
+        _validate_metadata(parameters, metrics)
 
     model_dir_hdfs = project_path + constants.MODEL_SERVING.MODELS_DATASET + \
                      constants.DELIMITERS.SLASH_DELIMITER + str(model_name) + constants.DELIMITERS.SLASH_DELIMITER
@@ -421,6 +423,8 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
                     version_list.append(int(version_dir[len(model_dir_hdfs):]))
             except:
                 pass
+
+    # If there are existing versions for this model, get the highest version number and add one
     if len(version_list) > 0:
         model_version = max(version_list) + 1
     else:
@@ -511,6 +515,16 @@ def _export_hdfs_model(hdfs_model_path, model_dir_hdfs, overwrite):
 
     return model_dir_hdfs
 
+def _validate_metadata(parameters, metrics):
+    assert type(parameters) is dict, 'provided parameters is not in a dict'
+    assert type(metrics) is dict, 'provided metrics is not in a dict'
+
+    parameters_set = set(parameters.keys())
+    metrics_set = set(metrics.keys())
+
+    intersection = parameters_set & metrics_set
+
+    assert len(intersection) == 0, 'parameters and metrics should not have keys with the same name'
 
 def get_id(serving_name):
     """
