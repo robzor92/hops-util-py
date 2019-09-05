@@ -352,7 +352,7 @@ def _create_or_update_serving_rest(model_path, model_name, serving_type, model_v
                                                                 error_code, error_msg, user_msg))
 
 
-def export(model_path, model_name, model_version=None, overwrite=False, parameters=None, metrics=None):
+def export(model_path, model_name, model_version=None, overwrite=False, parameters=None, metrics=None, description=None):
     """
     Copies a trained model to the Models directory in the project and creates the directory structure of:
 
@@ -459,7 +459,7 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
         # Attach link from experiment to model
         experiment_utils._attach_model_link_xattr(os.environ['ML_ID'], str(model_name) + '_' + str(model_version), 'CREATE')
         # Attach model metadata to models version folder
-        experiment_utils._attach_model_xattr(model_name + "_" + str(model_version), json.dumps({'name': model_name, 'version': model_version, 'parameters': experiment_utils._convert_dict_to_list(parameters), 'metrics': experiment_utils._convert_dict_to_list(metrics), 'experimentId': os.environ['ML_ID']}), 'CREATE')
+        experiment_utils._attach_model_xattr(model_name + "_" + str(model_version), json.dumps({'name': model_name, 'version': model_version, 'parameters': experiment_utils._convert_dict_to_list(parameters), 'metrics': experiment_utils._convert_dict_to_list(metrics), 'experimentId': os.environ['ML_ID'], 'description': description}), 'CREATE')
 
 def _export_local_model(local_model_path, model_dir_hdfs, overwrite):
     """
