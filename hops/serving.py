@@ -399,6 +399,9 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
         :ValueError: if there was an error with the exportation of the model due to invalid user input
     """
 
+    if not description:
+        description = 'A collection of models for ' + model_name
+
     project_path = hdfs.project_path()
 
     assert hdfs.exists(project_path + "Models"), "Your project is missing a dataset named Models, please create it."
