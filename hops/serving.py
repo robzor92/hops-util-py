@@ -402,6 +402,9 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
     if not description:
         description = 'A collection of models for ' + model_name
 
+    # Make sure model name is a string, users could supply numbers
+    model_name = str(model_name)
+
     project_path = hdfs.project_path()
 
     assert hdfs.exists(project_path + "Models"), "Your project is missing a dataset named Models, please create it."
@@ -410,11 +413,12 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
         raise ValueError("the provided model_path: {} , does not exist in HDFS or on the local filesystem".format(
             model_path))
 
+    # parameters and metrics need to be dict, also no keys can be shared between them
     if parameters and metrics:
         _validate_metadata(parameters, metrics)
 
     model_dir_hdfs = project_path + constants.MODEL_SERVING.MODELS_DATASET + \
-                     constants.DELIMITERS.SLASH_DELIMITER + str(model_name) + constants.DELIMITERS.SLASH_DELIMITER
+                     constants.DELIMITERS.SLASH_DELIMITER + model_name + constants.DELIMITERS.SLASH_DELIMITER
 
     # User did not specify model_version, pick the current highest version + 1, set to 1 if no model exists
     version_list = []
@@ -460,7 +464,7 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
     # Attach modelName_modelVersion to experiment directory
     if 'ML_ID' in os.environ:
         # Attach link from experiment to model
-        experiment_utils._attach_model_link_xattr(os.environ['ML_ID'], str(model_name) + '_' + str(model_version), 'CREATE')
+        experiment_utils._attach_model_link_xattr(os.environ['ML_ID'], model_name + '_' + str(model_version), 'CREATE')
         # Attach model metadata to models version folder
         experiment_utils._attach_model_xattr(model_name + "_" + str(model_version), json.dumps({'name': model_name, 'version': model_version, 'parameters': experiment_utils._convert_dict_to_list(parameters), 'metrics': experiment_utils._convert_dict_to_list(metrics), 'experimentId': os.environ['ML_ID'], 'description': description}), 'CREATE')
 
