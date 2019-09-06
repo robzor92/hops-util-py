@@ -431,12 +431,10 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
             except:
                 pass
 
-    raise Exception(version_list)
-
     # If there are existing versions for this model, get the highest version number and add one
     if len(version_list) > 0:
         model_version = max(version_list) + 1
-    else:
+    elif not model_version:
         model_version = 1
 
     # Path to directory in HDFS to put the model files
