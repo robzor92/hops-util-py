@@ -444,7 +444,7 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
     if not overwrite and hdfs.exists(model_version_dir_hdfs):
         raise ValueError("Could not create model directory: {}, the path already exists, "
                          "set flag overwrite=True "
-                         "to remove the version directory and create the correct directory structure".format(model_dir_hdfs))
+                         "to remove the version directory and create the correct directory structure".format(model_version_dir_hdfs))
 
     # Overwrite version directory by deleting all content (this is needed for Provenance to register Model as deleted)
     if overwrite and hdfs.exists(model_version_dir_hdfs):
