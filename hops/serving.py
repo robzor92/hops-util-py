@@ -430,11 +430,10 @@ def export(model_path, model_name, model_version=None, overwrite=False, paramete
                     version_list.append(int(version_dir[len(model_dir_hdfs):]))
             except:
                 pass
+        if len(version_list) > 0:
+            model_version = max(version_list) + 1
 
-    # If there are existing versions for this model, get the highest version number and add one
-    if len(version_list) > 0:
-        model_version = max(version_list) + 1
-    elif not model_version:
+    if not model_version:
         model_version = 1
 
     # Path to directory in HDFS to put the model files
