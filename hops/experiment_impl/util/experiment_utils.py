@@ -65,15 +65,6 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
     metric_file = hdfs_exec_logdir + '/.metric'
     hdfs.dump(str(opt_val), metric_file)
 
-def _get_readable_optimization_key(optimization_key, return_dict):
-    readable_optimization_key = None
-    if not optimization_key and len(return_dict.keys()) == 1:
-        readable_optimization_key = list(return_dict.keys())[0]
-    else:
-        readable_optimization_key = optimization_key
-    return readable_optimization_key
-
-
 def _validate_optimization_value(opt_val):
         try:
             int(opt_val)
