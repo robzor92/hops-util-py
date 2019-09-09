@@ -72,6 +72,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         :local_logdir: True if *tensorboard.logdir()* should be in the local filesystem, otherwise it is in HDFS
         :versioned_resources: A list of HDFS paths of resources to version with this experiment
         :description: A longer description for the experiment
+        :metric_key: If returning a dict with multiple return values, this key should match the name of the key in the dict for the metric you want to associate with the experiment
 
     Returns:
         HDFS path in your project where the experiment is stored
@@ -118,7 +119,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
     finally:
         _end_run(sc)
 
-def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
+def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key='metric'):
     """
 
     *Parallel Experiment*
@@ -214,7 +215,7 @@ def random_search(map_fun, boundary_dict, direction='max', samples=10, name='no-
     finally:
         _end_run(sc)
 
-def differential_evolution(objective_function, boundary_dict, direction = 'max', generations=4, population=6, mutation=0.5, crossover=0.7, cleanup_generations=False, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
+def differential_evolution(objective_function, boundary_dict, direction = 'max', generations=4, population=6, mutation=0.5, crossover=0.7, cleanup_generations=False, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key='metric'):
     """
     *Parallel Experiment*
 
@@ -308,7 +309,7 @@ def differential_evolution(objective_function, boundary_dict, direction = 'max',
     finally:
         _end_run(sc)
 
-def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key=None):
+def grid_search(map_fun, args_dict, direction='max', name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key='metric'):
     """
     *Parallel Experiment*
 
