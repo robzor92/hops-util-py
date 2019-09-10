@@ -142,7 +142,6 @@ def _count_rocm_gpus():
         print(err)
     return 0
 
-
 def get_num_gpus():
     """ Get the number of GPUs available in the environment and consequently by the application
     Assuming there is one GPU in the environment
