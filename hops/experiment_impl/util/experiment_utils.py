@@ -487,13 +487,14 @@ def _populate_experiment(model_name, function, type, hp, versioned_resources, de
         jobName = os.environ[constants.ENV_VARIABLES.JOB_NAME_ENV_VAR]
 
     if constants.ENV_VARIABLES.KERNEL_ID_ENV_VAR in os.environ:
-        jobName = os.environ[constants.ENV_VARIABLES.KERNEL_ID_ENV_VAR]
+        kernelId = os.environ[constants.ENV_VARIABLES.KERNEL_ID_ENV_VAR]
 
     if model_name == 'no-name' and jobName:
         model_name = jobName
 
     return {'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type,
-                       'appId': app_id, 'direction': direction, 'optimizationKey': optimization_key, 'jobName': jobName}
+                       'appId': app_id, 'direction': direction, 'optimizationKey': optimization_key, 'jobName': jobName,
+                       'kernelId': kernelId}
 
 def _version_resources(versioned_resources, rundir):
     """
