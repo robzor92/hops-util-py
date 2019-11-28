@@ -486,6 +486,9 @@ def _populate_experiment(model_name, function, type, hp, versioned_resources, de
     if constants.ENV_VARIABLES.JOB_NAME_ENV_VAR in os.environ:
         jobName = os.environ[constants.ENV_VARIABLES.JOB_NAME_ENV_VAR]
 
+    if constants.ENV_VARIABLES.KERNEL_ID_ENV_VAR in os.environ:
+        jobName = os.environ[constants.ENV_VARIABLES.KERNEL_ID_ENV_VAR]
+
     if model_name == 'no-name' and jobName:
         model_name = jobName
 
