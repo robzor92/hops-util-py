@@ -6,7 +6,6 @@ It is a wrapper around pydoop together with utility functions that are Hops-spec
 import socket
 
 import datetime
-from six import string_types
 
 import shutil
 import fnmatch

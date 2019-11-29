@@ -52,19 +52,20 @@ def _init_logger(exec_logdir, role=None, index=None):
     # override the builtin print
     __builtin__.print = experiment_print
 
-def log(string):
+def log(log_entry):
     """
     Logs a string to the log file
     Args:
-        :string: string to log
+        :log_entry: string to log
     """
     global logger_fd
     if logger_fd:
-        if isinstance(string, string_types):
-            logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(), string) + '\n').encode())
-        else:
-            logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(),
-                                        'ERROR! Attempting to write a non-string object to logfile') + '\n').encode())
+    try:
+        log_entry = str(log_entry)
+        logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(), string) + '\n').encode())
+    except:
+        logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(),
+                                    'ERROR! Attempting to write a non-string object to logfile') + '\n').encode())
 
 def _close_logger():
     """
