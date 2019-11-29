@@ -120,6 +120,8 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
         retval[key] = _cast_number_to_string(retval[key])
 
 
+    retval['log'] = hdfs_exec_logdir.replace(hdfs.project_path(), '') + '/output.log'
+
     return_file = hdfs_exec_logdir + '/.return.json'
     hdfs.dump(json.dumps(retval), return_file)
 
@@ -204,6 +206,8 @@ def _handle_return_simple(retval, hdfs_exec_logdir):
             retval = {'metric': retval}
         except:
             pass
+            
+    retval['log'] = hdfs_exec_logdir.replace(hdfs.project_path(), '') + '/output.log'
 
     return_file = hdfs_exec_logdir + '/.return.json'
     for key in retval.keys():
