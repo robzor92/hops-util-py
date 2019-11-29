@@ -5,8 +5,6 @@ It is a wrapper around pydoop together with utility functions that are Hops-spec
 """
 import socket
 
-import datetime
-
 import shutil
 import fnmatch
 import os
