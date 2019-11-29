@@ -66,7 +66,7 @@ def log(string):
             logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(),
                                         'ERROR! Attempting to write a non-string object to logfile') + '\n').encode())
 
-def _kill_logger():
+def _close_logger():
     """
     Closes the logfile
     """
@@ -218,7 +218,7 @@ def _cleanup(tensorboard, gpu_thread):
         if tensorboard.tb_pid != 0:
             subprocess.Popen(["kill", str(tensorboard.tb_pid)])
     except Exception as err:
-        print(err)
+        print('Exception occurred while killing tensorboard: {}'.format(err))
         pass
 
     # Store local TB in hdfs
@@ -234,16 +234,16 @@ def _cleanup(tensorboard, gpu_thread):
         if tensorboard.endpoint and handle.exists(tensorboard.endpoint):
             handle.delete(tensorboard.endpoint)
     except Exception as err:
-        print(err)
+        print('Exception occurred while deleting tensorboard endpoint file: {}'.(err))
         pass
     finally:
         tensorboard._reset_global()
 
     # Close and logging fd and flush
     try:
-        _kill_logger()
+        _close_logger()
     except Exception as err:
-        print(err)
+        print('Exception occurred while closing logger: {}'.(err))
         pass
 
 def _store_local_tensorboard(local_tb_path, hdfs_exec_logdir):
