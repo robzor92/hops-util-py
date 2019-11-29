@@ -83,7 +83,7 @@ def _close_logger():
         except:
             pass
 
-def _handle_return(retval, hdfs_exec_logdir, optimization_key):
+def _handle_return(retval, hdfs_exec_logdir, optimization_key, logfile):
     """
 
     Args:
@@ -121,7 +121,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
     for key in retval.keys():
         retval[key] = _cast_number_to_string(retval[key])
 
-    retval['log'] = hdfs_exec_logdir.replace(hdfs.project_path(), '') + '/output.log'
+    retval['log'] = logfile
 
     return_file = hdfs_exec_logdir + '/.return.json'
     hdfs.dump(json.dumps(retval), return_file)
@@ -291,8 +291,8 @@ def _build_summary_json(logdir):
         hyperparameter_combination = os.path.split(os.path.dirname(return_file_abs))[1]
 
         hp_arr = _convert_param_to_arr(hyperparameter_combination)
-        metric_arr = _convert_return_file_to_arr(return_file)
-        combinations.append({'parameters': hp_arr, 'metrics': metric_arr})
+        output_arr = _convert_return_file_to_arr(return_file)
+        combinations.append({'parameters': hp_arr, 'outputs': output_arr})
 
     return json.dumps({'combinations': combinations})
 
