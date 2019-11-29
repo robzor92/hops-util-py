@@ -119,7 +119,6 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key):
     for key in retval.keys():
         retval[key] = _cast_number_to_string(retval[key])
 
-
     retval['log'] = hdfs_exec_logdir.replace(hdfs.project_path(), '') + '/output.log'
 
     return_file = hdfs_exec_logdir + '/.return.json'

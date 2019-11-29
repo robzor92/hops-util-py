@@ -165,9 +165,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
             else:
                 retval = map_fun()
 
-            if retval is not None and role == "chief":
-                experiment_utils._handle_return_simple(retval, experiment_utils._get_logdir(app_id, run_id))
-
+            experiment_utils._handle_return_simple(retval, experiment_utils._get_logdir(app_id, run_id))
             task_end = time.time()
             time_str = 'Finished task - took ' + experiment_utils._time_diff(task_start, task_end)
             print(time_str)

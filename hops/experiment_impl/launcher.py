@@ -144,8 +144,7 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 task_start = time.time()
                 retval = map_fun(*args)
                 task_end = time.time()
-                if retval is not None:
-                    experiment_utils._handle_return_simple(retval, hdfs_exec_logdir)
+                experiment_utils._handle_return_simple(retval, hdfs_exec_logdir)
                 time_str = 'Finished task ' + param_string + ' - took ' + experiment_utils._time_diff(task_start, task_end)
                 print(time_str)
                 print('-------------------------------------------------------')
@@ -158,8 +157,7 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 task_start = time.time()
                 retval = map_fun()
                 task_end = time.time()
-                if retval is not None:
-                    experiment_utils._handle_return_simple(retval, hdfs_exec_logdir)
+                experiment_utils._handle_return_simple(retval, hdfs_exec_logdir)
                 time_str = 'Finished task - took ' + experiment_utils._time_diff(task_start, task_end)
                 print(time_str)
                 print('-------------------------------------------------------')
