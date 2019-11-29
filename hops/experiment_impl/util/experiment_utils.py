@@ -63,7 +63,7 @@ def log(log_entry):
     if logger_fd:
         try:
             log_entry = str(log_entry)
-            logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(), string) + '\n').encode())
+            logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(), log_entry) + '\n').encode())
         except:
             logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(),
                                         'ERROR! Attempting to write a non-string object to logfile') + '\n').encode())
