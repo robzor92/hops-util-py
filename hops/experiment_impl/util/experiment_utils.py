@@ -206,7 +206,7 @@ def _handle_return_simple(retval, hdfs_exec_logdir):
             retval = {'metric': retval}
         except:
             pass
-            
+
     retval['log'] = hdfs_exec_logdir.replace(hdfs.project_path(), '') + '/output.log'
 
     return_file = hdfs_exec_logdir + '/.return.json'
@@ -217,7 +217,7 @@ def _handle_return_simple(retval, hdfs_exec_logdir):
 
 def _cleanup(tensorboard, gpu_thread):
 
-    print("Running cleanup... ")
+    print("Cleaning up... ")
 
     # Kill running TB
     try:

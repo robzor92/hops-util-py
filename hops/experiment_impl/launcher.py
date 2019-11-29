@@ -141,14 +141,14 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
                 print(gpu_str)
                 print('-------------------------------------------------------')
-                print('Started running task ' + param_string + '\n')
+                print('Started running task ' + param_string)
                 task_start = time.time()
                 retval = map_fun(*args)
                 task_end = time.time()
                 if retval is not None:
                     experiment_utils._handle_return_simple(retval, hdfs_exec_logdir)
                 time_str = 'Finished task ' + param_string + ' - took ' + experiment_utils._time_diff(task_start, task_end)
-                print('\n' + time_str)
+                print(time_str)
                 print('-------------------------------------------------------')
             else:
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_exec_logdir, executor_num, local_logdir=local_logdir)
@@ -156,14 +156,14 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
                 print(gpu_str)
                 print('-------------------------------------------------------')
-                print('Started running task\n')
+                print('Started running task')
                 task_start = time.time()
                 retval = map_fun()
                 task_end = time.time()
                 if retval is not None:
                     experiment_utils._handle_return_simple(retval, hdfs_exec_logdir)
                 time_str = 'Finished task - took ' + experiment_utils._time_diff(task_start, task_end)
-                print('\n' + time_str)
+                print(time_str)
                 print('-------------------------------------------------------')
         except:
             raise

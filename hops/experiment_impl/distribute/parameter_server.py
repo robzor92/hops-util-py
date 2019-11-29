@@ -155,7 +155,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
             print(gpu_str)
             print('-------------------------------------------------------')
-            print('Started running task \n')
+            print('Started running task')
             task_start = time.time()
 
             retval=None
@@ -171,7 +171,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
 
             task_end = time.time()
             time_str = 'Finished task - took ' + experiment_utils._time_diff(task_start, task_end)
-            print('\n' + time_str)
+            print(time_str)
             print('-------------------------------------------------------')
         except:
             raise

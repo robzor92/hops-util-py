@@ -662,7 +662,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
                 print(gpu_str)
                 print('-------------------------------------------------------')
-                print('Started running task ' + param_string + '\n')
+                print('Started running task ' + param_string)
                 if val is not None:
                     val = json.loads(val)
                 task_start = time.time()
@@ -670,7 +670,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
                     val = map_fun(*args)
                 task_end = time.time()
                 time_str = 'Finished task ' + param_string + ' - took ' + experiment_utils._time_diff(task_start, task_end)
-                print('\n' + time_str)
+                print(time_str)
                 experiment_utils._handle_return(val, hdfs_exec_logdir, opt_key)
                 print('Returning metric ' + str(val))
                 print('-------------------------------------------------------')
