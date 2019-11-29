@@ -194,8 +194,11 @@ def _handle_return_simple(retval, hdfs_exec_logdir):
     Returns:
 
     """
-
+    return_file = hdfs_exec_logdir + '/.return.json'
+    
     if not retval:
+        retval['log'] = hdfs_exec_logdir.replace(hdfs.project_path(), '') + '/output.log'
+        hdfs.dump(json.dumps(retval), return_file)
         return
 
     _upload_file_output(retval, hdfs_exec_logdir)
@@ -209,7 +212,6 @@ def _handle_return_simple(retval, hdfs_exec_logdir):
 
     retval['log'] = hdfs_exec_logdir.replace(hdfs.project_path(), '') + '/output.log'
 
-    return_file = hdfs_exec_logdir + '/.return.json'
     for key in retval.keys():
         retval[key] = _cast_number_to_string(retval[key])
 
