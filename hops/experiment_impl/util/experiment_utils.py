@@ -198,8 +198,9 @@ def _handle_return_simple(retval, hdfs_exec_logdir, logfile):
     return_file = hdfs_exec_logdir + '/.return.json'
     
     if not retval:
-        retval = {'log': logfile}
-        hdfs.dump(json.dumps(retval), return_file)
+        if logfile is not None:
+            retval = {'log': logfile}
+            hdfs.dump(json.dumps(retval), return_file)
         return
 
     _upload_file_output(retval, hdfs_exec_logdir)
