@@ -196,7 +196,7 @@ def _handle_return_simple(retval, hdfs_exec_logdir):
     return_file = hdfs_exec_logdir + '/.return.json'
     
     if not retval:
-        retval['log'] = hdfs_exec_logdir.replace(hdfs.project_path(), '') + '/output.log'
+        retval = {'log': hdfs_exec_logdir.replace(hdfs.project_path(), '') + '/output.log'}
         hdfs.dump(json.dumps(retval), return_file)
         return
 
