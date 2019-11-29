@@ -53,6 +53,8 @@ def _init_logger(exec_logdir, role=None, index=None):
     # override the builtin print
     __builtin__.print = experiment_print
 
+    return logfile.replace(hdfs.project_path(), '')
+
 def log(log_entry):
     """
     Logs a string to the log file
@@ -183,7 +185,7 @@ def _upload_file_output(retval, hdfs_exec_logdir):
                 else:
                     raise Exception('Could not find file or directory on path ' + str(value))
 
-def _handle_return_simple(retval, hdfs_exec_logdir):
+def _handle_return_simple(retval, hdfs_exec_logdir, logfile):
     """
 
     Args:
@@ -196,7 +198,7 @@ def _handle_return_simple(retval, hdfs_exec_logdir):
     return_file = hdfs_exec_logdir + '/.return.json'
     
     if not retval:
-        retval = {'log': hdfs_exec_logdir.replace(hdfs.project_path(), '') + '/output.log'}
+        retval = {'log': logfile}
         hdfs.dump(json.dumps(retval), return_file)
         return
 

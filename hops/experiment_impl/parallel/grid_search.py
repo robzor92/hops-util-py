@@ -128,16 +128,15 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir, optimization
                     argIndex += 1
                 param_string = param_string[:-1]
                 hdfs_exec_logdir, hdfs_appid_logdir = experiment_utils._create_experiment_subdirectories(app_id, run_id, param_string, 'grid_search')
-                experiment_utils._init_logger(hdfs_exec_logdir)
+                logfile = experiment_utils._init_logger(hdfs_exec_logdir)
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)
-
                 print(devices._get_gpu_info())
                 print('-------------------------------------------------------')
                 print('Started running task ' + param_string)
                 task_start = time.time()
                 retval = map_fun(*args)
                 task_end = time.time()
-                experiment_utils._handle_return(retval, hdfs_exec_logdir, optimization_key)
+                experiment_utils._handle_return(retval, hdfs_exec_logdir, optimization_key, logfile)
                 time_str = 'Finished task ' + param_string + ' - took ' + experiment_utils._time_diff(task_start, task_end)
                 print(time_str)
                 print('Returning metric ' + str(retval))

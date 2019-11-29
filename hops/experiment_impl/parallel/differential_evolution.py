@@ -657,7 +657,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
 
                 val = _get_return_file(param_string, app_id, generation_id, run_id)
                 hdfs_exec_logdir, hdfs_appid_logdir = experiment_utils._create_experiment_subdirectories(app_id, run_id, param_string, 'differential_evolution', sub_type='generation.' + str(generation_id))
-                experiment_utils._init_logger(hdfs_exec_logdir)
+                logfile = experiment_utils._init_logger(hdfs_exec_logdir)
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir_bool)
                 print(devices._get_gpu_info())
                 print('-------------------------------------------------------')
@@ -670,7 +670,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
                 task_end = time.time()
                 time_str = 'Finished task ' + param_string + ' - took ' + experiment_utils._time_diff(task_start, task_end)
                 print(time_str)
-                experiment_utils._handle_return(val, hdfs_exec_logdir, opt_key)
+                experiment_utils._handle_return(val, hdfs_exec_logdir, opt_key, logfile)
                 print('Returning metric ' + str(val))
                 print('-------------------------------------------------------')
         except:
