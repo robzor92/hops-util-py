@@ -60,12 +60,12 @@ def log(log_entry):
     """
     global logger_fd
     if logger_fd:
-    try:
-        log_entry = str(log_entry)
-        logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(), string) + '\n').encode())
-    except:
-        logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(),
-                                    'ERROR! Attempting to write a non-string object to logfile') + '\n').encode())
+        try:
+            log_entry = str(log_entry)
+            logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(), string) + '\n').encode())
+        except:
+            logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(),
+                                        'ERROR! Attempting to write a non-string object to logfile') + '\n').encode())
 
 def _close_logger():
     """
