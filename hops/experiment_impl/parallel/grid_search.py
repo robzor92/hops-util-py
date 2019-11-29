@@ -131,8 +131,7 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir, optimization
                 experiment_utils._init_logger(hdfs_exec_logdir)
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)
 
-                gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
-                print(gpu_str)
+                print(devices._get_gpu_info())
                 print('-------------------------------------------------------')
                 print('Started running task ' + param_string)
                 task_start = time.time()
