@@ -234,7 +234,7 @@ def _cleanup(tensorboard, gpu_thread):
         if tensorboard.endpoint and handle.exists(tensorboard.endpoint):
             handle.delete(tensorboard.endpoint)
     except Exception as err:
-        print('Exception occurred while deleting tensorboard endpoint file: {}'.(err))
+        print('Exception occurred while deleting tensorboard endpoint file: {}'.format(err))
         pass
     finally:
         tensorboard._reset_global()
@@ -243,7 +243,7 @@ def _cleanup(tensorboard, gpu_thread):
     try:
         _close_logger()
     except Exception as err:
-        print('Exception occurred while closing logger: {}'.(err))
+        print('Exception occurred while closing logger: {}'.format(err))
         pass
 
 def _store_local_tensorboard(local_tb_path, hdfs_exec_logdir):
