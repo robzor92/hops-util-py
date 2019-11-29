@@ -34,7 +34,7 @@ def _init_logger(exec_logdir, role=None, index=None):
         prefix = str(role) + '_' + str(index) + '_'
 
     logfile = exec_logdir + '/' + prefix + 'output.log'
-    fs_handle = get_fs()
+    fs_handle = hdfs.get_fs()
     global logger_fd
     try:
         logger_fd = fs_handle.open_file(logfile, mode='w')
