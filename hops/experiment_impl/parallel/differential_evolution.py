@@ -657,7 +657,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
 
                 val = _get_return_file(param_string, app_id, generation_id, run_id)
                 hdfs_exec_logdir, hdfs_appid_logdir = experiment_utils._create_experiment_subdirectories(app_id, run_id, param_string, 'differential_evolution', sub_type='generation.' + str(generation_id))
-                hdfs._init_logger(hdfs_exec_logdir)
+                experiment_utils._init_logger(hdfs_exec_logdir)
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir_bool)
                 gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
                 print(gpu_str)

@@ -30,55 +30,6 @@ from xml.dom import minidom
 tls_enabled = None
 webhdfs_address = None
 
-logger_fd = None
-
-def _init_logger(exec_logdir, role=None, index=None):
-    """
-    Initialize the logger by opening the log file and pointing the global fd to the open file
-    """
-    prefix = ''
-    if role != None and index != None:
-        prefix = str(role) + '_' + str(index) + '_'
-
-    logfile = exec_logdir + '/' + prefix + 'logfile.txt'
-    fs_handle = get_fs()
-    global logger_fd
-    try:
-        logger_fd = fs_handle.open_file(logfile, mode='w')
-    except:
-        logger_fd = fs_handle.open_file(logfile, flags='w')
-
-    log('Started running task')
-
-
-def log(string):
-    """
-    Logs a string to the log file
-    Args:
-        :string: string to log
-    """
-    global logger_fd
-    if logger_fd:
-        if isinstance(string, string_types):
-            logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(), string) + '\n').encode())
-        else:
-            logger_fd.write(('{0}: {1}'.format(datetime.datetime.now().isoformat(),
-                                        'ERROR! Attempting to write a non-string object to logfile') + '\n').encode())
-
-
-def _kill_logger():
-    """
-    Closes the logfile
-    """
-    global logger_fd
-    if logger_fd:
-        try:
-            log('Finished running task')
-            logger_fd.flush()
-            logger_fd.close()
-        except:
-            pass
-
 def get_plain_path(abs_path):
     """
     Convert absolute HDFS/HOPSFS path to plain path (dropping prefix and ip)

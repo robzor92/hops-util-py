@@ -140,7 +140,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, evaluator,
                 logdir = experiment_utils._get_logdir(app_id, run_id)
                 tensorboard.events_logdir = logdir
 
-            hdfs._init_logger(experiment_utils._get_logdir(app_id, run_id), role=cluster["task"]["type"], index=cluster["task"]["index"])
+            experiment_utils._init_logger(experiment_utils._get_logdir(app_id, run_id), role=cluster["task"]["type"], index=cluster["task"]["index"])
 
             gpu_str = '\nChecking for GPUs in the environment' + devices._get_gpu_info()
 

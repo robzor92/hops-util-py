@@ -143,7 +143,7 @@ def _prepare_func(app_id, run_id, map_fun, local_logdir, server_addr, num_ps, ev
             print('TF_CONFIG: {} '.format(cluster_spec))
             os.environ["TF_CONFIG"] = json.dumps(cluster_spec)
 
-            hdfs._init_logger(experiment_utils._get_logdir(app_id, run_id), role=role, index=cluster_spec["task"]["index"])
+            experiment_utils._init_logger(experiment_utils._get_logdir(app_id, run_id), role=role, index=cluster_spec["task"]["index"])
 
             if role == "chief":
                 logdir = experiment_utils._get_logdir(app_id, run_id)
