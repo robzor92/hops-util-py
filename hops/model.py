@@ -12,6 +12,7 @@ import sys
 import os
 import time
 import six
+from six import string_types
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.SecurityWarning)
@@ -302,7 +303,7 @@ def _validate_metadata(metrics):
     assert type(metrics) is dict, 'provided metrics is not in a dict'
     for metric in metrics:
         try:
-            assert isinstance(metric, six.string_types), "metrics key {} is not a string".format(str(metric))
+            assert isinstance(metric, string_types), "metrics key {} is not a string".format(str(metric))
             experiment_utils._validate_optimization_value(metrics[metric])
         except ValueError:
             raise AssertionError("{} is not a number, only numbers can be attached as metadata for models.".format(str(metrics[metric])))
