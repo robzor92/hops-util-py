@@ -143,7 +143,7 @@ def _expand_path(hdfs_path, project="", exists=True):
     Returns:
         path expanded with HDFS and project
     """
-    if not isinstance(string, string_types):
+    if not isinstance(hdfs_path, string_types):
         hdfs_path = hdfs_path.decode()
     if project == "":
         project = project_name()
