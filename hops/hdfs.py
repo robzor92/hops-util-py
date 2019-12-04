@@ -4,7 +4,7 @@ API for interacting with the file system on Hops (HopsFS).
 It is a wrapper around pydoop together with utility functions that are Hops-specific.
 """
 import socket
-
+from six import string_types
 import shutil
 import fnmatch
 import os
@@ -143,6 +143,8 @@ def _expand_path(hdfs_path, project="", exists=True):
     Returns:
         path expanded with HDFS and project
     """
+    if not isinstance(string, string_types):
+        hdfs_path = hdfs_path.decode()
     if project == "":
         project = project_name()
     # Check if a full path is supplied. If not, assume it is a relative path for this project - then build its full path and return it.
