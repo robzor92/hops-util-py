@@ -215,8 +215,17 @@ def export(model_path, model_name, model_version=None, overwrite=False, metrics=
 
     print("Exported model " + model_name + " as version " + str(model_version) + " successfully.")
 
+    jobName=None
+    if constants.ENV_VARIABLES.JOB_NAME_ENV_VAR in os.environ:
+        jobName = os.environ[constants.ENV_VARIABLES.JOB_NAME_ENV_VAR]
+
+    kernelId=None
+    if constants.ENV_VARIABLES.KERNEL_ID_ENV_VAR in os.environ:
+        kernelId = os.environ[constants.ENV_VARIABLES.KERNEL_ID_ENV_VAR]
+
     # Attach modelName_modelVersion to experiment directory
-    model_summary = {'name': model_name, 'version': model_version, 'metrics': experiment_utils._cast_keys_to_string(metrics), 'experimentId': None, 'description': description}
+    model_summary = {'name': model_name, 'version': model_version, 'metrics': experiment_utils._cast_keys_to_string(metrics),
+    'experimentId': None, 'description': description, 'jobName': jobName, 'kernelId': kernelId}
     if 'ML_ID' in os.environ:
         # Attach link from experiment to model
         experiment_utils._attach_model_link_xattr(os.environ['ML_ID'], model_name + '_' + str(model_version), 'CREATE')
