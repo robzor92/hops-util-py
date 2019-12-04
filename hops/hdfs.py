@@ -143,7 +143,6 @@ def _expand_path(hdfs_path, project="", exists=True):
     Returns:
         path expanded with HDFS and project
     """
-    hdfs_path = hdfs_path.decode()
     if project == "":
         project = project_name()
     # Check if a full path is supplied. If not, assume it is a relative path for this project - then build its full path and return it.
