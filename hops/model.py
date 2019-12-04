@@ -150,6 +150,9 @@ def export(model_path, model_name, model_version=None, overwrite=False, metrics=
 
     # Make sure model name is a string, users could supply numbers
     model_name = str(model_name)
+    
+    if not isinstance(model_path, string_types):
+        model_path = model_path.decode()
 
     if not description:
         description = 'A collection of models for ' + model_name
