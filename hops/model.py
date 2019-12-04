@@ -150,7 +150,7 @@ def export(model_path, model_name, model_version=None, overwrite=False, metrics=
 
     # Make sure model name is a string, users could supply numbers
     model_name = str(model_name)
-    
+
     if not isinstance(model_path, string_types):
         model_path = model_path.decode()
 
@@ -165,7 +165,7 @@ def export(model_path, model_name, model_version=None, overwrite=False, metrics=
         raise ValueError("the provided model_path: {} , does not exist in HDFS or on the local filesystem".format(
             model_path))
 
-    # parameters and metrics need to be dict, also no keys can be shared between them
+    # make sure metrics are numbers
     if metrics:
         _validate_metadata(metrics)
 
