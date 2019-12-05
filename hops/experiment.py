@@ -21,7 +21,7 @@ from hops.experiment_impl.parallel import differential_evolution as diff_evo_imp
     random_search as r_search_impl
 from hops.experiment_impl.util import experiment_utils
 from hops.experiment_impl.distribute import allreduce as allreduce_impl, parameter_server as ps_impl, mirrored as mirrored_impl
-from hops import util, tensorboard
+from hops import util, tensorboard, hdfs
 
 import time
 import atexit
