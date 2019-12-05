@@ -32,7 +32,7 @@ app_id = None
 experiment_json = None
 running = False
 
-def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versioned_resources=None, description=None, metric_key=None):
+def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, description=None, metric_key=None):
     """
 
     *Experiment* or *Parallel Experiment*
@@ -71,7 +71,6 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
         :args_dict: If specified will run the same function multiple times with different arguments, {'a':[1,2], 'b':[5,3]} would run the function two times with arguments (1,5) and (2,3) provided that the function signature contains two arguments like *def func(a,b):*
         :name: name of the experiment
         :local_logdir: True if *tensorboard.logdir()* should be in the local filesystem, otherwise it is in HDFS
-        :versioned_resources: A list of HDFS paths of resources to version with this experiment
         :description: A longer description for the experiment
         :metric_key: If returning a dict with multiple return values, this key should match the name of the key in the dict for the metric you want to associate with the experiment
 
@@ -97,13 +96,13 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
 
         _start_run()
 
-        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
+        hdfs.mkdir(experiment_utils._get_logdir(app_id, run_id))
 
         experiment_json = None
         if args_dict:
-            experiment_json = experiment_utils._populate_experiment(name, 'launch', 'EXPERIMENT', json.dumps(args_dict), versioned_path, description, app_id, None, None)
+            experiment_json = experiment_utils._populate_experiment(name, 'launch', 'EXPERIMENT', json.dumps(args_dict), description, app_id, None, None)
         else:
-            experiment_json = experiment_utils._populate_experiment(name, 'launch', 'EXPERIMENT', None, versioned_path, description, app_id, None, None)
+            experiment_json = experiment_utils._populate_experiment(name, 'launch', 'EXPERIMENT', None, description, app_id, None, None)
 
         experiment_json = experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
@@ -120,7 +119,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, versione
     finally:
         _end_run(sc)
 
-def random_search(map_fun, boundary_dict, direction=Direction.MAX, samples=10, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key='metric'):
+def random_search(map_fun, boundary_dict, direction=Direction.MAX, samples=10, name='no-name', local_logdir=False, description=None, optimization_key='metric'):
     """
 
     *Parallel Experiment*
@@ -166,7 +165,6 @@ def random_search(map_fun, boundary_dict, direction=Direction.MAX, samples=10, n
         :samples: the number of random samples to evaluate for each hyperparameter given the boundaries, for example samples=3 would result in 3 hyperparameter combinations in total to evaluate
         :name: name of the experiment
         :local_logdir: True if *tensorboard.logdir()* should be in the local filesystem, otherwise it is in HDFS
-        :versioned_resources: A list of HDFS paths of resources to version with this experiment
         :description: A longer description for the experiment
         :optimization_key: When returning a dict, the key name of the metric to maximize or minimize in the dict should be set as this value
 
@@ -192,11 +190,9 @@ def random_search(map_fun, boundary_dict, direction=Direction.MAX, samples=10, n
 
         _start_run()
 
-        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
+        hdfs.mkdir(experiment_utils._get_logdir(app_id, run_id))
 
-        experiment_json = experiment_utils._populate_experiment(name, 'random_search', 'PARALLEL_EXPERIMENTS', json.dumps(boundary_dict), versioned_path, description, app_id, direction, optimization_key)
-
-        experiment_utils._version_resources(versioned_resources, experiment_utils._get_logdir(app_id, run_id))
+        experiment_json = experiment_utils._populate_experiment(name, 'random_search', 'PARALLEL_EXPERIMENTS', json.dumps(boundary_dict), description, app_id, direction, optimization_key)
 
         experiment_json = experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
@@ -214,7 +210,7 @@ def random_search(map_fun, boundary_dict, direction=Direction.MAX, samples=10, n
     finally:
         _end_run(sc)
 
-def differential_evolution(objective_function, boundary_dict, direction = Direction.MAX, generations=4, population=6, mutation=0.5, crossover=0.7, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key='metric'):
+def differential_evolution(objective_function, boundary_dict, direction = Direction.MAX, generations=4, population=6, mutation=0.5, crossover=0.7, name='no-name', local_logdir=False, description=None, optimization_key='metric'):
     """
     *Parallel Experiment*
 
@@ -259,7 +255,6 @@ def differential_evolution(objective_function, boundary_dict, direction = Direct
         :crossover: how fast to adapt the population to the best in each generation
         :name: name of the experiment
         :local_logdir: True if *tensorboard.logdir()* should be in the local filesystem, otherwise it is in HDFS
-        :versioned_resources: A list of HDFS paths of resources to version with this experiment
         :description: a longer description for the experiment
         :optimization_key: When returning a dict, the key name of the metric to maximize or minimize in the dict should be set as this value
 
@@ -287,9 +282,9 @@ def differential_evolution(objective_function, boundary_dict, direction = Direct
 
         diff_evo_impl.run_id = run_id
 
-        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
+        hdfs.mkdir(experiment_utils._get_logdir(app_id, run_id))
 
-        experiment_json = experiment_utils._populate_experiment(name, 'differential_evolution', 'PARALLEL_EXPERIMENTS', json.dumps(boundary_dict), versioned_path, description, app_id, direction, optimization_key)
+        experiment_json = experiment_utils._populate_experiment(name, 'differential_evolution', 'PARALLEL_EXPERIMENTS', json.dumps(boundary_dict), description, app_id, direction, optimization_key)
 
         experiment_json = experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
@@ -308,7 +303,7 @@ def differential_evolution(objective_function, boundary_dict, direction = Direct
     finally:
         _end_run(sc)
 
-def grid_search(map_fun, grid_dict, direction=Direction.MAX, name='no-name', local_logdir=False, versioned_resources=None, description=None, optimization_key='metric'):
+def grid_search(map_fun, grid_dict, direction=Direction.MAX, name='no-name', local_logdir=False, description=None, optimization_key='metric'):
     """
     *Parallel Experiment*
 
@@ -351,7 +346,6 @@ def grid_search(map_fun, grid_dict, direction=Direction.MAX, name='no-name', loc
         :direction: Direction.MAX to maximize the returned metric, Direction.MIN to minize the returned metric
         :name: name of the experiment
         :local_logdir: True if *tensorboard.logdir()* should be in the local filesystem, otherwise it is in HDFS
-        :versioned_resources: A list of HDFS paths of resources to version with this experiment
         :description: a longer description for the experiment
         :optimization_key: When returning a dict, the key name of the metric to maximize or minimize in the dict should be set as this value
 
@@ -377,9 +371,9 @@ def grid_search(map_fun, grid_dict, direction=Direction.MAX, name='no-name', loc
 
         _start_run()
 
-        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
+        hdfs.mkdir(experiment_utils._get_logdir(app_id, run_id))
 
-        experiment_json = experiment_utils._populate_experiment(name, 'grid_search', 'PARALLEL_EXPERIMENTS', json.dumps(grid_dict), versioned_path, description, app_id, direction, optimization_key)
+        experiment_json = experiment_utils._populate_experiment(name, 'grid_search', 'PARALLEL_EXPERIMENTS', json.dumps(grid_dict), description, app_id, direction, optimization_key)
 
         experiment_json = experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
@@ -399,7 +393,7 @@ def grid_search(map_fun, grid_dict, direction=Direction.MAX, name='no-name', loc
     finally:
         _end_run(sc)
 
-def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
+def collective_all_reduce(map_fun, name='no-name', local_logdir=False, description=None, evaluator=False):
     """
     *Distributed Training*
 
@@ -424,7 +418,6 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
         :map_fun: the function containing code to run CollectiveAllReduceStrategy
         :name: the name of the experiment
         :local_logdir: True if *tensorboard.logdir()* should be in the local filesystem, otherwise it is in HDFS
-        :versioned_resources: A list of HDFS paths of resources to version with this experiment
         :description: a longer description for the experiment
         :evaluator: whether to run one of the workers as an evaluator
 
@@ -455,9 +448,9 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
 
         _start_run()
 
-        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
+        hdfs.mkdir(experiment_utils._get_logdir(app_id, run_id))
 
-        experiment_json = experiment_utils._populate_experiment(name, 'collective_all_reduce', 'DISTRIBUTED_TRAINING', None, versioned_path, description, app_id, None, None)
+        experiment_json = experiment_utils._populate_experiment(name, 'collective_all_reduce', 'DISTRIBUTED_TRAINING', None, description, app_id, None, None)
 
         experiment_json = experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
@@ -473,7 +466,7 @@ def collective_all_reduce(map_fun, name='no-name', local_logdir=False, versioned
     finally:
         _end_run(sc)
 
-def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
+def parameter_server(map_fun, name='no-name', local_logdir=False, description=None, evaluator=False):
     """
     *Distributed Training*
 
@@ -498,7 +491,6 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
         :map_fun: contains the code where you are using ParameterServerStrategy.
         :name: name of the experiment
         :local_logdir: True if *tensorboard.logdir()* should be in the local filesystem, otherwise it is in HDFS
-        :versioned_resources: A list of HDFS paths of resources to version with this experiment
         :description: a longer description for the experiment
         :evaluator: whether to run one of the workers as an evaluator
 
@@ -528,9 +520,9 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
 
         _start_run()
 
-        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
+        hdfs.mkdir(experiment_utils._get_logdir(app_id, run_id))
 
-        experiment_json = experiment_utils._populate_experiment(name, 'parameter_server', 'DISTRIBUTED_TRAINING', None, versioned_path, description, app_id, None, None)
+        experiment_json = experiment_utils._populate_experiment(name, 'parameter_server', 'DISTRIBUTED_TRAINING', None, description, app_id, None, None)
 
         experiment_json = experiment_json = experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 
@@ -546,7 +538,7 @@ def parameter_server(map_fun, name='no-name', local_logdir=False, versioned_reso
     finally:
         _end_run(sc)
 
-def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=None, description=None, evaluator=False):
+def mirrored(map_fun, name='no-name', local_logdir=False, description=None, evaluator=False):
     """
     *Distributed Training*
 
@@ -567,7 +559,6 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
         :map_fun: contains the code where you are using MirroredStrategy.
         :name: name of the experiment
         :local_logdir: True if *tensorboard.logdir()* should be in the local filesystem, otherwise it is in HDFS
-        :versioned_resources: A list of HDFS paths of resources to version with this experiment
         :description: a longer description for the experiment
         :evaluator: whether to run one of the workers as an evaluator
 
@@ -597,9 +588,9 @@ def mirrored(map_fun, name='no-name', local_logdir=False, versioned_resources=No
 
         _start_run()
 
-        versioned_path = experiment_utils._setup_experiment(versioned_resources, experiment_utils._get_logdir(app_id, run_id), app_id, run_id)
+        hdfs.mkdir(experiment_utils._get_logdir(app_id, run_id))
 
-        experiment_json = experiment_utils._populate_experiment(name, 'mirrored', 'DISTRIBUTED_TRAINING', None, versioned_path, description, app_id, None, None)
+        experiment_json = experiment_utils._populate_experiment(name, 'mirrored', 'DISTRIBUTED_TRAINING', None, description, app_id, None, None)
 
         experiment_json = experiment_utils._attach_experiment_xattr(app_id, run_id, experiment_json, 'CREATE')
 

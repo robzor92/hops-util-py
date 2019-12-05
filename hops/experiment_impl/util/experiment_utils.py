@@ -535,7 +535,7 @@ def _attach_model_xattr(ml_id, json_data, xattr):
 
     resp = util.send_request('POST', resource_url, data=json_data, headers=headers)
 
-def _populate_experiment(model_name, function, type, hp, versioned_resources, description, app_id, direction, optimization_key):
+def _populate_experiment(model_name, function, type, hp, description, app_id, direction, optimization_key):
     """
     Args:
          :sc:
@@ -544,7 +544,6 @@ def _populate_experiment(model_name, function, type, hp, versioned_resources, de
          :function:
          :logdir:
          :hyperparameter_space:
-         :versioned_resources:
          :description:
 
     Returns:
@@ -564,31 +563,6 @@ def _populate_experiment(model_name, function, type, hp, versioned_resources, de
     return {'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type,
                        'appId': app_id, 'direction': direction, 'optimizationKey': optimization_key, 'jobName': jobName,
                        'kernelId': kernelId}
-
-def _version_resources(versioned_resources, rundir):
-    """
-
-    Args:
-        versioned_resources:
-        rundir:
-
-    Returns:
-
-    """
-    if not versioned_resources:
-        return None
-    pyhdfs_handle = hdfs.get()
-    pyhdfs_handle.create_directory(rundir)
-    endpoint_prefix = hdfs.project_path()
-    versioned_paths = []
-    for hdfs_resource in versioned_resources:
-        if pydoop.hdfs.path.exists(hdfs_resource):
-            pyhdfs_handle.copy(hdfs_resource, pyhdfs_handle, rundir)
-            path, filename = os.path.split(hdfs_resource)
-            versioned_paths.append(rundir.replace(endpoint_prefix, '') + '/' + filename)
-        else:
-            raise Exception('Could not find resource in specified path: ' + hdfs_resource)
-    return ', '.join(versioned_paths)
 
 def grid_params(dict):
     """
@@ -744,11 +718,6 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
     avg = sum(results)/float(len(results))
 
     return max_val, max_hp, min_val, min_hp, avg, max_return_dict, min_return_dict
-
-def _setup_experiment(versioned_resources, logdir, app_id, run_id):
-    versioned_path = _version_resources(versioned_resources, logdir)
-    hdfs.mkdir(_get_logdir(app_id, run_id))
-    return versioned_path
 
 def _finalize_experiment(experiment_json, metric, app_id, run_id, state, duration, logdir, bestLogdir, optimization_key):
 
