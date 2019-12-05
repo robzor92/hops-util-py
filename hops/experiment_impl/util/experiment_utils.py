@@ -477,7 +477,7 @@ def _attach_experiment_xattr(app_id, run_id, json_data, xattr):
                    constants.REST_CONFIG.HOPSWORKS_EXPERIMENTS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    app_id + "_" + str(run_id) + "?xattr=" + xattr
 
-    response = util.send_request('POST', resource_url, data=json_data, headers=headers)
+    response = util.send_request('PUT', resource_url, data=json_data, headers=headers)
 
     response_object = response.json()
     if response.status_code >= 400:
@@ -509,7 +509,7 @@ def _attach_model_link_xattr(ml_id, model, xattr):
                    constants.REST_CONFIG.HOPSWORKS_EXPERIMENTS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    ml_id + "?xattr=" + xattr + "&model=" + model
 
-    resp = util.send_request('POST', resource_url)
+    resp = util.send_request('PUT', resource_url)
 
 def _attach_model_xattr(ml_id, json_data, xattr):
     """
@@ -533,7 +533,7 @@ def _attach_model_xattr(ml_id, json_data, xattr):
                    constants.REST_CONFIG.HOPSWORKS_MODELS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    ml_id + "?xattr=" + xattr
 
-    resp = util.send_request('POST', resource_url, data=json_data, headers=headers)
+    resp = util.send_request('PUT', resource_url, data=json_data, headers=headers)
 
 def _populate_experiment(model_name, function, type, hp, description, app_id, direction, optimization_key):
     """
