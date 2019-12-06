@@ -11,6 +11,7 @@ import json
 import shutil
 import subprocess
 import datetime
+import numpy as np
 
 from hops.exceptions import RestAPIError
 
