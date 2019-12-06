@@ -120,7 +120,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key, logfile):
     retval['log'] = logfile
 
     return_file = hdfs_exec_logdir + '/.outputs.json'
-    hdfs.dump(dumps(retval, default=json_default_numpy), return_file)
+    hdfs.dump(dumps(retval), return_file)
 
     metric_file = hdfs_exec_logdir + '/.metric'
     hdfs.dump(str(opt_val), metric_file)
@@ -178,7 +178,7 @@ def _handle_return_simple(retval, hdfs_exec_logdir, logfile):
     if not retval:
         if logfile is not None:
             retval = {'log': logfile}
-            hdfs.dump(dumps(retval, default=json_default_numpy), return_file)
+            hdfs.dump(dumps(retval), return_file)
         return
 
     _upload_file_output(retval, hdfs_exec_logdir)
@@ -192,7 +192,7 @@ def _handle_return_simple(retval, hdfs_exec_logdir, logfile):
 
     retval['log'] = hdfs_exec_logdir.replace(hdfs.project_path(), '') + '/output.log'
 
-    hdfs.dump(dumps(retval, default=json_default_numpy), return_file)
+    hdfs.dump(dumps(retval), return_file)
 
 def _cleanup(tensorboard, gpu_thread):
 
@@ -270,7 +270,7 @@ def _build_summary_json(logdir):
         output_arr = _convert_return_file_to_arr(return_file)
         combinations.append({'parameters': hp_arr, 'outputs': output_arr})
 
-    return dumps({'combinations': combinations}, default=json_default_numpy)
+    return dumps({'combinations': combinations})
 
 def _get_experiments_dir():
     """
@@ -435,7 +435,7 @@ def _attach_experiment_xattr(app_id, run_id, json_data, xattr):
 
     """
 
-    json_data = dumps(json_data, default=json_default_numpy)
+    json_data = dumps(json_data)
 
     headers = {'Content-type': 'application/json'}
     resource_url = constants.DELIMITERS.SLASH_DELIMITER + \
