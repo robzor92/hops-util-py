@@ -117,10 +117,6 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key, logfile):
         opt_val = _validate_optimization_value(retval)
         retval = {'metric': opt_val}
 
-    # Make sure all digits are strings
-    for key in retval.keys():
-        retval[key] = _cast_number_to_string(retval[key])
-
     retval['log'] = logfile
 
     return_file = hdfs_exec_logdir + '/.return.json'
@@ -141,24 +137,6 @@ def _validate_optimization_value(opt_val):
         except:
             pass
         raise ValueError('Metric to maximize or minimize is not a number: {}'.format(opt_val))
-
-def _cast_number_to_string(val):
-    is_number=False
-    try:
-        int(val)
-        is_number=True
-    except:
-        pass
-    try:
-        float(val)
-        is_number=True
-    except:
-        pass
-
-    if is_number:
-        return str(val)
-    else:
-        return val
 
 def _upload_file_output(retval, hdfs_exec_logdir):
     if type(retval) is dict:
@@ -213,9 +191,6 @@ def _handle_return_simple(retval, hdfs_exec_logdir, logfile):
             pass
 
     retval['log'] = hdfs_exec_logdir.replace(hdfs.project_path(), '') + '/output.log'
-
-    for key in retval.keys():
-        retval[key] = _cast_number_to_string(retval[key])
 
     hdfs.dump(json.dumps(retval), return_file)
 
@@ -296,13 +271,6 @@ def _build_summary_json(logdir):
         combinations.append({'parameters': hp_arr, 'outputs': output_arr})
 
     return json.dumps({'combinations': combinations})
-
-def _cast_keys_to_string(input_dict):
-    if not input_dict:
-        return None
-    for key in input_dict.keys():
-        input_dict[key] = _cast_number_to_string(input_dict[key])
-    return input_dict
 
 def _get_experiments_dir():
     """
@@ -511,7 +479,7 @@ def _attach_model_link_xattr(ml_id, model, xattr):
 
     resp = util.send_request('PUT', resource_url)
 
-def _attach_model_xattr(ml_id, json_data, xattr):
+def _attach_model_xattr(ml_id, json_data):
     """
     Utility method for putting JSON data into elastic search
 
@@ -531,7 +499,7 @@ def _attach_model_xattr(ml_id, json_data, xattr):
                    constants.REST_CONFIG.HOPSWORKS_PROJECT_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    hdfs.project_id() + constants.DELIMITERS.SLASH_DELIMITER + \
                    constants.REST_CONFIG.HOPSWORKS_MODELS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
-                   ml_id + "?xattr=" + xattr
+                   ml_id
 
     resp = util.send_request('PUT', resource_url, data=json_data, headers=headers)
 
