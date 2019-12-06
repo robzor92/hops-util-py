@@ -119,7 +119,7 @@ def _handle_return(retval, hdfs_exec_logdir, optimization_key, logfile):
 
     retval['log'] = logfile
 
-    return_file = hdfs_exec_logdir + '/.return.json'
+    return_file = hdfs_exec_logdir + '/.outputs.json'
     hdfs.dump(dumps(retval, default=json_default_numpy), return_file)
 
     metric_file = hdfs_exec_logdir + '/.metric'
@@ -173,7 +173,7 @@ def _handle_return_simple(retval, hdfs_exec_logdir, logfile):
     Returns:
 
     """
-    return_file = hdfs_exec_logdir + '/.return.json'
+    return_file = hdfs_exec_logdir + '/.outputs.json'
     
     if not retval:
         if logfile is not None:
@@ -259,7 +259,7 @@ def _build_summary_json(logdir):
     for experiment_dir in hdfs.ls(logdir):
         runs = hdfs.ls(experiment_dir, recursive=True)
         for run in runs:
-            if run.endswith('.return.json'):
+            if run.endswith('.outputs.json'):
                 return_files.append(run)
 
     for return_file in return_files:
@@ -649,7 +649,7 @@ def _get_best(args_dict, num_combinations, arg_names, arg_count, hdfs_appid_dir,
 
         param_string = param_string[:-1]
 
-        path_to_return = hdfs_appid_dir + '/' + param_string + '/.return.json'
+        path_to_return = hdfs_appid_dir + '/' + param_string + '/.outputs.json'
 
         assert hdfs.exists(path_to_return), 'Could not find .return file on path: {}'.format(path_to_return)
 

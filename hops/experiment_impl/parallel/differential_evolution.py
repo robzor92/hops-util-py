@@ -695,7 +695,7 @@ def _get_return_file(param_string, app_id, generation_id, run_id):
     handle = hdfs.get()
     for i in range(generation_id):
         possible_result_path = experiment_utils._get_experiments_dir() + '/' + app_id + '_' \
-                               + str(run_id) + '/generation.' + str(i) + '/' + param_string + '/.return.json'
+                               + str(run_id) + '/generation.' + str(i) + '/' + param_string + '/.outputs.json'
         if handle.exists(possible_result_path):
             return_file_contents = hdfs.load(possible_result_path)
             return return_file_contents
@@ -733,13 +733,13 @@ def _get_best(root_logdir, direction):
 
     if direction.upper() == Direction.MAX:
         return_dict = {}
-        with hdfs.open_file(max_logdir + '/.return.json', flags="r") as fi:
+        with hdfs.open_file(max_logdir + '/.outputs.json', flags="r") as fi:
             return_dict = json.loads(fi.read())
             fi.close()
         return max_logdir, return_dict
     else:
         return_dict = {}
-        with hdfs.open_file(min_logdir + '/.return.json', flags="r") as fi:
+        with hdfs.open_file(min_logdir + '/.outputs.json', flags="r") as fi:
             return_dict = json.loads(fi.read())
             fi.close()
         return min_logdir, return_dict

@@ -52,7 +52,7 @@ def _run(sc, map_fun, run_id, local_logdir=False, name="no-name", evaluator=Fals
 
     print('Finished Experiment \n')
 
-    path_to_return = logdir + '/.return.json'
+    path_to_return = logdir + '/.outputs.json'
     if pydoop.hdfs.path.exists(path_to_return):
         with pydoop.hdfs.open(path_to_return, "r") as fi:
             contents = fi.read()
