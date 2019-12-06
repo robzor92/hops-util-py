@@ -224,16 +224,16 @@ def export(model_path, model_name, model_version=None, overwrite=False, metrics=
         kernelId = os.environ[constants.ENV_VARIABLES.KERNEL_ID_ENV_VAR]
 
     # Attach modelName_modelVersion to experiment directory
-    model_summary = {'name': model_name, 'version': model_version, 'metrics': experiment_utils._cast_keys_to_string(metrics),
+    model_summary = {'name': model_name, 'version': model_version, 'metrics': metrics,
     'experimentId': None, 'description': description, 'jobName': jobName, 'kernelId': kernelId}
     if 'ML_ID' in os.environ:
         # Attach link from experiment to model
         experiment_utils._attach_model_link_xattr(os.environ['ML_ID'], model_name + '_' + str(model_version))
         # Attach model metadata to models version folder
         model_summary['experimentId'] = os.environ['ML_ID']
-        experiment_utils._attach_model_xattr(model_name + "_" + str(model_version), json.dumps(model_summary))
+        experiment_utils._attach_model_xattr(model_name + "_" + str(model_version), experiment_utils.dumps(model_summary))
     else:
-        experiment_utils._attach_model_xattr(model_name + "_" + str(model_version), json.dumps(model_summary))
+        experiment_utils._attach_model_xattr(model_name + "_" + str(model_version), experiment_utils.dumps(model_summary))
 
     # Model metadata is attached asynchronously by Epipe, therefore this necessary to ensure following steps in a pipeline will not fail
     if synchronous:
