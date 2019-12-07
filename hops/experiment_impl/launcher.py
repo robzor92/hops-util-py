@@ -7,7 +7,6 @@ from hops import devices, tensorboard, hdfs
 
 import pydoop.hdfs
 import threading
-import six
 import time
 import json
 import os

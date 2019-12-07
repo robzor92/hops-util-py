@@ -265,9 +265,9 @@ def _build_summary_json(logdir):
 
     for return_file in return_files:
         return_file_abs = hdfs.abs_path(return_file)
-        hyperparameter_combination = os.path.split(os.path.dirname(return_file_abs))[1]
+        params_file_abs = os.path.split(os.path.dirname(return_file_abs))[0] + '/hparams.json'
 
-        hp_arr = _convert_param_to_arr(hyperparameter_combination)
+        hp_arr = _convert_param_to_arr(params_file_abs)
         output_arr = _convert_return_file_to_arr(return_file)
         combinations.append({'parameters': hp_arr, 'outputs': output_arr})
 
@@ -364,14 +364,13 @@ def _convert_to_dict(best_param):
 
     return best_param_dict
 
-def _convert_param_to_arr(best_param):
-    param_dict={}
-    if '=' in best_param:
-        best_param = best_param.split('&')
-        for hp in best_param:
-            hp = hp.split('=')
-            param_dict[hp[0]] = hp[1]
-    return param_dict
+def _convert_param_to_arr(params_file):
+    params = hdfs.load(params_file)
+    params_json = json.loads(return_file_contents)
+    params_dict = {}
+    for param_key in params_json:
+        params_dict[param_key] = params_json[param_key]
+    return params_dict
 
 def _convert_return_file_to_arr(return_file_path):
     return_file_contents = hdfs.load(return_file_path)
@@ -383,10 +382,10 @@ def _convert_return_file_to_arr(return_file_path):
     except:
         pass
 
-    metrics_return_file = json.loads(return_file_contents)
+    return_json = json.loads(return_file_contents)
     metric_dict = {}
-    for metric_key in metrics_return_file:
-        metric_dict[metric_key] = metrics_return_file[metric_key]
+    for metric_key in return_json:
+        metric_dict[metric_key] = return_json[metric_key]
     return metric_dict
 
 def _get_ip_address():
