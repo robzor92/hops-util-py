@@ -364,10 +364,7 @@ def _get_params_dict(best_dir):
 
 def _convert_param_to_arr(params_file):
     params = hdfs.load(params_file)
-    params_json = json.loads(return_file_contents)
-    params_dict = {}
-    for param_key in params_json:
-        params_dict[param_key] = params_json[param_key]
+    params_dict = json.loads(params)
     return params_dict
 
 def _convert_return_file_to_arr(return_file_path):
