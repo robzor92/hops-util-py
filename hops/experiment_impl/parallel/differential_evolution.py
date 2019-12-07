@@ -639,7 +639,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
         try:
             #Arguments
             if args_dict:
-                param_string, params = build_parameters(map_fun, executor_num)
+                param_string, params = experiment_utils.build_parameters(map_fun, executor_num)
                 val = _get_return_file(param_string, app_id, generation_id, run_id)
                 hdfs_exec_logdir, hdfs_appid_logdir = experiment_utils._create_experiment_subdirectories(app_id, run_id, param_string, 'differential_evolution', sub_type='generation.' + str(generation_id), params=params)
                 logfile = experiment_utils._init_logger(hdfs_exec_logdir)
