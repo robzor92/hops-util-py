@@ -357,7 +357,7 @@ def _get_params_dict(best_dir):
 
     """
 
-    params = hdfs.load(best_dir + '/hparams.json')
+    params = hdfs.load(best_dir + '/.hparams.json')
     params_json = json.loads(return_file_contents)
 
     return params_json
