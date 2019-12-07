@@ -268,7 +268,7 @@ def _build_summary_json(logdir):
     for return_file in return_files:
         output_arr = _convert_return_file_to_arr(return_file)
         param_file = return_file.replace('outputs.json', 'hparams.json')
-        if hdfs.exists(param_file)
+        if hdfs.exists(param_file):
             hp_arr = _convert_param_to_arr(param_file)
         combinations.append({'parameters': hp_arr, 'outputs': output_arr})
 
