@@ -455,7 +455,7 @@ def _attach_experiment_xattr(app_id, run_id, json_data, xattr):
     else:
         return response_object
 
-def _attach_model_link_xattr(ml_id, model, xattr):
+def _attach_model_link_xattr(ml_id, model):
     """
     Utility method for putting JSON data into elastic search
 
@@ -474,7 +474,7 @@ def _attach_model_link_xattr(ml_id, model, xattr):
                    constants.REST_CONFIG.HOPSWORKS_PROJECT_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    hdfs.project_id() + constants.DELIMITERS.SLASH_DELIMITER + \
                    constants.REST_CONFIG.HOPSWORKS_EXPERIMENTS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
-                   ml_id + "?xattr=" + xattr + "&model=" + model
+                   ml_id + "?model=" + model
 
     resp = util.send_request('PUT', resource_url)
 
