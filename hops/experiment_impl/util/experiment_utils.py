@@ -296,7 +296,7 @@ def _get_logdir(app_id, run_id):
     """
     return _get_experiments_dir() + '/' + str(app_id) + '_' + str(run_id)
 
-def _create_experiment_subdirectories(app_id, run_id, param_string, type, sub_type=None):
+def _create_experiment_subdirectories(app_id, run_id, param_string, type, sub_type=None, params=None):
     """
     Creates directories for an experiment, if Experiments folder exists it will create directories
     below it, otherwise it will create them in the Logs directory.
@@ -307,6 +307,7 @@ def _create_experiment_subdirectories(app_id, run_id, param_string, type, sub_ty
         :param_string: name of the new directory created under parent directories
         :type: type of the new directory parent, e.g differential_evolution
         :sub_type: type of sub directory to parent, e.g generation
+        :params: dict of hyperparameters
 
     Returns:
         The new directories for the yarn-application and for the execution (hdfs_exec_logdir, hdfs_appid_logdir)
@@ -336,6 +337,9 @@ def _create_experiment_subdirectories(app_id, run_id, param_string, type, sub_ty
 
     # create the new directory
     pyhdfs_handle.create_directory(hdfs_exec_logdir)
+
+    return_file = hdfs_exec_logdir + '/.hparams.json'
+    hdfs.dump(dumps(params), return_file)
 
     return hdfs_exec_logdir, hdfs_experiment_dir
 
@@ -774,3 +778,22 @@ def json_default_numpy(obj):
 
 def dumps(data):
     return json.dumps(data, default=json_default_numpy)
+
+def build_parameters(map_fun, executor_num):
+    argcount = six.get_function_code(map_fun).co_argcount
+    names = six.get_function_code(map_fun).co_varnames
+    args = []
+    argIndex = 0
+    param_string = ''
+    params = {}
+    while argcount > 0:
+        #Get args for executor and run function
+        param_name = names[argIndex]
+        param_val = args_dict[param_name][executor_num]
+        param_string += str(param_name) + '=' + str(param_val) + '&'
+        params[param_name] = param_val
+        args.append(param_val)
+        argcount -= 1
+        argIndex += 1
+    param_string = param_string[:-1]
+    return param_string, params

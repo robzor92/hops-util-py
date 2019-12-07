@@ -120,22 +120,8 @@ def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir):
         try:
             #Arguments
             if args_dict:
-                argcount = six.get_function_code(map_fun).co_argcount
-                names = six.get_function_code(map_fun).co_varnames
-
-                args = []
-                argIndex = 0
-                param_string = ''
-                while argcount > 0:
-                    #Get args for executor and run function
-                    param_name = names[argIndex]
-                    param_val = args_dict[param_name][executor_num]
-                    param_string += str(param_name) + '=' + str(param_val) + '&'
-                    args.append(param_val)
-                    argcount -= 1
-                    argIndex += 1
-                param_string = param_string[:-1]
-                hdfs_exec_logdir, hdfs_appid_logdir = experiment_utils._create_experiment_subdirectories(app_id, run_id, param_string, 'grid_search')
+                param_string, params = build_parameters(map_fun, executor_num)
+                hdfs_exec_logdir, hdfs_appid_logdir = experiment_utils._create_experiment_subdirectories(app_id, run_id, param_string, 'grid_search', params=params)
                 experiment_utils._init_logger(hdfs_exec_logdir)
                 tb_hdfs_path, tb_pid = tensorboard._register(hdfs_exec_logdir, hdfs_appid_logdir, executor_num, local_logdir=local_logdir)
                 print(devices._get_gpu_info())
