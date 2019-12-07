@@ -784,7 +784,6 @@ def build_parameters(map_fun, executor_num, args_dict):
     param_string = ''
     params = {}
     while argcount > 0:
-        #Get args for executor and run function
         param_name = names[argIndex]
         param_val = args_dict[param_name][executor_num]
         param_string += str(param_name) + '=' + str(param_val) + '&'
@@ -793,4 +792,4 @@ def build_parameters(map_fun, executor_num, args_dict):
         argcount -= 1
         argIndex += 1
     param_string = param_string[:-1]
-    return param_string, params
+    return param_string, params, args
