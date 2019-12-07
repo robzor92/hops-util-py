@@ -256,6 +256,8 @@ def _build_summary_json(logdir):
 
     combinations = []
     return_files = []
+    hp_arr = None
+    output_arr = None
 
     for experiment_dir in hdfs.ls(logdir):
         runs = hdfs.ls(experiment_dir, recursive=True)
@@ -264,11 +266,10 @@ def _build_summary_json(logdir):
                 return_files.append(run)
 
     for return_file in return_files:
-        return_file_abs = hdfs.abs_path(return_file)
-        params_file_abs = os.path.split(os.path.dirname(return_file_abs))[0] + '/hparams.json'
-
-        hp_arr = _convert_param_to_arr(params_file_abs)
         output_arr = _convert_return_file_to_arr(return_file)
+        param_file = return_file.replace('outputs.json', 'hparams.json')
+        if hdfs.exists(param_file)
+            hp_arr = _convert_param_to_arr(param_file)
         combinations.append({'parameters': hp_arr, 'outputs': output_arr})
 
     return dumps({'combinations': combinations})
