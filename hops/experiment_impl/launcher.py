@@ -10,6 +10,7 @@ import threading
 import time
 import json
 import os
+import six
 
 
 def _run(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-name"):
