@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import datetime
 import numpy as np
+import six
 
 from hops.exceptions import RestAPIError
 
@@ -344,7 +345,7 @@ def _create_experiment_subdirectories(app_id, run_id, param_string, type, sub_ty
 
     return hdfs_exec_logdir, hdfs_experiment_dir
 
-def _convert_to_dict(best_param):
+def _get_params_dict(best_dir):
     """
     Utiliy method for converting best_param string to dict
 
@@ -356,14 +357,10 @@ def _convert_to_dict(best_param):
 
     """
 
+    params = hdfs.load(best_dir + '/hparams.json')
+    params_json = json.loads(return_file_contents)
 
-    best_param_dict={}
-    best_param = best_param.split('&')
-    for hp in best_param:
-        hp = hp.split('=')
-        best_param_dict[hp[0]] = hp[1]
-
-    return best_param_dict
+    return params_json
 
 def _convert_param_to_arr(params_file):
     params = hdfs.load(params_file)
@@ -779,7 +776,7 @@ def json_default_numpy(obj):
 def dumps(data):
     return json.dumps(data, default=json_default_numpy)
 
-def build_parameters(map_fun, executor_num):
+def build_parameters(map_fun, executor_num, args_dict):
     argcount = six.get_function_code(map_fun).co_argcount
     names = six.get_function_code(map_fun).co_varnames
     args = []

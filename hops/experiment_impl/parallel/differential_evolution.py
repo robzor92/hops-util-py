@@ -561,7 +561,7 @@ def _run(function, search_dict, direction = Direction.MAX, generations=4, popula
 
     print('Finished Experiment \n')
 
-    return best_exp_logdir, param_string, best_metric, return_dict
+    return best_exp_logdir, experiment.utils._get_params_dict(best_exp_logdir), best_val, return_dict
 
 def _evolutionary_launch(spark, map_fun, args_dict, name="no-name"):
     """ Run the wrapper function with each hyperparameter combination as specified by the dictionary
@@ -639,7 +639,7 @@ def _prepare_func(app_id, generation_id, map_fun, args_dict, run_id, opt_key):
         try:
             #Arguments
             if args_dict:
-                param_string, params = experiment_utils.build_parameters(map_fun, executor_num)
+                param_string, params = experiment_utils.build_parameters(map_fun, executor_num, args_dict)
                 val = _get_return_file(param_string, app_id, generation_id, run_id)
                 hdfs_exec_logdir, hdfs_appid_logdir = experiment_utils._create_experiment_subdirectories(app_id, run_id, param_string, 'differential_evolution', sub_type='generation.' + str(generation_id), params=params)
                 logfile = experiment_utils._init_logger(hdfs_exec_logdir)

@@ -201,9 +201,7 @@ def random_search(map_fun, boundary_dict, direction=Direction.MAX, samples=10, n
 
         experiment_utils._finalize_experiment(experiment_json, best_metric, app_id, run_id, 'FINISHED', duration, experiment_utils._get_logdir(app_id, run_id), logdir, optimization_key)
 
-        best_param_dict = experiment_utils._convert_to_dict(best_param)
-
-        return logdir, best_param_dict, return_dict
+        return logdir, best_param, return_dict
     except:
         _exception_handler(experiment_utils._seconds_to_milliseconds(time.time() - start))
         raise
@@ -293,9 +291,7 @@ def differential_evolution(objective_function, boundary_dict, direction = Direct
 
         experiment_utils._finalize_experiment(experiment_json, best_metric, app_id, run_id, 'FINISHED', duration, experiment_utils._get_logdir(app_id, run_id), logdir, optimization_key)
 
-        best_param_dict = experiment_utils._convert_to_dict(best_param)
-
-        return logdir, best_param_dict, return_dict
+        return logdir, best_param, return_dict
 
     except:
         _exception_handler(experiment_utils._seconds_to_milliseconds(time.time() - start))
@@ -384,9 +380,7 @@ def grid_search(map_fun, grid_dict, direction=Direction.MAX, name='no-name', loc
 
         experiment_utils._finalize_experiment(experiment_json, best_metric, app_id, run_id, 'FINISHED', duration, experiment_utils._get_logdir(app_id, run_id), logdir, optimization_key)
 
-        best_param_dict = experiment_utils._convert_to_dict(best_param)
-
-        return logdir, best_param_dict, return_dict
+        return logdir, best_param, return_dict
     except:
         _exception_handler(experiment_utils._seconds_to_milliseconds(time.time() - start))
         raise
