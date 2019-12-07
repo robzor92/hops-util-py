@@ -561,7 +561,7 @@ def _run(function, search_dict, direction = Direction.MAX, generations=4, popula
 
     print('Finished Experiment \n')
 
-    return best_exp_logdir, experiment.utils._get_params_dict(best_exp_logdir), best_val, return_dict
+    return best_exp_logdir, experiment_utils._get_params_dict(best_exp_logdir), best_val, return_dict
 
 def _evolutionary_launch(spark, map_fun, args_dict, name="no-name"):
     """ Run the wrapper function with each hyperparameter combination as specified by the dictionary

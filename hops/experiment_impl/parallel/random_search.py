@@ -86,7 +86,7 @@ def _run(sc, map_fun, run_id, args_dict, samples, direction=Direction.MAX, local
 
     best_dir = exp_dir + '/' + param_combination
 
-    return best_dir, experiment.utils._get_params_dict(best_dir), best_val, return_dict
+    return best_dir, experiment_utils._get_params_dict(best_dir), best_val, return_dict
 
 def _remove_duplicates(random_dict, samples):
     hp_names = random_dict.keys()

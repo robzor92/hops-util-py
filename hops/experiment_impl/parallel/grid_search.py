@@ -73,7 +73,7 @@ def _run(sc, map_fun, run_id, args_dict, direction=Direction.MAX, local_logdir=F
 
     best_dir = exp_dir + '/' + param_combination
 
-    return best_dir, experiment.utils._get_params_dict(best_dir), best_val, return_dict
+    return best_dir, experiment_utils._get_params_dict(best_dir), best_val, return_dict
 
 def _prepare_func(app_id, run_id, map_fun, args_dict, local_logdir, optimization_key):
     """
