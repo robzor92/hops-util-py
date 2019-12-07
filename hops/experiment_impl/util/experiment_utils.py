@@ -474,7 +474,7 @@ def _attach_model_link_xattr(ml_id, model):
                    constants.REST_CONFIG.HOPSWORKS_PROJECT_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
                    hdfs.project_id() + constants.DELIMITERS.SLASH_DELIMITER + \
                    constants.REST_CONFIG.HOPSWORKS_EXPERIMENTS_RESOURCE + constants.DELIMITERS.SLASH_DELIMITER + \
-                   ml_id + "?model=" + model
+                   ml_id + "?model=" + model + '&xattr=CREATE'
 
     resp = util.send_request('PUT', resource_url)
 
