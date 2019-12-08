@@ -160,7 +160,7 @@ def _upload_file_output(retval, hdfs_exec_logdir):
                     os.remove(output_file)
                     hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
                     retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  output_file.split('/')[-1]
-                elif value.startswith('Experiments') and hdfs.exists(hdfs.project_path() + '/' + value):
+                elif value.startswith('Experiments') and hdfs.exists(hdfs.project_path() + '/' + value) and not value.endswith('output.log'):
                     hdfs.cp(hdfs.project_path() + '/' + value, hdfs_exec_logdir)
                 else:
                     raise Exception('Could not find file or directory on path ' + str(value))
@@ -789,3 +789,11 @@ def build_parameters(map_fun, executor_num, args_dict):
         argIndex += 1
     param_string = param_string[:-1]
     return param_string, params, args
+
+def print_log_file(logfile):
+    hdfs.open_file(logfile, flags='rt') as fd:
+        try:
+            while fd.available() > 0:
+                print(fd.readline())
+        finally:
+            fd.close()
