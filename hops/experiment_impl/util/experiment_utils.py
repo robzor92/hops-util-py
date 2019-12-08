@@ -789,11 +789,3 @@ def build_parameters(map_fun, executor_num, args_dict):
         argIndex += 1
     param_string = param_string[:-1]
     return param_string, params, args
-
-def print_log_file(logfile):
-    with hdfs.open_file(logfile, flags='rt') as fd:
-        try:
-            while fd.available() > 0:
-                print(fd.readline())
-        finally:
-            fd.close()

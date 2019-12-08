@@ -52,7 +52,6 @@ def _run(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-name"
     # For single run return .return if exists
     if args_dict == None:
         path_to_return = experiment_utils._get_logdir(app_id, run_id) + '/.outputs.json'
-        print_log_file(experiment_utils._get_logdir(app_id, run_id) + '/.output.log')
         if hdfs.exists(path_to_return):
             return_json = hdfs.load(path_to_return)
             return_dict = json.loads(return_json)
@@ -72,7 +71,6 @@ def _run(sc, map_fun, run_id, args_dict=None, local_logdir=False, name="no-name"
             argIndex += 1
         param_string = param_string[:-1]
         path_to_return = experiment_utils._get_logdir(app_id, run_id) + '/' + param_string + '/.outputs.json'
-        print_log_file(experiment_utils._get_logdir(app_id, run_id) + '/' + param_string + '/.output.log')
         if hdfs.exists(path_to_return):
             return_json = hdfs.load(path_to_return)
             return_dict = json.loads(return_json)
