@@ -160,7 +160,9 @@ def _upload_file_output(retval, hdfs_exec_logdir):
                     os.remove(output_file)
                     hdfs_exec_logdir = hdfs.abs_path(hdfs_exec_logdir)
                     retval[metric_key] = hdfs_exec_logdir[len(hdfs.abs_path(hdfs.project_path())):] + '/' +  output_file.split('/')[-1]
-                elif value.startswith('Experiments') and hdfs.exists(hdfs.project_path() + '/' + value) and not value.endswith('output.log'):
+                elif value.startswith('Experiments') and value.endswith('output.log'):
+                    continue
+                elif value.startswith('Experiments') and hdfs.exists(hdfs.project_path() + '/' + value):
                     hdfs.cp(hdfs.project_path() + '/' + value, hdfs_exec_logdir)
                 else:
                     raise Exception('Could not find file or directory on path ' + str(value))
