@@ -528,7 +528,7 @@ def _populate_experiment(model_name, function, type, hp, description, app_id, di
     if model_name == 'no-name' and jobName:
         model_name = jobName
 
-    return {'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type,
+    return {'id': os.environ['ML_ID'], 'name': model_name, 'description': description, 'state': 'RUNNING', 'function': function, 'experimentType': type,
                        'appId': app_id, 'direction': direction, 'optimizationKey': optimization_key, 'jobName': jobName,
                        'kernelId': kernelId}
 
