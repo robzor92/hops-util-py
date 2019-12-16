@@ -699,7 +699,7 @@ def _finalize_experiment(experiment_json, metric, app_id, run_id, state, duratio
     experiment_json['optimizationKey'] = optimization_key
     experiment_json['metric'] = metric
     experiment_json['state'] = state
-    experiment_json['finished'] = experiment_json['started'] + duration
+    experiment_json['duration'] = duration
 
     _attach_experiment_xattr(app_id, run_id, experiment_json, 'REPLACE')
 
