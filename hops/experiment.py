@@ -95,7 +95,7 @@ def launch(map_fun, args_dict=None, name='no-name', local_logdir=False, descript
         app_id = str(sc.applicationId)
 
         _start_run()
-        print('run_id start ' + run_id)
+        print('run_id start ' + str(run_id))
 
         hdfs.mkdir(experiment_utils._get_logdir(app_id, run_id))
 
@@ -648,9 +648,9 @@ def _end_run(sc):
     global app_id
     global run_id
     print('incrementing')
-    print(run_id)
+    print(str(run_id))
     run_id = run_id + 1
-    print(run_id)
+    print(str(run_id))
     running = False
     sc.setJobGroup("", "")
 
