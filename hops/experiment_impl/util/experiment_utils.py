@@ -43,17 +43,6 @@ def _init_logger(exec_logdir, role=None, index=None):
     except:
         logger_fd = fs_handle.open_file(logfile, flags='w')
 
-    # save the builtin print
-    original_print = __builtin__.print
-
-    def experiment_print(*args, **kwargs):
-        """Experiments custom print() function."""
-        log(' '.join(str(x) for x in args))
-        original_print(*args, **kwargs)
-
-    # override the builtin print
-    __builtin__.print = experiment_print
-
     return logfile.replace(hdfs.project_path(), '')
 
 def log(log_entry):
