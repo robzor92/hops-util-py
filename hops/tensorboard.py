@@ -77,10 +77,10 @@ def _register(hdfs_exec_dir, endpoint_dir, exec_num, local_logdir=False):
                 os.makedirs(local_logdir_path)
 
             local_logdir_path = local_logdir_path + '/'
-            tb_proc = subprocess.Popen([pypath, tb_path, "--logdir=%s" % local_logdir_path, "--port=%d" % tb_port, "--host=%s" % "0.0.0.0"],
+            tb_proc = subprocess.Popen([pypath, tb_path, "--logdir=%s" % local_logdir_path, "--port=%d" % tb_port, "--host=%s" % "0.0.0.0", "--path_prefix=/"],
                                        env=tb_env, preexec_fn=util._on_executor_exit('SIGTERM'))
         else:
-            tb_proc = subprocess.Popen([pypath, tb_path, "--logdir=%s" % events_logdir, "--port=%d" % tb_port, "--host=%s" % "0.0.0.0"],
+            tb_proc = subprocess.Popen([pypath, tb_path, "--logdir=%s" % events_logdir, "--port=%d" % tb_port, "--host=%s" % "0.0.0.0", "--path_prefix=/"],
                                    env=tb_env, preexec_fn=util._on_executor_exit('SIGTERM'))
 
         tb_pid = tb_proc.pid
@@ -165,12 +165,12 @@ def _restart_debugging(interactive=True):
     global tb_port
 
     if interactive:
-        tb_proc = subprocess.Popen([pypath, tb_path, "--logdir=%s" % logdir(), "--port=%d" % tb_port, "--debugger_port=%d" % debugger_port, "--host=%s" % "0.0.0.0"],
+        tb_proc = subprocess.Popen([pypath, tb_path, "--logdir=%s" % logdir(), "--port=%d" % tb_port, "--debugger_port=%d" % debugger_port, "--host=%s" % "0.0.0.0", "--path_prefix=/"],
                                    env=tb_env, preexec_fn=util._on_executor_exit('SIGTERM'))
         tb_pid = tb_proc.pid
 
     if not interactive:
-        tb_proc = subprocess.Popen([pypath, tb_path, "--logdir=%s" % logdir(), "--port=%d" % tb_port, "--debugger_data_server_grpc_port=%d" % debugger_port, "--host=%s" % "0.0.0.0"],
+        tb_proc = subprocess.Popen([pypath, tb_path, "--logdir=%s" % logdir(), "--port=%d" % tb_port, "--debugger_data_server_grpc_port=%d" % debugger_port, "--host=%s" % "0.0.0.0", "--path_prefix=/"],
                                    env=tb_env, preexec_fn=util._on_executor_exit('SIGTERM'))
         tb_pid = tb_proc.pid
 
